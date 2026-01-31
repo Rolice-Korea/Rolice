@@ -1,8 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// 색깔 매칭 타일 행동 ScriptableObject
-/// </summary>
 [CreateAssetMenu(fileName = "ColorMatchBehavior", menuName = "Rolice/Behaviors/Color Match")]
 public class RcColorMatchBehaviorSO : RcTileBehaviorSO
 {
@@ -12,6 +9,12 @@ public class RcColorMatchBehaviorSO : RcTileBehaviorSO
     
     [Tooltip("클리어된 타일의 Material")]
     public Material clearedMaterial;
+
+    private void OnEnable()
+    {
+        // 색깔 타일은 항상 클리어 추적이 필요함
+        RequiresClearTracking = true;
+    }
     
     public override ITileBehavior CreateBehavior(GameObject tileObject, RcTileData tileData)
     {
@@ -51,7 +54,11 @@ public class RcColorMatchBehavior : ITileBehavior
     public void OnEnter(RcDicePawn pawn)
     {
         // 이미 클리어된 타일은 다시 체크하지 않음
-        if (isCleared) return;
+        if (isCleared)
+        {
+            Debug.Log($"[ColorMatchBehavior] 이미 클리어된 타일: {tileObject.name}");
+            return;
+        }
         
         // 타일 색깔 가져오기
         var materialDB = RcDataManager.Instance.MaterialDatabase;
@@ -66,9 +73,16 @@ public class RcColorMatchBehavior : ITileBehavior
         // 주사위 바닥 면 색깔과 비교
         ColorType diceBottomColor = pawn.GetBottomColor();
         
+        Debug.Log($"[ColorMatchBehavior] 색깔 비교: 타일={tileColor.Value}, 주사위={diceBottomColor}");
+        
         if (diceBottomColor == tileColor.Value)
         {
+            Debug.Log($"[ColorMatchBehavior] ✓ 색깔 매칭! 타일 클리어 진행");
             ClearTile();
+        }
+        else
+        {
+            Debug.Log($"[ColorMatchBehavior] ✗ 색깔 불일치 (타일: {tileColor.Value} vs 주사위: {diceBottomColor})");
         }
     }
     
@@ -92,7 +106,7 @@ public class RcColorMatchBehavior : ITileBehavior
         // 2. 레벨 매니저에게 클리어 알림
         RcLevelManager.Instance.ClearColorTile(tilePosition);
         
-        Debug.Log($"[ColorMatchBehavior] 타일 클리어: {tileObject.name} at {tilePosition}");
+        Debug.Log($"[ColorMatchBehavior] 타일 클리어 완료: {tileObject.name} at {tilePosition}");
     }
     
     private void ApplyVisualFeedback()
@@ -101,6 +115,7 @@ public class RcColorMatchBehavior : ITileBehavior
         if (settings.clearedMaterial != null && tileRenderer != null)
         {
             tileRenderer.material = settings.clearedMaterial;
+            Debug.Log($"[ColorMatchBehavior] Material 변경 완료");
         }
         
         // 파티클 효과

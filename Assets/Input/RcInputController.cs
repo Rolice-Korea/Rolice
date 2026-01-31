@@ -10,7 +10,11 @@ public class RcInputController : MonoBehaviour
     
     void Update()
     {
-        if (isProcessing)
+        // 입력 처리 중이거나 게임이 끝났으면 입력 무시
+        if (isProcessing) 
+            return;
+        
+        if (RcGameRuleManager.Instance != null && RcGameRuleManager.Instance.IsGameOver)
             return;
         
         // 터치/마우스 시작
@@ -24,6 +28,9 @@ public class RcInputController : MonoBehaviour
         {
             DetectSwipe();
         }
+        
+        // 키보드 입력 (디버그/테스트용)
+        HandleKeyboardInput();
     }
     
     void DetectSwipe()
@@ -50,10 +57,38 @@ public class RcInputController : MonoBehaviour
         }
         
         // Pawn에게 이동 명령
-        pawn.Move(direction);
+        if (pawn != null)
+        {
+            pawn.Move(direction);
+        }
+        else
+        {
+            Debug.LogWarning("[InputController] Pawn이 할당되지 않았습니다!");
+        }
+    }
+
+    void HandleKeyboardInput()
+    {
+        if (pawn == null) return;
+        
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+        {
+            pawn.Move(new Vector2Int(0, 1));
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+        {
+            pawn.Move(new Vector2Int(0, -1));
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        {
+            pawn.Move(Vector2Int.left);
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        {
+            pawn.Move(Vector2Int.right);
+        }
     }
     
-    // Pawn의 애니메이션 시작/끝 시 호출
     public void SetProcessing(bool processing)
     {
         isProcessing = processing;

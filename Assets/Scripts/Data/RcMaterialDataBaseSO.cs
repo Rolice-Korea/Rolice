@@ -49,7 +49,6 @@ public class RcMaterialDataBaseSO : ScriptableObject
             _reverseCache[entry.Material] = entry;
         }
 
-        Debug.Log($"[MaterialDatabase] {_cache.Count} materials loaded");
     }
 
     public Material GetMaterial(ColorType color, MaterialUsageType usage)

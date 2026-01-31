@@ -35,6 +35,7 @@ public class RcDicePawn : MonoBehaviour
 
     private void Start()
     {
+        // 시작 타일에 진입
         tileInteractor.OnEnterTile(movement.GetGridPos());
     }
 
@@ -48,7 +49,15 @@ public class RcDicePawn : MonoBehaviour
 
     public void Move(Vector2Int direction)
     {
-        if (movement.IsMoving()) return;
+        if (movement.IsMoving()) 
+            return;
+
+        // 게임 오버 상태면 이동 불가
+        if (RcGameRuleManager.Instance.IsGameOver)
+        {
+            Debug.Log("[DicePawn] 게임이 종료되어 이동할 수 없습니다");
+            return;
+        }
 
         Vector2Int targetPos = movement.GetGridPos() + direction;
         
@@ -102,16 +111,29 @@ public class RcDicePawn : MonoBehaviour
         
         return true;
     }
-
+    
     private void OnMoveStarted(Vector2Int fromPos)
     {
-        // 현재 타일에서 나가기
         tileInteractor.OnExitTile(fromPos);
     }
-
+    
     private void OnMoveCompleted(Vector2Int toPos)
     {
-        // 새 타일에 진입
+        // 1. 새 타일에 진입
         tileInteractor.OnEnterTile(toPos);
+        
+        // 2. 턴 증가 (중요!)
+        if (RcGameRuleManager.Instance.IsInitialized)
+        {
+            RcGameRuleManager.Instance.IncrementTurn();
+            
+            // 3. 승리 조건 체크
+            // (색깔 타일이 모두 클리어되었는지 확인)
+            RcGameRuleManager.Instance.CheckWinCondition();
+        }
+        else
+        {
+            Debug.LogWarning("[DicePawn] GameRuleManager가 초기화되지 않았습니다!");
+        }
     }
 }

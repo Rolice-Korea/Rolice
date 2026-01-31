@@ -3,10 +3,14 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewLevel", menuName = "Rolice/Level")]
 public class RcLevelDataSO : ScriptableObject
 {
+    [Header("Map Settings")]
     public int Width;
     public int Height;
     
     public RcTileData[] Tiles;
+    
+    [Header("Game Rules")]
+    public LevelRules Rules = new LevelRules();
     
     private void OnValidate()
     {
@@ -30,6 +34,12 @@ public class RcLevelDataSO : ScriptableObject
         }
             
         Tiles = newTiles;
+        
+        // 규칙 검증
+        if (Rules != null)
+        {
+            Rules.Validate();
+        }
     }
     
     public RcTileData GetTile(int x, int y) {

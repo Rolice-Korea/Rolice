@@ -1,49 +1,70 @@
+using System;
 using System.Collections.Generic;
 using Engine;
 using UnityEngine;
 
-/// 레벨의 모든 데이터와 생명주기를 관리하는 중앙 매니저
-/// - 맵 생성을 주도하고 제어
-/// - 런타임 타일 데이터와 GameObject를 함께 관리
-/// - 타일 접근 API 제공
-/// - 게임 로직 (클리어 조건 등) 처리
 public class RcLevelManager : RcSingleton<RcLevelManager>
 {
     private RcLevelDataSO currentLevelData;
-    
     private Dictionary<Vector2Int, RcTileData> runtimeTiles;
-    
     private HashSet<Vector2Int> colorTilesRemaining;
-    
-    // 텔레포트 페어 관리 (pairID -> 타일 위치들)
-    private Dictionary<string, List<Vector2Int>> teleportPairs;
+    private RcTeleportPairManager teleportManager;
     
     public bool IsInitialized { get; private set; }
     
-    public void LoadLevel(RcLevelDataSO levelData, Transform tilesParent = null)
+    public event Action OnLevelCompleted;
+    public event Action<Vector2Int> OnColorTileCleared;
+
+    public LevelLoadResult LoadLevel(RcLevelDataSO levelData, Transform tilesParent = null)
     {
+        // 입력 검증
         if (levelData == null)
+            return LevelLoadResult.CreateFailure("LevelData가 null입니다");
+        
+        if (levelData.Width <= 0 || levelData.Height <= 0)
+            return LevelLoadResult.CreateFailure($"잘못된 맵 크기: {levelData.Width}x{levelData.Height}");
+        
+        try
         {
-            Debug.LogError("[LevelManager] LevelData가 null입니다!");
-            return;
+            ClearLevel();
+            InitializeCollections();
+            currentLevelData = levelData;
+            
+            int tilesCreated = GenerateMap(tilesParent);
+            
+            IsInitialized = true;
+            
+            return LevelLoadResult.CreateSuccess(tilesCreated, colorTilesRemaining.Count);
         }
-        
-        ClearLevel();
-        
-        currentLevelData = levelData;
-        runtimeTiles = new Dictionary<Vector2Int, RcTileData>();
-        colorTilesRemaining = new HashSet<Vector2Int>();
-        teleportPairs = new Dictionary<string, List<Vector2Int>>();
-        
-        GenerateMap(tilesParent);
-        
-        IsInitialized = true;
-        
-        Debug.Log($"[LevelManager] 레벨 로드 완료: {levelData.name} ({levelData.Width}x{levelData.Height})");
+        catch (Exception e)
+        {
+            Debug.LogError($"[LevelManager] 레벨 로드 실패: {e.Message}");
+            ClearLevel();
+            return LevelLoadResult.CreateFailure(e.Message);
+        }
     }
     
-    private void GenerateMap(Transform tilesParent)
+    public void ClearLevel()
     {
+        runtimeTiles?.Clear();
+        colorTilesRemaining?.Clear();
+        teleportManager?.Clear();
+        
+        currentLevelData = null;
+        IsInitialized = false;
+    }
+    
+    private void InitializeCollections()
+    {
+        runtimeTiles = new Dictionary<Vector2Int, RcTileData>();
+        colorTilesRemaining = new HashSet<Vector2Int>();
+        teleportManager = new RcTeleportPairManager();
+    }
+
+    private int GenerateMap(Transform tilesParent)
+    {
+        int tilesCreated = 0;
+        
         for (int y = 0; y < currentLevelData.Height; y++)
         {
             for (int x = 0; x < currentLevelData.Width; x++)
@@ -69,15 +90,23 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
                 }
                 
                 runtimeTile.Setup(tileObj);
+                tilesCreated++;
                 
+                // 3. 타일 행동 초기화
                 InitializeTileBehavior(tileObj, runtimeTile);
                 
-                if (IsColorTile(runtimeTile))
+                // 4. 클리어 추적이 필요한 타일 등록
+                if (RequiresClearTracking(runtimeTile))
                 {
                     colorTilesRemaining.Add(gridPos);
+                    Debug.Log($"[LevelManager] 색깔 타일 등록: {gridPos} (BehaviorSO: {runtimeTile.BehaviorSO.name}, RequiresClearTracking: {runtimeTile.BehaviorSO.RequiresClearTracking})");
                 }
             }
         }
+        
+        Debug.Log($"[LevelManager] === 맵 생성 완료 ===");
+        
+        return tilesCreated;
     }
     
     private void InitializeTileBehavior(GameObject tileObject, RcTileData tileData)
@@ -85,22 +114,14 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
         if (tileData.BehaviorSO == null) return;
         
         ITileBehavior behavior = tileData.GetBehavior(tileObject);
-        
-        if (behavior != null)
-        {
-            Debug.Log($"[LevelManager] 타일 행동 초기화: {tileObject.name} - {tileData.BehaviorSO.name}");
-        }
     }
     
-    private void ClearLevel()
+    private bool RequiresClearTracking(RcTileData tile)
     {
-        runtimeTiles?.Clear();
-        colorTilesRemaining?.Clear();
-        teleportPairs?.Clear();
-        
-        currentLevelData = null;
-        IsInitialized = false;
+        return tile.BehaviorSO != null && tile.BehaviorSO.RequiresClearTracking;
     }
+    
+    // === 타일 접근 API ===
     
     public RcTileData GetRuntimeTile(Vector2Int pos)
     {
@@ -114,77 +135,62 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
     
     public void ClearColorTile(Vector2Int pos)
     {
-        if (!colorTilesRemaining.Remove(pos)) return;
+        if (!colorTilesRemaining.Remove(pos)) 
+            return;
         
-        Debug.Log($"[LevelManager] 색깔 타일 클리어: {pos} (남은 타일: {colorTilesRemaining.Count})");
-            
-        // 클리어 조건 체크
+        Debug.Log($"[LevelManager] 색깔 타일 클리어: {pos}");
+        Debug.Log($"  - 남은 타일: {colorTilesRemaining.Count}개");
+        
+        OnColorTileCleared?.Invoke(pos);
+        
+        // 모든 색깔 타일이 클리어되면 레벨 완료
         if (CheckLevelComplete())
         {
-            OnLevelComplete();
+            HandleLevelComplete();
         }
     }
     
+    /// 레벨 클리어 조건 체크 (모든 색깔 타일이 클리어되었는지)
     public bool CheckLevelComplete()
     {
-        return colorTilesRemaining.Count == 0;
+        bool isComplete = colorTilesRemaining.Count == 0;
+        
+        if (isComplete)
+        {
+            Debug.Log("[LevelManager] ✓ 모든 색깔 타일이 클리어되었습니다!");
+        }
+        
+        return isComplete;
     }
     
-    private void OnLevelComplete()
+    private void HandleLevelComplete()
     {
-        Debug.Log("=== 레벨 클리어! ===");
-        // TODO: 이벤트 발행 또는 승리 UI 표시
-        // RcEventHub.Publish(GameEvent.LevelComplete);
+        OnLevelCompleted?.Invoke();
     }
     
-    private bool IsColorTile(RcTileData tile)
-    {
-        // BehaviorSO가 ColorMatch 타입인지 확인
-        return tile.BehaviorSO is RcColorMatchBehaviorSO;
-    }
-
+    // === 텔레포트 관리 ===
+    
     public void RegisterTeleportPair(string pairID, Vector2Int position)
     {
-        if (string.IsNullOrEmpty(pairID))
-        {
-            Debug.LogWarning("[LevelManager] PairID가 비어있습니다!");
-            return;
-        }
-        
-        if (!teleportPairs.ContainsKey(pairID))
-        {
-            teleportPairs[pairID] = new List<Vector2Int>();
-        }
-        
-        if (!teleportPairs[pairID].Contains(position))
-        {
-            teleportPairs[pairID].Add(position);
-            Debug.Log($"[LevelManager] 텔레포트 페어 등록: {pairID} at {position}");
-        }
+        teleportManager?.Register(pairID, position);
     }
     
-    /// <summary>
-    /// 같은 pairID를 가진 다른 타일의 위치를 찾습니다
-    /// </summary>
     public Vector2Int? FindTeleportPair(string pairID, Vector2Int myPosition)
     {
-        if (!teleportPairs.TryGetValue(pairID, out var positions))
-            return null;
-        
-        // 자기 자신을 제외한 첫 번째 타일 반환
-        foreach (var pos in positions)
-        {
-            if (pos != myPosition)
-                return pos;
-        }
-        
-        return null;
+        return teleportManager?.FindPair(pairID, myPosition);
     }
- 
+    
     public void PrintDebugInfo()
     {
-        Debug.Log($"[LevelManager] 런타임 타일: {runtimeTiles?.Count ?? 0}개");
-        Debug.Log($"[LevelManager] 남은 색깔 타일: {colorTilesRemaining?.Count ?? 0}개");
-        Debug.Log($"[LevelManager] 텔레포트 페어: {teleportPairs?.Count ?? 0}개");
+        Debug.Log("=== LevelManager 상태 ===");
+        Debug.Log($"  - 초기화: {IsInitialized}");
+        Debug.Log($"  - 런타임 타일: {runtimeTiles?.Count ?? 0}개");
+        Debug.Log($"  - 남은 색깔 타일: {colorTilesRemaining?.Count ?? 0}개");
+        Debug.Log($"  - 텔레포트 페어: {teleportManager?.GetPairCount() ?? 0}개");
+    }
+    
+    public int GetRemainingColorTiles()
+    {
+        return colorTilesRemaining?.Count ?? 0;
     }
 }
