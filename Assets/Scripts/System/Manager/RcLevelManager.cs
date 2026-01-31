@@ -2,13 +2,11 @@ using System.Collections.Generic;
 using Engine;
 using UnityEngine;
 
-/// <summary>
 /// 레벨의 모든 데이터와 생명주기를 관리하는 중앙 매니저
 /// - 맵 생성을 주도하고 제어
 /// - 런타임 타일 데이터와 GameObject를 함께 관리
 /// - 타일 접근 API 제공
 /// - 게임 로직 (클리어 조건 등) 처리
-/// </summary>
 public class RcLevelManager : RcSingleton<RcLevelManager>
 {
     private RcLevelDataSO currentLevelData;
@@ -145,13 +143,6 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
         return tile.BehaviorSO is RcColorMatchBehaviorSO;
     }
 
-    // ========================================
-    // 텔레포트 페어 관리
-    // ========================================
-    
-    /// <summary>
-    /// 텔레포트 타일을 페어에 등록합니다
-    /// </summary>
     public void RegisterTeleportPair(string pairID, Vector2Int position)
     {
         if (string.IsNullOrEmpty(pairID))

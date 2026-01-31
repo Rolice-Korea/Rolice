@@ -1,9 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// 간단한 1대1 텔레포트 타일
 /// - pairID가 같은 타일끼리 양방향 텔레포트
-/// </summary>
 [CreateAssetMenu(fileName = "TeleportBehavior", menuName = "Rolice/Behaviors/Teleport")]
 public class RcTeleportBehaviorSO : RcTileBehaviorSO
 {
@@ -30,9 +27,7 @@ public class RcTeleportBehaviorSO : RcTileBehaviorSO
     }
 }
 
-/// <summary>
 /// 텔레포트 타일의 런타임 행동
-/// </summary>
 public class RcTeleportBehavior : ITileBehavior
 {
     private RcTeleportBehaviorSO settings;

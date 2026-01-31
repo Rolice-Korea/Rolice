@@ -19,11 +19,6 @@ public class RcColorMatchBehaviorSO : RcTileBehaviorSO
     }
 }
 
-/// <summary>
-/// 색깔 매칭 타일의 런타임 행동
-/// - 주사위의 바닥 면 색깔과 타일 색깔이 일치하면 클리어
-/// - LevelManager에게 클리어 상태를 알림
-/// </summary>
 public class RcColorMatchBehavior : ITileBehavior
 {
     private RcColorMatchBehaviorSO settings;
@@ -100,9 +95,6 @@ public class RcColorMatchBehavior : ITileBehavior
         Debug.Log($"[ColorMatchBehavior] 타일 클리어: {tileObject.name} at {tilePosition}");
     }
     
-    /// <summary>
-    /// 클리어 시각 효과를 적용합니다
-    /// </summary>
     private void ApplyVisualFeedback()
     {
         // Material 변경
