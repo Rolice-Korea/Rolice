@@ -1,10 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// 게임 초기화를 담당하는 Bootstrap 클래스
-/// - 데이터 매니저 초기화
-/// - 레벨 로드
-/// </summary>
 public class GameBootstrap : MonoBehaviour
 {
     [Header("Data Assets")]
@@ -30,9 +25,6 @@ public class GameBootstrap : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// 데이터 매니저를 초기화합니다
-    /// </summary>
     private void InitializeDataManager()
     {
         if (materialDatabase == null)
@@ -45,9 +37,6 @@ public class GameBootstrap : MonoBehaviour
         Debug.Log("[Bootstrap] 데이터 매니저 초기화 완료");
     }
     
-    /// <summary>
-    /// 시작 레벨을 로드합니다
-    /// </summary>
     private void LoadStartingLevel()
     {
         RcLevelManager.Instance.LoadLevel(startingLevel, tilesParent);

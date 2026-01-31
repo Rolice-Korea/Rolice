@@ -16,7 +16,6 @@ public class RcLevelDataSO : ScriptableObject
         
         RcTileData[] newTiles = new RcTileData[requiredSize];
             
-        // 기존 데이터 보존
         if (Tiles != null)
         {
             for (int i = 0; i < Mathf.Min(Tiles.Length, newTiles.Length); i++)
@@ -25,7 +24,6 @@ public class RcLevelDataSO : ScriptableObject
             }
         }
             
-        // 빈 칸은 새 TileData로 초기화
         for (int i = 0; i < newTiles.Length; i++)
         {
             newTiles[i] ??= new RcTileData { TileID = "" };

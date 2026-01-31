@@ -78,6 +78,38 @@ public class RcDicePawn : MonoBehaviour
         StartCoroutine(RollCo(dir, targetPos));
     }
 
+    /// <summary>
+    /// 텔레포트로 즉시 위치를 이동합니다 (OnEnter 발동 안 함)
+    /// </summary>
+    public void Teleport(Vector2Int targetPos, float duration = 0.5f, Action onComplete = null)
+    {
+        if (isRolling)
+        {
+            Debug.LogWarning("[DicePawn] 이동 중에는 텔레포트할 수 없습니다");
+            return;
+        }
+        
+        // 목표 위치 유효성 검사
+        if (!IsValidTeleportTarget(targetPos))
+        {
+            Debug.LogWarning($"[DicePawn] 텔레포트 대상이 유효하지 않습니다: {targetPos}");
+            onComplete?.Invoke();
+            return;
+        }
+        
+        StartCoroutine(TeleportCo(targetPos, duration, onComplete));
+    }
+
+    /// <summary>
+    /// 순수 위치 이동 (타일 이벤트 없음)
+    /// 텔레포트, 점프 등 강제 이동에 사용
+    /// </summary>
+    private void SetPosition(Vector2Int newPos)
+    {
+        gridPos = newPos;
+        transform.position = new Vector3(newPos.x, 1f, newPos.y);
+    }
+
     // ========================================
     // 이동 검증
     // ========================================
@@ -100,6 +132,14 @@ public class RcDicePawn : MonoBehaviour
             return false;
         
         return true;
+    }
+
+    private bool IsValidTeleportTarget(Vector2Int targetPos)
+    {
+        RcTileData targetTile = LevelManager.GetRuntimeTile(targetPos);
+        
+        // 타일이 존재하고 진입 가능한지만 체크 (텔레포트는 특수 이동)
+        return targetTile != null && !string.IsNullOrEmpty(targetTile.TileID);
     }
 
     // ========================================
@@ -161,10 +201,67 @@ public class RcDicePawn : MonoBehaviour
         modelTransform.localRotation = endRot;
 
         // 새 타일 진입
-        OnEnterTile(targetPos);
 
         isRolling = false;
         inputController?.SetProcessing(false);
+        
+        OnEnterTile(targetPos);
+    }
+
+    private IEnumerator TeleportCo(Vector2Int targetPos, float duration, Action onComplete)
+    {
+        isRolling = true;
+        inputController?.SetProcessing(true);
+
+        // 현재 타일에서 나가기
+        OnExitTile(gridPos);
+
+        // 시작 위치
+        Vector3 startPos = transform.position;
+        Vector3 endPos = new Vector3(targetPos.x, 1f, targetPos.y);
+
+        // 텔레포트 애니메이션 (페이드 아웃 -> 이동 -> 페이드 인)
+        float halfDuration = duration * 0.5f;
+        
+        // Phase 1: 페이드 아웃 (Y축으로 살짝 올라가면서)
+        float t = 0f;
+        Vector3 fadeOutPos = startPos + Vector3.up * 0.5f;
+        while (t < 1f)
+        {
+            t = Mathf.Min(t + Time.deltaTime / halfDuration, 1f);
+            float ease = 1f - Mathf.Pow(1f - t, 2); // Ease out quad
+            
+            transform.position = Vector3.Lerp(startPos, fadeOutPos, ease);
+            
+            yield return null;
+        }
+
+        // 순수 위치 이동 (OnEnter 발동 안 함!)
+        SetPosition(targetPos);
+        transform.position = endPos + Vector3.up * 0.5f;
+
+        // Phase 2: 페이드 인 (Y축으로 내려오면서)
+        t = 0f;
+        Vector3 fadeInStart = endPos + Vector3.up * 0.5f;
+        while (t < 1f)
+        {
+            t = Mathf.Min(t + Time.deltaTime / halfDuration, 1f);
+            float ease = 1f - Mathf.Pow(1f - t, 2); // Ease out quad
+            
+            transform.position = Vector3.Lerp(fadeInStart, endPos, ease);
+            
+            yield return null;
+        }
+
+        // 최종 위치
+        transform.position = endPos;
+
+        // OnEnter 발동 안 함! (텔레포트는 도착지 타일 이벤트 무시)
+
+        isRolling = false;
+        inputController?.SetProcessing(false);
+        
+        onComplete?.Invoke();
     }
 
     // ========================================

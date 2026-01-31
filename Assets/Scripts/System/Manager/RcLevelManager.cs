@@ -17,6 +17,9 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
     
     private HashSet<Vector2Int> colorTilesRemaining;
     
+    // 텔레포트 페어 관리 (pairID -> 타일 위치들)
+    private Dictionary<string, List<Vector2Int>> teleportPairs;
+    
     public bool IsInitialized { get; private set; }
     
     public void LoadLevel(RcLevelDataSO levelData, Transform tilesParent = null)
@@ -32,6 +35,7 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
         currentLevelData = levelData;
         runtimeTiles = new Dictionary<Vector2Int, RcTileData>();
         colorTilesRemaining = new HashSet<Vector2Int>();
+        teleportPairs = new Dictionary<string, List<Vector2Int>>();
         
         GenerateMap(tilesParent);
         
@@ -94,6 +98,7 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
     {
         runtimeTiles?.Clear();
         colorTilesRemaining?.Clear();
+        teleportPairs?.Clear();
         
         currentLevelData = null;
         IsInitialized = false;
@@ -139,10 +144,56 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
         // BehaviorSO가 ColorMatch 타입인지 확인
         return tile.BehaviorSO is RcColorMatchBehaviorSO;
     }
+
+    // ========================================
+    // 텔레포트 페어 관리
+    // ========================================
+    
+    /// <summary>
+    /// 텔레포트 타일을 페어에 등록합니다
+    /// </summary>
+    public void RegisterTeleportPair(string pairID, Vector2Int position)
+    {
+        if (string.IsNullOrEmpty(pairID))
+        {
+            Debug.LogWarning("[LevelManager] PairID가 비어있습니다!");
+            return;
+        }
+        
+        if (!teleportPairs.ContainsKey(pairID))
+        {
+            teleportPairs[pairID] = new List<Vector2Int>();
+        }
+        
+        if (!teleportPairs[pairID].Contains(position))
+        {
+            teleportPairs[pairID].Add(position);
+            Debug.Log($"[LevelManager] 텔레포트 페어 등록: {pairID} at {position}");
+        }
+    }
+    
+    /// <summary>
+    /// 같은 pairID를 가진 다른 타일의 위치를 찾습니다
+    /// </summary>
+    public Vector2Int? FindTeleportPair(string pairID, Vector2Int myPosition)
+    {
+        if (!teleportPairs.TryGetValue(pairID, out var positions))
+            return null;
+        
+        // 자기 자신을 제외한 첫 번째 타일 반환
+        foreach (var pos in positions)
+        {
+            if (pos != myPosition)
+                return pos;
+        }
+        
+        return null;
+    }
  
     public void PrintDebugInfo()
     {
         Debug.Log($"[LevelManager] 런타임 타일: {runtimeTiles?.Count ?? 0}개");
         Debug.Log($"[LevelManager] 남은 색깔 타일: {colorTilesRemaining?.Count ?? 0}개");
+        Debug.Log($"[LevelManager] 텔레포트 페어: {teleportPairs?.Count ?? 0}개");
     }
 }
