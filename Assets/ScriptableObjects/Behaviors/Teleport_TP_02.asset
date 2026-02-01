@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3d189310d7a8544ea7d9d879402b1da, type: 3}
+  m_Name: Teleport_TP_02
+  m_EditorClassIdentifier: 
+  RequiresClearTracking: 0
+  pairID: TP_02
+  teleportOutEffectPrefab: {fileID: 0}
+  teleportInEffectPrefab: {fileID: 0}
+  teleportSound: {fileID: 0}
+  teleportDuration: 0.5

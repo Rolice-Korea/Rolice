@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3d189310d7a8544ea7d9d879402b1da, type: 3}
-  m_Name: TeleportBehavior
+  m_Name: Teleport_TP_03
   m_EditorClassIdentifier: 
-  pairID: TP_01
+  RequiresClearTracking: 0
+  pairID: TP_03
   teleportOutEffectPrefab: {fileID: 0}
   teleportInEffectPrefab: {fileID: 0}
   teleportSound: {fileID: 0}

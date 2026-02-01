@@ -1,11 +1,7 @@
+using System;
 using UnityEngine;
 
-/// <summary>
-/// 게임 초기화 부트스트랩
-/// - 매니저 초기화 순서 관리
-/// - 레벨 로드
-/// - 이벤트 연결
-/// </summary>
+
 public class GameBootstrap : MonoBehaviour
 {
     [Header("Data Assets")]
@@ -15,17 +11,35 @@ public class GameBootstrap : MonoBehaviour
     [SerializeField] private RcLevelDataSO startingLevel;
     [SerializeField] private Transform tilesParent;
     
+    [Header("Temp")]
+    [SerializeField] private RcLevelDataSO tempLevelData;
+    
     private void Awake()
     {
+        GameLoad(startingLevel);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            GameLoad(tempLevelData);
+        }
+    }
+
+    private void GameLoad(RcLevelDataSO levelData)
+    {
+        UnsubscribeEventConnections();
+        
         Debug.Log("=== Game Bootstrap 시작 ===");
         
         // 1. 데이터 매니저 초기화
         InitializeDataManager();
         
         // 2. 시작 레벨 로드
-        if (startingLevel != null)
+        if (levelData != null)
         {
-            LoadStartingLevel();
+            LoadLevel(levelData);
         }
         else
         {
@@ -47,9 +61,7 @@ public class GameBootstrap : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// 데이터 매니저 초기화
-    /// </summary>
+
     private void InitializeDataManager()
     {
         if (materialDatabase == null)
@@ -61,13 +73,10 @@ public class GameBootstrap : MonoBehaviour
         RcDataManager.Instance.Initialize(materialDatabase);
     }
     
-    /// <summary>
-    /// 시작 레벨 로드 및 게임 룰 초기화
-    /// </summary>
-    private void LoadStartingLevel()
+    private void LoadLevel(RcLevelDataSO levelData)
     {
         // 레벨 로드
-        LevelLoadResult result = RcLevelManager.Instance.LoadLevel(startingLevel, tilesParent);
+        LevelLoadResult result = RcLevelManager.Instance.LoadLevel(levelData, tilesParent);
         
         if (!result.Success)
         {
@@ -78,26 +87,21 @@ public class GameBootstrap : MonoBehaviour
         Debug.Log($"[Bootstrap] ✓ 레벨 로드 완료: {startingLevel.name}");
         
         // 게임 룰 매니저 초기화
-        InitializeGameRules();
+        InitializeGameRules(levelData);
     }
     
-    /// <summary>
-    /// 게임 룰 매니저 초기화
-    /// </summary>
-    private void InitializeGameRules()
+
+    private void InitializeGameRules(RcLevelDataSO levelData)
     {
-        if (startingLevel == null || startingLevel.Rules == null)
+        if (levelData == null || levelData.Rules == null)
         {
             Debug.LogWarning("[Bootstrap] LevelRules가 없습니다!");
             return;
         }
         
-        RcGameRuleManager.Instance.Initialize(startingLevel.Rules);
+        RcGameRuleManager.Instance.Initialize(levelData.Rules);
     }
     
-    /// <summary>
-    /// 매니저 간 이벤트 연결
-    /// </summary>
     private void SetupEventConnections()
     {
         // 레벨 완료 → 게임 승리
@@ -107,7 +111,14 @@ public class GameBootstrap : MonoBehaviour
         RcGameRuleManager.Instance.OnGameWin += OnGameWin;
         RcGameRuleManager.Instance.OnGameLose += OnGameLose;
         RcGameRuleManager.Instance.OnTurnChanged += OnTurnChanged;
-        
+    }
+
+    private void UnsubscribeEventConnections()
+    {
+        RcLevelManager.Instance.OnLevelCompleted -= OnLevelCompleted;
+        RcGameRuleManager.Instance.OnGameWin -= OnGameWin;
+        RcGameRuleManager.Instance.OnGameLose -= OnGameLose;
+        RcGameRuleManager.Instance.OnTurnChanged -= OnTurnChanged;
     }
     
     // === 이벤트 핸들러 ===

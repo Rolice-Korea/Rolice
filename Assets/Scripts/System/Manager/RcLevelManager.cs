@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Engine;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class RcLevelManager : RcSingleton<RcLevelManager>
 {
@@ -46,6 +47,12 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
     
     public void ClearLevel()
     {
+        if (runtimeTiles != null)
+        {
+            foreach (var tileData in runtimeTiles.Values)
+                Object.Destroy(tileData.TileObject);
+        }
+        
         runtimeTiles?.Clear();
         colorTilesRemaining?.Clear();
         teleportManager?.Clear();

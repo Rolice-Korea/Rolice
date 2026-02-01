@@ -150,7 +150,6 @@ Transform:
   m_Children:
   - {fileID: 601311150}
   - {fileID: 645333689}
-  - {fileID: 415295205}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &262450466
@@ -320,7 +319,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: -10
   far clip plane: 1000
   field of view: 60
   orthographic: 1
@@ -349,11 +348,11 @@ Transform:
   m_GameObject: {fileID: 415295202}
   serializedVersion: 2
   m_LocalRotation: {x: 0.35355338, y: -0.35355338, z: 0.1464466, w: 0.8535535}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 117827841}
+  m_Father: {fileID: 893243767}
   m_LocalEulerAnglesHint: {x: 45, y: -45, z: 0}
 --- !u!114 &415295206
 MonoBehaviour:
@@ -723,8 +722,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   materialDatabase: {fileID: 11400000, guid: b1ac90be69498904e82a7c8c3933a7f2, type: 2}
-  startingLevel: {fileID: 11400000, guid: 6b527a2e20f8f6b4fbc6e0777ff4f167, type: 2}
+  startingLevel: {fileID: 11400000, guid: 56cb3cf7807f5104b922dcc81054e91f, type: 2}
   tilesParent: {fileID: 688716421}
+  tempLevelData: {fileID: 11400000, guid: 56cb3cf7807f5104b922dcc81054e91f, type: 2}
 --- !u!1 &815347660
 GameObject:
   m_ObjectHideFlags: 0
@@ -976,6 +976,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 415295205}
   - {fileID: 1502208417}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1038,7 +1039,7 @@ MonoBehaviour:
   - {fileID: 815347663}
   - {fileID: 484240739}
   - {fileID: 262450469}
-  initialFaces: 010000000200000003000000040000000500000006000000
+  initialFaces: 010000000300000001000000020000000300000002000000
 --- !u!1 &951998180
 GameObject:
   m_ObjectHideFlags: 0
