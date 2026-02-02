@@ -926,7 +926,7 @@ public class RcLevelEditorWindow : EditorWindow
             newLevel.Tiles[i] = new RcTileData { TileID = "" };
         }
         
-        newLevel.Rules = new LevelRules
+        newLevel.Rules = new RcLevelRules
         {
             HasTurnLimit = true,
             MaxTurns = 15,

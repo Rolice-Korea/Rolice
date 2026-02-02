@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 
-public class GameBootstrap : MonoBehaviour
+public class RcGameBootstrap : MonoBehaviour
 {
     [Header("Data Assets")]
     [SerializeField] private RcMaterialDataBaseSO materialDatabase;
@@ -76,7 +76,7 @@ public class GameBootstrap : MonoBehaviour
     private void LoadLevel(RcLevelDataSO levelData)
     {
         // 레벨 로드
-        LevelLoadResult result = RcLevelManager.Instance.LoadLevel(levelData, tilesParent);
+        RcLevelLoadResult result = RcLevelManager.Instance.LoadLevel(levelData, tilesParent);
         
         if (!result.Success)
         {

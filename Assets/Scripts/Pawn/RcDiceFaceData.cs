@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public struct DiceFaceData
+public struct RcDiceFaceData
 {
     // === 면 인덱스 상수 ===
     public const int TOP = 0, BOTTOM = 1, FRONT = 2, BACK = 3, LEFT = 4, RIGHT = 5;
@@ -15,7 +15,7 @@ public struct DiceFaceData
 
     public ColorType[] faces;
 
-    public DiceFaceData(ColorType[] initialFaces)
+    public RcDiceFaceData(ColorType[] initialFaces)
     {
         if (initialFaces == null || initialFaces.Length != 6)
         {
@@ -28,7 +28,7 @@ public struct DiceFaceData
         }
     }
 
-    public DiceFaceData Rotate(Vector2Int direction)
+    public RcDiceFaceData Rotate(Vector2Int direction)
     {
         int mapIndex = GetMapIndex(direction);
         int[] map = RollMaps[mapIndex];
@@ -39,7 +39,7 @@ public struct DiceFaceData
             newFaces[i] = faces[map[i]];
         }
         
-        return new DiceFaceData(newFaces);
+        return new RcDiceFaceData(newFaces);
     }
 
     public ColorType GetFaceColor(int faceIndex)

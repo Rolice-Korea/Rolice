@@ -5,7 +5,7 @@ using UnityEngine;
 public class RcGameRuleManager : RcSingletonMono<RcGameRuleManager>
 {
     
-    private LevelRules currentRules;
+    private RcLevelRules currentRules;
     
     private int currentTurn;
     private float elapsedTime;
@@ -21,11 +21,11 @@ public class RcGameRuleManager : RcSingletonMono<RcGameRuleManager>
     public float ElapsedTime => elapsedTime;
     public bool IsInitialized => isInitialized;
     
-    public void Initialize(LevelRules rules)
+    public void Initialize(RcLevelRules rules)
     {
         if (rules == null)
         {
-            Debug.LogError("[GameRuleManager] LevelRules가 null입니다!");
+            Debug.LogError("[GameRuleManager] RcLevelRules가 null입니다!");
             return;
         }
         

@@ -5,7 +5,7 @@ using UnityEngine;
 /// - 턴 제한, 시간 제한 등의 조건 설정
 /// - LevelDataSO에 포함되어 Inspector에서 설정
 [Serializable]
-public class LevelRules
+public class RcLevelRules
 {
     [Header("Turn Limit")]
     [Tooltip("턴 제한을 사용할지 여부")]

@@ -8,11 +8,11 @@ public class RcDiceFaceController : MonoBehaviour
     [Header("Initial Face Colors")]
     [SerializeField] private ColorType[] initialFaces = new ColorType[6];
 
-    private DiceFaceData faceData;
+    private RcDiceFaceData faceData;
 
     public void Initialize()
     {
-        faceData = new DiceFaceData(initialFaces);
+        faceData = new RcDiceFaceData(initialFaces);
         UpdateVisuals();
     }
 

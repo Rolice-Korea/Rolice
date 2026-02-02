@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// - 로드된 타일 수
 /// - 경고 메시지 리스트
 
-public class LevelLoadResult
+public class RcLevelLoadResult
 {
     public bool Success { get; set; }
     public string ErrorMessage { get; set; }
@@ -14,9 +14,9 @@ public class LevelLoadResult
     public int ColorTilesCount { get; set; }
     public List<string> Warnings { get; set; } = new List<string>();
     
-    public static LevelLoadResult CreateSuccess(int tilesLoaded, int colorTiles)
+    public static RcLevelLoadResult CreateSuccess(int tilesLoaded, int colorTiles)
     {
-        return new LevelLoadResult
+        return new RcLevelLoadResult
         {
             Success = true,
             TilesLoaded = tilesLoaded,
@@ -26,7 +26,7 @@ public class LevelLoadResult
     
     public static LevelLoadResult CreateFailure(string errorMessage)
     {
-        return new LevelLoadResult
+        return new RcLevelLoadResult
         {
             Success = false,
             ErrorMessage = errorMessage

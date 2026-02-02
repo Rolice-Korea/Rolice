@@ -16,14 +16,14 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
     public event Action OnLevelCompleted;
     public event Action<Vector2Int> OnColorTileCleared;
 
-    public LevelLoadResult LoadLevel(RcLevelDataSO levelData, Transform tilesParent = null)
+    public RcLevelLoadResult LoadLevel(RcLevelDataSO levelData, Transform tilesParent = null)
     {
         // 입력 검증
         if (levelData == null)
-            return LevelLoadResult.CreateFailure("LevelData가 null입니다");
+            return RcLevelLoadResult.CreateFailure("LevelData가 null입니다");
         
         if (levelData.Width <= 0 || levelData.Height <= 0)
-            return LevelLoadResult.CreateFailure($"잘못된 맵 크기: {levelData.Width}x{levelData.Height}");
+            return RcLevelLoadResult.CreateFailure($"잘못된 맵 크기: {levelData.Width}x{levelData.Height}");
         
         try
         {
@@ -35,13 +35,13 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
             
             IsInitialized = true;
             
-            return LevelLoadResult.CreateSuccess(tilesCreated, colorTilesRemaining.Count);
+            return RcLevelLoadResult.CreateSuccess(tilesCreated, colorTilesRemaining.Count);
         }
         catch (Exception e)
         {
             Debug.LogError($"[LevelManager] 레벨 로드 실패: {e.Message}");
             ClearLevel();
-            return LevelLoadResult.CreateFailure(e.Message);
+            return RcLevelLoadResult.CreateFailure(e.Message);
         }
     }
     
