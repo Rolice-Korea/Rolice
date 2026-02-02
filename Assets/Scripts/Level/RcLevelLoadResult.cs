@@ -24,7 +24,7 @@ public class RcLevelLoadResult
         };
     }
     
-    public static LevelLoadResult CreateFailure(string errorMessage)
+    public static RcLevelLoadResult CreateFailure(string errorMessage)
     {
         return new RcLevelLoadResult
         {
