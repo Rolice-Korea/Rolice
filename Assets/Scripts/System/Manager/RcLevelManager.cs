@@ -10,11 +10,8 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
     private Dictionary<Vector2Int, RcTileData> runtimeTiles;
     private HashSet<Vector2Int> colorTilesRemaining;
     private RcTeleportPairManager teleportManager;
-    
+
     public bool IsInitialized { get; private set; }
-    
-    public event Action OnLevelCompleted;
-    public event Action<Vector2Int> OnColorTileCleared;
 
     public RcLevelLoadResult LoadLevel(RcLevelDataSO levelData, Transform tilesParent = null)
     {
@@ -148,7 +145,7 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
         Debug.Log($"[LevelManager] 색깔 타일 클리어: {pos}");
         Debug.Log($"  - 남은 타일: {colorTilesRemaining.Count}개");
         
-        OnColorTileCleared?.Invoke(pos);
+        RcGameEvents.Instance.Publish(RcGameEvent.ColorTileCleared, pos);
         
         // 모든 색깔 타일이 클리어되면 레벨 완료
         if (CheckLevelComplete())
@@ -172,7 +169,7 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
     
     private void HandleLevelComplete()
     {
-        OnLevelCompleted?.Invoke();
+        RcGameEvents.Instance.Publish(RcGameEvent.LevelCompleted);
     }
     
     // === 텔레포트 관리 ===

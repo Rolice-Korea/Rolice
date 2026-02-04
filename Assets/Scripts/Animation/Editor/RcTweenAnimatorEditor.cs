@@ -15,7 +15,7 @@ public class RcTweenAnimatorEditor : Editor
     {
         _sequencesProperty = serializedObject.FindProperty("_sequences");
         _playOnEnableProperty = serializedObject.FindProperty("_playOnEnable");
-        _onDisableBehaviorProperty = serializedObject.FindProperty("_onDisableBehavior");
+        _onDisableBehaviorProperty = serializedObject.FindProperty("_onDisableBehaviorType");
     }
 
     public override void OnInspectorGUI()

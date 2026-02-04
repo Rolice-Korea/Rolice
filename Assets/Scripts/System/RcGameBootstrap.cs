@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 
@@ -54,13 +53,8 @@ public class RcGameBootstrap : MonoBehaviour
     
     private void OnDestroy()
     {
-        // 이벤트 연결 해제
-        if (RcLevelManager.Instance != null)
-        {
-            RcLevelManager.Instance.OnLevelCompleted -= OnLevelCompleted;
-        }
+        UnsubscribeEventConnections();
     }
-    
 
     private void InitializeDataManager()
     {
@@ -104,42 +98,32 @@ public class RcGameBootstrap : MonoBehaviour
     
     private void SetupEventConnections()
     {
-        // 레벨 완료 → 게임 승리
-        RcLevelManager.Instance.OnLevelCompleted += OnLevelCompleted;
-        
-        // 게임 승리/패배 이벤트 구독 (필요시 UI 연결)
-        RcGameRuleManager.Instance.OnGameWin += OnGameWin;
-        RcGameRuleManager.Instance.OnGameLose += OnGameLose;
-        RcGameRuleManager.Instance.OnTurnChanged += OnTurnChanged;
+        RcGameEvents.Instance.Subscribe(RcGameEvent.GameWin, OnGameWin);
+        RcGameEvents.Instance.Subscribe(RcGameEvent.GameLose, OnGameLose);
+        RcGameEvents.Instance.Subscribe(RcGameEvent.TurnChanged, OnTurnChanged);
     }
 
     private void UnsubscribeEventConnections()
     {
-        RcLevelManager.Instance.OnLevelCompleted -= OnLevelCompleted;
-        RcGameRuleManager.Instance.OnGameWin -= OnGameWin;
-        RcGameRuleManager.Instance.OnGameLose -= OnGameLose;
-        RcGameRuleManager.Instance.OnTurnChanged -= OnTurnChanged;
+        RcGameEvents.Instance.Unsubscribe(RcGameEvent.GameWin, OnGameWin);
+        RcGameEvents.Instance.Unsubscribe(RcGameEvent.GameLose, OnGameLose);
+        RcGameEvents.Instance.Unsubscribe(RcGameEvent.TurnChanged, OnTurnChanged);
     }
-    
+
     // === 이벤트 핸들러 ===
-    
-    private void OnLevelCompleted()
-    {
-        RcGameRuleManager.Instance.CheckWinCondition();
-    }
-    
+
     private void OnGameWin()
     {
         Debug.Log("[Bootstrap] 승리 처리");
         // TODO: 승리 UI 표시, 다음 레벨 로드 등
     }
-    
+
     private void OnGameLose()
     {
         Debug.Log("[Bootstrap] 패배 처리");
         // TODO: 패배 UI 표시, 재시작 옵션 등
     }
-    
+
     private void OnTurnChanged(int currentTurn)
     {
         // TODO: UI 업데이트

@@ -119,21 +119,10 @@ public class RcDicePawn : MonoBehaviour
     
     private void OnMoveCompleted(Vector2Int toPos)
     {
-        // 1. 새 타일에 진입
+        // 1. 새 타일에 진입 (로컬 처리)
         tileInteractor.OnEnterTile(toPos);
-        
-        // 2. 턴 증가 (중요!)
-        if (RcGameRuleManager.Instance.IsInitialized)
-        {
-            RcGameRuleManager.Instance.IncrementTurn();
-            
-            // 3. 승리 조건 체크
-            // (색깔 타일이 모두 클리어되었는지 확인)
-            RcGameRuleManager.Instance.CheckWinCondition();
-        }
-        else
-        {
-            Debug.LogWarning("[DicePawn] GameRuleManager가 초기화되지 않았습니다!");
-        }
+
+        // 2. 이동 완료 이벤트 발행 (턴 증가, 승리 체크는 구독자가 처리)
+        RcGameEvents.Instance.Publish(RcGameEvent.MoveCompleted, toPos);
     }
 }

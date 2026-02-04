@@ -34,7 +34,7 @@ namespace Engine
         }
     }
     
-    public class EventHub<TTrigger>
+    public class RcEventHub<TTrigger>
     {
         private readonly Dictionary<TTrigger, List<Action>> _events = new();
 

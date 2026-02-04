@@ -1,4 +1,4 @@
-public enum RcOnDisableBehavior
+public enum RcOnDisableBehaviorType
 {
     Kill,
     Rewind,

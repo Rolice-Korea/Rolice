@@ -12,10 +12,6 @@ public class RcGameRuleManager : RcSingletonMono<RcGameRuleManager>
     private bool isGameOver;
     private bool isInitialized;
     
-    public event Action OnGameWin;
-    public event Action OnGameLose;
-    public event Action<int> OnTurnChanged;  // UI 업데이트용
-    
     public bool IsGameOver => isGameOver;
     public int CurrentTurn => currentTurn;
     public float ElapsedTime => elapsedTime;
@@ -28,19 +24,23 @@ public class RcGameRuleManager : RcSingletonMono<RcGameRuleManager>
             Debug.LogError("[GameRuleManager] RcLevelRules가 null입니다!");
             return;
         }
-        
+
         if (!rules.Validate())
         {
             Debug.LogError("[GameRuleManager] 잘못된 규칙입니다!");
             return;
         }
-        
+
+        UnsubscribeEvents();
+
         currentRules = rules;
         currentTurn = 0;
         elapsedTime = 0f;
         isGameOver = false;
         isInitialized = true;
-        
+
+        SubscribeEvents();
+
         Debug.Log($"[GameRuleManager] 규칙 초기화 완료");
         Debug.Log($"  - 턴 제한: {(rules.HasTurnLimit ? $"{rules.MaxTurns}턴" : "없음")}");
         Debug.Log($"  - 시간 제한: {(rules.HasTimeLimit ? $"{rules.MaxTime}초" : "없음")}");
@@ -80,7 +80,7 @@ public class RcGameRuleManager : RcSingletonMono<RcGameRuleManager>
             return;
         
         currentTurn++;
-        OnTurnChanged?.Invoke(currentTurn);
+        RcGameEvents.Instance.Publish(RcGameEvent.TurnChanged, currentTurn);
         
         Debug.Log($"[GameRuleManager] 턴 증가: {currentTurn}/{(currentRules.HasTurnLimit ? currentRules.MaxTurns.ToString() : "∞")}");
         
@@ -124,7 +124,7 @@ public class RcGameRuleManager : RcSingletonMono<RcGameRuleManager>
 
         Debug.Log("║     🎉 게임 승리! 🎉     ║");
         
-        OnGameWin?.Invoke();
+        RcGameEvents.Instance.Publish(RcGameEvent.GameWin);
     }
     
     private void HandleGameLose(string reason)
@@ -133,9 +133,41 @@ public class RcGameRuleManager : RcSingletonMono<RcGameRuleManager>
 
         Debug.Log("║     ❌ 게임 패배 ❌      ║");
         
-        OnGameLose?.Invoke();
+        RcGameEvents.Instance.Publish(RcGameEvent.GameLose);
     }
     
+    // === 이벤트 구독 ===
+
+    private void SubscribeEvents()
+    {
+        RcGameEvents.Instance.Subscribe(RcGameEvent.MoveCompleted, OnMoveCompleted);
+        RcGameEvents.Instance.Subscribe(RcGameEvent.LevelCompleted, OnLevelCompleted);
+    }
+
+    private void UnsubscribeEvents()
+    {
+        RcGameEvents.Instance.Unsubscribe(RcGameEvent.MoveCompleted, OnMoveCompleted);
+        RcGameEvents.Instance.Unsubscribe(RcGameEvent.LevelCompleted, OnLevelCompleted);
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeEvents();
+    }
+
+    private void OnMoveCompleted(Vector2Int pos)
+    {
+        if (!isInitialized || isGameOver) return;
+
+        IncrementTurn();
+        CheckWinCondition();
+    }
+
+    private void OnLevelCompleted()
+    {
+        CheckWinCondition();
+    }
+
     // === UI용 헬퍼 메서드 ===
     
     public int GetRemainingTurns()

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class RcTweenAnimator : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class RcTweenAnimator : MonoBehaviour
 
     [SerializeField] private List<AnimationSequence> _sequences = new();
     [SerializeField] private bool _playOnEnable = false;
-    [SerializeField] private RcOnDisableBehavior _onDisableBehavior = RcOnDisableBehavior.Rewind;
+    [SerializeField] private RcOnDisableBehaviorType _onDisableBehaviorType = RcOnDisableBehaviorType.Rewind;
 
     public Action OnComplete;
     public Action OnStart;
@@ -40,16 +41,16 @@ public class RcTweenAnimator : MonoBehaviour
         if (_currentSequence == null || !_currentSequence.IsActive())
             return;
 
-        switch (_onDisableBehavior)
+        switch (_onDisableBehaviorType)
         {
-            case RcOnDisableBehavior.Kill:
+            case RcOnDisableBehaviorType.Kill:
                 _currentSequence.Kill();
                 break;
-            case RcOnDisableBehavior.Rewind:
+            case RcOnDisableBehaviorType.Rewind:
                 _currentSequence.Rewind();
                 _currentSequence.Kill();
                 break;
-            case RcOnDisableBehavior.Complete:
+            case RcOnDisableBehaviorType.Complete:
                 _currentSequence.Complete();
                 break;
         }
