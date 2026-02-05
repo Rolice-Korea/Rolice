@@ -11,6 +11,9 @@ namespace Engine.UI
 
         protected virtual void Awake()
         {
+            if (GetComponent<CanvasGroup>() == null)
+                gameObject.AddComponent<CanvasGroup>();
+
             _animator = GetComponent<RcTweenAnimator>();
         }
 

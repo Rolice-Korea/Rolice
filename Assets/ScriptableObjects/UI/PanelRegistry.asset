@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b69d7843fb68a374ab01012a4302906b, type: 3}
+  m_Name: PanelRegistry
+  m_EditorClassIdentifier: Assembly-CSharp::Engine.UI.RcUIPanelRegistry
+  _entries:
+  - Prefab: {fileID: 3897423192581192989, guid: 4bf8735e4afb36a479d5f2fc46f172f6, type: 3}
+    Layer: 100
