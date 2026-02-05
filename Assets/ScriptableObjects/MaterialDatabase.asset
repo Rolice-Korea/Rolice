@@ -13,22 +13,22 @@ MonoBehaviour:
   m_Name: MaterialDatabase
   m_EditorClassIdentifier: 
   materials:
-  - Material: {fileID: 2100000, guid: 8715c26143c030648918b69184d99523, type: 2}
+  - Material: {fileID: 2100000, guid: 36482279d5d8abb49a4a6046586b3d2c, type: 2}
     ColorType: 1
     UsageType: 0
-  - Material: {fileID: 2100000, guid: 3ae972448f1d64840bf1487ad890ab51, type: 2}
+  - Material: {fileID: 2100000, guid: c5359b79c6fa4fa4fb0ec6951f0fb60d, type: 2}
     ColorType: 2
     UsageType: 0
-  - Material: {fileID: 2100000, guid: 74371cfe276423745bcdc617e783bc30, type: 2}
+  - Material: {fileID: 2100000, guid: a8e68c3652d1a9a4ea0cbd8bf668a65a, type: 2}
     ColorType: 3
     UsageType: 0
-  - Material: {fileID: 2100000, guid: 4dcdd863a801d3d44abe4553b282bbc5, type: 2}
+  - Material: {fileID: 2100000, guid: 3e851cf3232850a449833e6611a1a190, type: 2}
     ColorType: 4
     UsageType: 0
-  - Material: {fileID: 2100000, guid: ee32cda6f158a7241ada424afcdda4e3, type: 2}
+  - Material: {fileID: 2100000, guid: 347db7d5689082a4290526175b569edf, type: 2}
     ColorType: 5
     UsageType: 0
-  - Material: {fileID: 2100000, guid: 7bada31283bc1d64383d0fb0b4e42dc5, type: 2}
+  - Material: {fileID: 2100000, guid: d8b75750499bcba408097e5efcbf2cbd, type: 2}
     ColorType: 6
     UsageType: 0
   - Material: {fileID: 2100000, guid: cb8132b58c81c4e41b0862a2d3db7316, type: 2}

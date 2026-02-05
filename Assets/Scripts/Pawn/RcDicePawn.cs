@@ -78,7 +78,7 @@ public class RcDicePawn : MonoBehaviour
         movement.Teleport(targetPos, onComplete);
     }
 
-    public ColorType GetBottomColor()
+    public RcColorSO GetBottomColor()
     {
         return faceController.GetBottomColor();
     }
@@ -88,7 +88,7 @@ public class RcDicePawn : MonoBehaviour
         return movement.GetGridPos();
     }
 
-    public ColorType GetFaceColor(int faceIndex)
+    public RcColorSO GetFaceColor(int faceIndex)
     {
         return faceController.GetFaceColor(faceIndex);
     }

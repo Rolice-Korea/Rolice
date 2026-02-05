@@ -3,9 +3,6 @@ using UnityEngine;
 
 public class RcGameBootstrap : MonoBehaviour
 {
-    [Header("Data Assets")]
-    [SerializeField] private RcMaterialDataBaseSO materialDatabase;
-    
     [Header("Level Settings")]
     [SerializeField] private RcLevelDataSO startingLevel;
     [SerializeField] private Transform tilesParent;
@@ -32,10 +29,7 @@ public class RcGameBootstrap : MonoBehaviour
         
         Debug.Log("=== Game Bootstrap 시작 ===");
         
-        // 1. 데이터 매니저 초기화
-        InitializeDataManager();
-        
-        // 2. 시작 레벨 로드
+        // 1. 시작 레벨 로드
         if (levelData != null)
         {
             LoadLevel(levelData);
@@ -45,7 +39,7 @@ public class RcGameBootstrap : MonoBehaviour
             Debug.LogWarning("[Bootstrap] 시작 레벨이 설정되지 않았습니다!");
         }
         
-        // 3. 이벤트 연결
+        // 2. 이벤트 연결
         SetupEventConnections();
         
         Debug.Log("=== Game Bootstrap 완료 ===");
@@ -56,17 +50,6 @@ public class RcGameBootstrap : MonoBehaviour
         UnsubscribeEventConnections();
     }
 
-    private void InitializeDataManager()
-    {
-        if (materialDatabase == null)
-        {
-            Debug.LogError("[Bootstrap] MaterialDatabase가 할당되지 않았습니다!");
-            return;
-        }
-        
-        RcDataManager.Instance.Initialize(materialDatabase);
-    }
-    
     private void LoadLevel(RcLevelDataSO levelData)
     {
         // 레벨 로드

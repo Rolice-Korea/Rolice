@@ -13,18 +13,18 @@ public struct RcDiceFaceData
         new[] { RIGHT, LEFT, FRONT, BACK, TOP, BOTTOM }     // LEFT
     };
 
-    public ColorType[] faces;
+    public RcColorSO[] faces;
 
-    public RcDiceFaceData(ColorType[] initialFaces)
+    public RcDiceFaceData(RcColorSO[] initialFaces)
     {
         if (initialFaces == null || initialFaces.Length != 6)
         {
             Debug.LogError("[DiceFaceData] 면 배열은 6개여야 합니다!");
-            faces = new ColorType[6];
+            faces = new RcColorSO[6];
         }
         else
         {
-            faces = (ColorType[])initialFaces.Clone();
+            faces = (RcColorSO[])initialFaces.Clone();
         }
     }
 
@@ -32,26 +32,26 @@ public struct RcDiceFaceData
     {
         int mapIndex = GetMapIndex(direction);
         int[] map = RollMaps[mapIndex];
-        
-        ColorType[] newFaces = new ColorType[6];
+
+        RcColorSO[] newFaces = new RcColorSO[6];
         for (int i = 0; i < 6; i++)
         {
             newFaces[i] = faces[map[i]];
         }
-        
+
         return new RcDiceFaceData(newFaces);
     }
 
-    public ColorType GetFaceColor(int faceIndex)
+    public RcColorSO GetFaceColor(int faceIndex)
     {
-        if (faceIndex >= 0 && faceIndex < 6) 
+        if (faceIndex >= 0 && faceIndex < 6)
             return faces[faceIndex];
-        
+
         Debug.LogError($"[DiceFaceData] 잘못된 면 인덱스: {faceIndex}");
-        return ColorType.Gray;
+        return null;
     }
 
-    public ColorType GetBottomColor() => faces[BOTTOM];
+    public RcColorSO GetBottomColor() => faces[BOTTOM];
 
     private static int GetMapIndex(Vector2Int direction)
     {
@@ -59,7 +59,7 @@ public struct RcDiceFaceData
         if (direction == Vector2Int.down) return 1;
         if (direction == Vector2Int.right) return 2;
         if (direction == Vector2Int.left) return 3;
-        
+
         Debug.LogWarning($"[DiceFaceData] 알 수 없는 방향: {direction}");
         return 0;
     }
