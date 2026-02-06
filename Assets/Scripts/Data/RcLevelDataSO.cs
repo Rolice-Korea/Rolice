@@ -1,14 +1,18 @@
+using Rolice.Data;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewLevel", menuName = "Rolice/Level")]
 public class RcLevelDataSO : ScriptableObject
 {
+    [Header("Stage Info")]
+    public RcStageInfo StageInfo = new();
+
     [Header("Map Settings")]
     public int Width;
     public int Height;
-    
+
     public RcTileData[] Tiles;
-    
+
     [Header("Game Rules")]
     public RcLevelRules Rules = new RcLevelRules();
     
@@ -40,6 +44,10 @@ public class RcLevelDataSO : ScriptableObject
         {
             Rules.Validate();
         }
+
+        // 스테이지 정보 검증
+        StageInfo ??= new RcStageInfo();
+        StageInfo.Validate();
     }
     
     public RcTileData GetTile(int x, int y) {

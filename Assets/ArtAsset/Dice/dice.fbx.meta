@@ -1,44 +1,9 @@
 fileFormatVersion: 2
-guid: e61fd8a09f279d9498a1c88ac8e4b6ce
+guid: 7f74f7539de5e124889ad461247a694f
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Back
-    second: {fileID: 2100000, guid: ee32cda6f158a7241ada424afcdda4e3, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Bottom
-    second: {fileID: 2100000, guid: 74371cfe276423745bcdc617e783bc30, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Edge.001
-    second: {fileID: 2100000, guid: 67ea0963ad8954c4ca823734c4fe00e9, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Front
-    second: {fileID: 2100000, guid: 8715c26143c030648918b69184d99523, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Left
-    second: {fileID: 2100000, guid: 7bada31283bc1d64383d0fb0b4e42dc5, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Right
-    second: {fileID: 2100000, guid: 3ae972448f1d64840bf1487ad890ab51, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Top
-    second: {fileID: 2100000, guid: 4dcdd863a801d3d44abe4553b282bbc5, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
