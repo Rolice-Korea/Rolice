@@ -3,9 +3,6 @@ using UnityEngine;
 
 namespace Rolice.UI
 {
-    /// <summary>
-    /// 스테이지 선택 프레젠터
-    /// </summary>
     public class RcStageSelectPresenter : RcUIPresenter<RcStageSelectPanel>
     {
         protected override void OnInitialize()
@@ -19,14 +16,11 @@ namespace Rolice.UI
             Panel.OnStageSelected -= HandleStageSelected;
         }
 
-        /// <summary>
-        /// 스테이지 목록 갱신
-        /// </summary>
         public void RefreshStageList()
         {
             if (!RcProgressManager.Instance.IsInitialized)
             {
-                Debug.LogWarning("[StageSelectPresenter] ProgressManager가 초기화되지 않았습니다");
+                Debug.LogWarning("[StageSelectPresenter] ProgressManager 미초기화");
                 return;
             }
 
@@ -38,7 +32,6 @@ namespace Rolice.UI
                 int stageNumber = i + 1;
                 var state = GetStageState(stageNumber);
                 int stars = RcProgressManager.Instance.GetStageStars(stageNumber);
-
                 Panel.SetItemData(i, stageNumber, state, stars);
             }
         }
@@ -57,10 +50,6 @@ namespace Rolice.UI
         private void HandleStageSelected(int stageNumber)
         {
             Debug.Log($"[StageSelectPresenter] 스테이지 {stageNumber} 선택됨");
-
-            // TODO: 게임씬으로 전환
-            // SceneManager.LoadScene("GameScene");
-            // 또는 이벤트 발행
         }
     }
 }

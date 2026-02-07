@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Rolice.UI;
 using UnityEngine;
 
 namespace Engine.UI
@@ -30,7 +31,8 @@ namespace Engine.UI
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                Instance.Toggle<RcTestPanel>();
+                //Instance.Toggle<RcTestPanel>();
+                Instance.Toggle<RcStageSelectPanel>();
             }
         }
 

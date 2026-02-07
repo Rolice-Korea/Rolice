@@ -15,3 +15,5 @@ MonoBehaviour:
   _entries:
   - Prefab: {fileID: 3897423192581192989, guid: 4bf8735e4afb36a479d5f2fc46f172f6, type: 3}
     Layer: 100
+  - Prefab: {fileID: 3244917718109596645, guid: d1df15f5b20ed8849a7d7e31c29d148b, type: 3}
+    Layer: 100

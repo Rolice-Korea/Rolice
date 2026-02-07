@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class RcLobbyCube : MonoBehaviour
 {
-    #region Serialized Fields
-
     [Header("자동 회전")]
     [SerializeField] private float _autoRotateSpeed = 15f;
     [SerializeField] private Vector3 _autoRotateAxis = Vector3.up;
@@ -17,30 +15,21 @@ public class RcLobbyCube : MonoBehaviour
     [SerializeField] private RcTweenAnimator _floatAnimator;
     [SerializeField] private bool _pauseFloatOnDrag = true;
 
-    #endregion
-
-    #region Private Fields
-
     private Camera _mainCamera;
     private Vector2 _lastPointerPos;
     private Vector2 _dragVelocity;
     private bool _isDragging;
     private bool _isFloatPaused;
 
-    #endregion
-
-    #region Properties
-
     public bool IsDragging => _isDragging;
     public bool HasInertia => _dragVelocity.magnitude > _minInertiaSpeed;
-
-    #endregion
-
-    #region Unity Callbacks
 
     private void Start()
     {
         _mainCamera = Camera.main;
+
+        if (GetComponent<Collider>() == null)
+            gameObject.AddComponent<BoxCollider>();
     }
 
     private void Update()
@@ -48,10 +37,6 @@ public class RcLobbyCube : MonoBehaviour
         HandleInput();
         UpdateRotation();
     }
-
-    #endregion
-
-    #region Input
 
     private void HandleInput()
     {
@@ -66,6 +51,12 @@ public class RcLobbyCube : MonoBehaviour
 
     private void BeginDrag()
     {
+        if (_mainCamera == null) return;
+
+        var ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+        if (!Physics.Raycast(ray, out var hit) || hit.transform != transform)
+            return;
+
         _isDragging = true;
         _lastPointerPos = Input.mousePosition;
         _dragVelocity = Vector2.zero;
@@ -80,15 +71,9 @@ public class RcLobbyCube : MonoBehaviour
     private void UpdateDrag()
     {
         Vector2 currentPos = Input.mousePosition;
-        Vector2 delta = currentPos - _lastPointerPos;
-
-        _dragVelocity = delta * _dragSensitivity;
+        _dragVelocity = (currentPos - _lastPointerPos) * _dragSensitivity;
         _lastPointerPos = currentPos;
     }
-
-    #endregion
-
-    #region Rotation
 
     private void UpdateRotation()
     {
@@ -115,11 +100,8 @@ public class RcLobbyCube : MonoBehaviour
     {
         if (_mainCamera == null) return;
 
-        var camRight = _mainCamera.transform.right;
-        var camUp = _mainCamera.transform.up;
-
-        transform.Rotate(camUp, -velocity.x, Space.World);
-        transform.Rotate(camRight, velocity.y, Space.World);
+        transform.Rotate(_mainCamera.transform.up, -velocity.x, Space.World);
+        transform.Rotate(_mainCamera.transform.right, velocity.y, Space.World);
     }
 
     private void ApplyAutoRotation()
@@ -127,22 +109,14 @@ public class RcLobbyCube : MonoBehaviour
         transform.Rotate(_autoRotateAxis * _autoRotateSpeed * Time.deltaTime, Space.World);
     }
 
-    #endregion
-
-    #region Float Animation
-
     private void SetFloatPaused(bool paused)
     {
         if (_floatAnimator == null || !_pauseFloatOnDrag) return;
         if (_isFloatPaused == paused) return;
 
-        if (paused)
-            _floatAnimator.Pause();
-        else
-            _floatAnimator.Resume();
+        if (paused) _floatAnimator.Pause();
+        else _floatAnimator.Resume();
 
         _isFloatPaused = paused;
     }
-
-    #endregion
 }

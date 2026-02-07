@@ -8,115 +8,127 @@ namespace Rolice.UI
 {
     public enum RcStageState
     {
-        Locked,     // 잠금
-        Unlocked,   // 해제 (플레이 가능)
-        Cleared     // 클리어됨
+        Locked,
+        Unlocked,
+        Cleared
     }
 
-    /// <summary>
-    /// 개별 스테이지 아이템 위젯
-    /// </summary>
     public class RcStageItemWidget : RcUIWidget
     {
         [Header("UI References")]
         [SerializeField] private Button _button;
         [SerializeField] private TMP_Text _stageNumberText;
-        [SerializeField] private GameObject _lockedIcon;
-        [SerializeField] private GameObject[] _starIcons;  // 별 아이콘 3개
+        [SerializeField] private Image _glowFrame;
+        [SerializeField] private Image[] _starImages;
 
-        [Header("Visual Settings")]
-        [SerializeField] private Color _lockedColor = new Color(0.3f, 0.3f, 0.3f);
-        [SerializeField] private Color _unlockedColor = Color.white;
-        [SerializeField] private Color _clearedColor = new Color(1f, 0.9f, 0.5f);
+        [Header("Text Alpha")]
+        [SerializeField, Range(0f, 1f)] private float _lockedTextAlpha = 0.25f;
+        [SerializeField, Range(0f, 1f)] private float _unlockedTextAlpha = 0.7f;
+
+        [Header("Glow / Star Alpha")]
+        [SerializeField, Range(0f, 1f)] private float _glowDimmedAlpha = 0.15f;
+        [SerializeField, Range(0f, 1f)] private float _starDimmedAlpha = 0.2f;
 
         private int _stageNumber;
         private RcStageState _state;
         private int _stars;
-
-        public event Action<int> OnStageSelected;
+        private bool _isSelected;
 
         public int StageNumber => _stageNumber;
         public RcStageState State => _state;
+        public event Action<int> OnStageSelected;
 
         public override void Initialize()
         {
-            _button.onClick.AddListener(OnButtonClick);
+            _button.onClick.AddListener(HandleClick);
+            if (_glowFrame != null) _glowFrame.raycastTarget = false;
+            if (_stageNumberText != null) _stageNumberText.raycastTarget = false;
         }
 
         public override void Cleanup()
         {
-            _button.onClick.RemoveListener(OnButtonClick);
+            _button.onClick.RemoveListener(HandleClick);
             OnStageSelected = null;
         }
 
-        /// <summary>
-        /// 스테이지 데이터 바인딩
-        /// </summary>
         public void SetData(int stageNumber, RcStageState state, int stars = 0)
         {
             _stageNumber = stageNumber;
             _state = state;
             _stars = Mathf.Clamp(stars, 0, 3);
+            UpdateVisual();
+        }
 
+        public void SetSelected(bool selected)
+        {
+            _isSelected = selected;
             UpdateVisual();
         }
 
         private void UpdateVisual()
         {
-            // 스테이지 번호
-            if (_stageNumberText != null)
-                _stageNumberText.text = _stageNumber.ToString();
-
-            // 잠금 아이콘
-            if (_lockedIcon != null)
-                _lockedIcon.SetActive(_state == RcStageState.Locked);
-
-            // 별 아이콘
+            UpdateStageNumber();
             UpdateStars();
-
-            // 버튼 상호작용
+            UpdateGlow();
             _button.interactable = _state != RcStageState.Locked;
+        }
 
-            // 색상
-            UpdateColor();
+        private void UpdateStageNumber()
+        {
+            if (_stageNumberText == null) return;
+
+            _stageNumberText.text = _stageNumber.ToString();
+            SetAlpha(_stageNumberText, GetTextAlpha());
         }
 
         private void UpdateStars()
         {
-            if (_starIcons == null) return;
+            if (_starImages == null) return;
 
-            // 잠금 상태면 별 숨김
-            bool showStars = _state == RcStageState.Cleared;
-
-            for (int i = 0; i < _starIcons.Length; i++)
+            for (int i = 0; i < _starImages.Length; i++)
             {
-                if (_starIcons[i] != null)
-                {
-                    // 클리어 상태일 때만 획득한 별만큼 표시
-                    _starIcons[i].SetActive(showStars && i < _stars);
-                }
+                if (_starImages[i] == null) continue;
+
+                bool isEarned = _state == RcStageState.Cleared && i < _stars;
+                SetAlpha(_starImages[i], isEarned ? 1f : _starDimmedAlpha);
             }
         }
 
-        private void UpdateColor()
+        private void UpdateGlow()
         {
-            var image = _button.GetComponent<Image>();
-            if (image == null) return;
+            if (_glowFrame == null) return;
 
-            image.color = _state switch
-            {
-                RcStageState.Locked => _lockedColor,
-                RcStageState.Unlocked => _unlockedColor,
-                RcStageState.Cleared => _clearedColor,
-                _ => _unlockedColor
-            };
+            bool show = _state != RcStageState.Locked;
+            _glowFrame.gameObject.SetActive(show);
+
+            if (show)
+                SetAlpha(_glowFrame, _isSelected ? 1f : _glowDimmedAlpha);
         }
 
-        private void OnButtonClick()
+        private float GetTextAlpha()
+        {
+            if (_isSelected || _state == RcStageState.Cleared) return 1f;
+            return _state == RcStageState.Locked ? _lockedTextAlpha : _unlockedTextAlpha;
+        }
+
+        private void HandleClick()
         {
             if (_state == RcStageState.Locked) return;
-
             OnStageSelected?.Invoke(_stageNumber);
+        }
+
+        private static void SetAlpha(Image image, float alpha)
+        {
+            var color = image.color;
+            color.a = alpha;
+            image.color = color;
+        }
+
+        private static void SetAlpha(TMP_Text text, float alpha)
+        {
+            var color = text.color;
+            color.a = alpha;
+            text.color = color;
         }
     }
 }
