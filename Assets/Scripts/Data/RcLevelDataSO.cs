@@ -10,7 +10,7 @@ public class RcLevelDataSO : ScriptableObject
     public RcTileData[] Tiles;
     
     [Header("Game Rules")]
-    public LevelRules Rules = new LevelRules();
+    public RcLevelRules Rules = new RcLevelRules();
     
     private void OnValidate()
     {

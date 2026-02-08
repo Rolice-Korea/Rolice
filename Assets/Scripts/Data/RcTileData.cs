@@ -10,6 +10,9 @@ public class RcTileData
 
     public bool bCanEnter = true;
     
+    [Header("Color (색깔 타일용)")]
+    public RcColorSO Color;
+
     [Header("Special Behavior (optional)")]
     public RcTileBehaviorSO BehaviorSO;
     
@@ -42,6 +45,7 @@ public class RcTileData
         {
             TileID = this.TileID,
             bCanEnter = this.bCanEnter,
+            Color = this.Color,
             BehaviorSO = this.BehaviorSO
         };
     }

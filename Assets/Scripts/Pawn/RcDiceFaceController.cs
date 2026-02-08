@@ -2,17 +2,21 @@ using UnityEngine;
 
 public class RcDiceFaceController : MonoBehaviour
 {
-    [Header("Face Renderers")]
-    [SerializeField] private MeshRenderer[] faceRenderers = new MeshRenderer[6];
+    [Header("Dice Renderer")]
+    [SerializeField] private MeshRenderer diceRenderer;
+
+    [Header("Material Slot Mapping")]
+    [Tooltip("각 면(TOP, BOTTOM, FRONT, BACK, LEFT, RIGHT)에 대응하는 Material 슬롯 인덱스")]
+    [SerializeField] private int[] faceToSlot = { 0, 1, 2, 3, 4, 5 };
 
     [Header("Initial Face Colors")]
-    [SerializeField] private ColorType[] initialFaces = new ColorType[6];
+    [SerializeField] private RcColorSO[] initialFaces = new RcColorSO[6];
 
-    private DiceFaceData faceData;
+    private RcDiceFaceData faceData;
 
     public void Initialize()
     {
-        faceData = new DiceFaceData(initialFaces);
+        faceData = new RcDiceFaceData(initialFaces);
         UpdateVisuals();
     }
 
@@ -20,51 +24,108 @@ public class RcDiceFaceController : MonoBehaviour
     {
         faceData = faceData.Rotate(direction);
     }
-    
-    public ColorType GetBottomColor()
+
+    public RcColorSO GetBottomColor()
     {
         return faceData.GetBottomColor();
     }
-    
-    public ColorType GetFaceColor(int faceIndex)
+
+    public RcColorSO GetFaceColor(int faceIndex)
     {
         return faceData.GetFaceColor(faceIndex);
     }
-    
-    
-    private void UpdateVisuals()
+
+    public void UpdateVisuals()
     {
-        var materialDB = RcDataManager.Instance.MaterialDatabase;
-        
+        if (diceRenderer == null) return;
+
+        var mats = diceRenderer.materials;
+
         for (int i = 0; i < 6; i++)
         {
-            if (faceRenderers[i] == null) continue;
-            
-            ColorType faceColor = faceData.GetFaceColor(i);
-            Material material = materialDB.GetMaterial(faceColor, MaterialUsageType.Dice);
-            
-            if (material != null)
+            int slot = faceToSlot[i];
+            if (slot < 0 || slot >= mats.Length) continue;
+
+            RcColorSO faceColor = faceData.GetFaceColor(i);
+
+            if (faceColor != null && faceColor.DiceMaterial != null)
             {
-                faceRenderers[i].material = material;
+                mats[slot] = faceColor.DiceMaterial;
             }
-            else
-            {
-                Debug.LogWarning($"[DiceFaceController] ColorType {faceColor}에 대한 Material이 없습니다!");
-            }
+        }
+
+        diceRenderer.materials = mats;
+    }
+
+    private void OnValidate()
+    {
+        if (initialFaces == null || initialFaces.Length != 6)
+        {
+            initialFaces = new RcColorSO[6];
+        }
+
+        if (faceToSlot == null || faceToSlot.Length != 6)
+        {
+            faceToSlot = new int[] { 0, 1, 2, 3, 4, 5 };
         }
     }
     
-    private void OnValidate()
+#if UNITY_EDITOR
+    private int[] BuildFaceToSlotByNormal(MeshFilter mf)
     {
-        // 배열 크기 자동 조정
-        if (faceRenderers == null || faceRenderers.Length != 6)
+        Mesh mesh = mf.sharedMesh;
+        Vector3[] normals = mesh.normals;
+
+        int[] result = new int[6];
+
+        for (int sub = 0; sub < mesh.subMeshCount; sub++)
         {
-            faceRenderers = new MeshRenderer[6];
+            int[] tris = mesh.GetTriangles(sub);
+            Vector3 avg = Vector3.zero;
+
+            foreach (int t in tris)
+                avg += normals[t];
+
+            avg.Normalize();
+            Vector3 world = mf.transform.TransformDirection(avg);
+
+            int face = GetFaceIndex(world);
+            result[face] = sub;
         }
-        
-        if (initialFaces == null || initialFaces.Length != 6)
-        {
-            initialFaces = new ColorType[6];
-        }
+
+        return result;
     }
+
+    private int GetFaceIndex(Vector3 n)
+    {
+        n.Normalize();
+
+        if (Vector3.Dot(n, Vector3.up) > 0.9f) return RcDiceFaceData.TOP;
+        if (Vector3.Dot(n, Vector3.down) > 0.9f) return RcDiceFaceData.BOTTOM;
+        if (Vector3.Dot(n, Vector3.forward) > 0.9f) return RcDiceFaceData.FRONT;
+        if (Vector3.Dot(n, Vector3.back) > 0.9f) return RcDiceFaceData.BACK;
+        if (Vector3.Dot(n, Vector3.left) > 0.9f) return RcDiceFaceData.LEFT;
+        if (Vector3.Dot(n, Vector3.right) > 0.9f) return RcDiceFaceData.RIGHT;
+        
+        return RcDiceFaceData.TOP;
+    }
+#endif
+    
+#if UNITY_EDITOR
+    [ContextMenu("Bake FaceToSlot From Mesh")]
+    private void BakeFaceToSlot()
+    {
+        var mf = GetComponentInChildren<MeshFilter>();
+        if (mf == null || mf.sharedMesh == null)
+        {
+            Debug.LogError("MeshFilter 없음");
+            return;
+        }
+
+        faceToSlot = BuildFaceToSlotByNormal(mf);
+        UnityEditor.EditorUtility.SetDirty(this);
+
+        Debug.Log("Dice faceToSlot baked 완료");
+    }
+#endif
 }

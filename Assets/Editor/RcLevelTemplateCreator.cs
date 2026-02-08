@@ -224,7 +224,7 @@ public class RcLevelTemplateCreator : EditorWindow
         }
         
         // 기본 게임 룰 설정
-        level.Rules = new LevelRules
+        level.Rules = new RcLevelRules
         {
             HasTurnLimit = true,
             MaxTurns = 15,
