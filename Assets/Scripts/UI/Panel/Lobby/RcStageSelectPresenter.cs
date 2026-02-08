@@ -1,0 +1,64 @@
+using DG.Tweening;
+using Engine.UI;
+using UnityEditor.Timeline.Actions;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+namespace Rolice.UI
+{
+    public class RcStageSelectPresenter : RcUIPresenter<RcStageSelectPanel>
+    {
+        protected override void OnInitialize()
+        {
+            Panel.OnStageSelected += HandleStageSelected;
+            RefreshStageList();
+        }
+
+        protected override void OnDispose()
+        {
+            Panel.OnStageSelected -= HandleStageSelected;
+        }
+
+        public void RefreshStageList()
+        {
+            if (!RcProgressManager.Instance.IsInitialized)
+            {
+                Debug.LogWarning("[StageSelectPresenter] ProgressManager 미초기화");
+                return;
+            }
+
+            int totalStages = RcProgressManager.Instance.TotalStageCount;
+            Panel.CreateItems(totalStages);
+
+            for (int i = 0; i < totalStages; i++)
+            {
+                int stageNumber = i + 1;
+                var state = GetStageState(stageNumber);
+                int stars = RcProgressManager.Instance.GetStageStars(stageNumber);
+                Panel.SetItemData(i, stageNumber, state, stars);
+            }
+        }
+
+        private RcStageState GetStageState(int stageNumber)
+        {
+            if (!RcProgressManager.Instance.IsStageUnlocked(stageNumber))
+                return RcStageState.Locked;
+
+            if (RcProgressManager.Instance.IsStageCleared(stageNumber))
+                return RcStageState.Cleared;
+
+            return RcStageState.Unlocked;
+        }
+
+        private void HandleStageSelected(int stageNumber)
+        {
+            Debug.Log($"[StageSelectPresenter] 스테이지 {stageNumber} 선택됨");
+            
+            DOVirtual.DelayedCall(1f, () =>
+            {
+                SceneManager.LoadScene("MainScene");
+                Debug.Log("1초 뒤 실행됨");
+            });
+        }
+    }
+}

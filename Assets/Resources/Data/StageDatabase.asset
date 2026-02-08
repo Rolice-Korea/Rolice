@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e8f71db215648b4f849810774569dbf, type: 3}
+  m_Name: StageDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::Rolice.Data.RcStageDatabaseSO
+  Stages:
+  - {fileID: 11400000, guid: 56cb3cf7807f5104b922dcc81054e91f, type: 2}
+  - {fileID: 11400000, guid: 591ceeb55a43394429658099123ccc35, type: 2}
+  - {fileID: 11400000, guid: cf6280006a93f0444a1fdb07e70eefa6, type: 2}
+  - {fileID: 11400000, guid: d669df5700176564fa7d0f7fdf62edad, type: 2}
+  - {fileID: 11400000, guid: 8f1d9e1b2854f2c46ab633eed094ff5a, type: 2}
+  - {fileID: 11400000, guid: c968b784583a73842b89c8c97a694075, type: 2}
+  - {fileID: 11400000, guid: f1703f1a614b25f48bf8634c2f43a0d8, type: 2}
+  - {fileID: 11400000, guid: 5954447924209c04785fc65044ca36db, type: 2}

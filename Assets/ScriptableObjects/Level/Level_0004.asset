@@ -10,8 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8e4209ec50143204cbbd7887e7de7a19, type: 3}
-  m_Name: Level_0l
+  m_Name: Level_0004
   m_EditorClassIdentifier: 
+  StageInfo:
+    StageNumber: 1
+    DisplayName: stage_1
+    MaxStars: 3
+    StarThresholds: 110000001400000019000000
   Width: 7
   Height: 7
   Tiles:
