@@ -1,5 +1,8 @@
+using DG.Tweening;
 using Engine.UI;
+using UnityEditor.Timeline.Actions;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Rolice.UI
 {
@@ -50,6 +53,12 @@ namespace Rolice.UI
         private void HandleStageSelected(int stageNumber)
         {
             Debug.Log($"[StageSelectPresenter] 스테이지 {stageNumber} 선택됨");
+            
+            DOVirtual.DelayedCall(1f, () =>
+            {
+                SceneManager.LoadScene("MainScene");
+                Debug.Log("1초 뒤 실행됨");
+            });
         }
     }
 }
