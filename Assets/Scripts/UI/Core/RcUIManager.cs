@@ -1,7 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using Rolice.UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Engine.UI
 {
@@ -9,15 +10,11 @@ namespace Engine.UI
     {
         [Header("Registry")]
         [SerializeField, Tooltip("패널 레지스트리 SO")]
-        private RcUIPanelRegistry _registry;
+        private RcUIPanelRegistry registry;
 
-        [Header("Canvas Settings")]
-        [SerializeField, Tooltip("UI 카메라 (null이면 ScreenSpace-Overlay)")]
-        private Camera _uiCamera;
-
-        private RcUICanvasLayer _canvasLayer;
-        private readonly Dictionary<Type, RcUIPanel> _instanceCache = new();
-        private readonly List<RcUIPanel> _panelStack = new();
+        private RcUICanvasLayer canvasLayer;
+        private readonly Dictionary<Type, RcUIPanel> instanceCache = new();
+        private readonly List<RcUIPanel> panelStack = new();
 
         private void Awake()
         {
@@ -27,30 +24,34 @@ namespace Engine.UI
             Initialize();
         }
 
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                //Instance.Toggle<RcTestPanel>();
-                Instance.Toggle<RcStageSelectPanel>();
-            }
-        }
-
         private void OnDestroy()
         {
-            _canvasLayer?.Dispose();
+            canvasLayer?.Dispose();
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         private void Initialize()
         {
-            if (_registry == null)
+            if (registry == null)
             {
                 Debug.LogError("[RcUIManager] PanelRegistry가 할당되지 않았습니다.");
                 return;
             }
 
-            _registry.Initialize();
-            _canvasLayer = new RcUICanvasLayer(transform, _uiCamera);
+            registry.Initialize();
+            canvasLayer = new RcUICanvasLayer(transform, Camera.main);
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            StartCoroutine(UpdateCameraDelayed());
+        }
+
+        private IEnumerator UpdateCameraDelayed()
+        {
+            yield return null;
+            canvasLayer.UpdateCamera(Camera.main);
         }
 
         public T Open<T>() where T : RcUIPanel
@@ -64,7 +65,7 @@ namespace Engine.UI
                 return panel;
             }
 
-            _panelStack.Add(panel);
+            panelStack.Add(panel);
             panel.Open();
             return panel;
         }
@@ -80,14 +81,14 @@ namespace Engine.UI
                 return panel;
             }
 
-            _panelStack.Add(panel);
+            panelStack.Add(panel);
             panel.Open(data);
             return panel;
         }
 
         public void CloseCurrent(Action onComplete = null)
         {
-            if (_panelStack.Count == 0) return;
+            if (panelStack.Count == 0) return;
 
             var panel = PopStack();
             panel.Close(onComplete);
@@ -95,23 +96,23 @@ namespace Engine.UI
 
         public void Close<T>(Action onComplete = null) where T : RcUIPanel
         {
-            if (!_instanceCache.TryGetValue(typeof(T), out var panel)) return;
+            if (!instanceCache.TryGetValue(typeof(T), out var panel)) return;
             if (!panel.IsOpen) return;
 
-            _panelStack.Remove(panel);
+            panelStack.Remove(panel);
             panel.Close(onComplete);
         }
 
         public void CloseAll()
         {
-            for (int i = _panelStack.Count - 1; i >= 0; i--)
+            for (int i = panelStack.Count - 1; i >= 0; i--)
             {
-                var panel = _panelStack[i];
+                var panel = panelStack[i];
                 if (panel.IsOpen)
                     panel.Close();
             }
 
-            _panelStack.Clear();
+            panelStack.Clear();
         }
 
         public void Toggle<T>() where T : RcUIPanel
@@ -127,42 +128,42 @@ namespace Engine.UI
 
         public bool IsOpen<T>() where T : RcUIPanel
         {
-            if (!_instanceCache.TryGetValue(typeof(T), out var panel)) return false;
+            if (!instanceCache.TryGetValue(typeof(T), out var panel)) return false;
             return panel.IsOpen;
         }
 
         public RcUIPanel CurrentPanel =>
-            _panelStack.Count > 0 ? _panelStack[^1] : null;
+            panelStack.Count > 0 ? panelStack[^1] : null;
 
-        public int OpenPanelCount => _panelStack.Count;
+        public int OpenPanelCount => panelStack.Count;
 
         private T GetOrCreatePanel<T>() where T : RcUIPanel
         {
             var type = typeof(T);
 
-            if (_instanceCache.TryGetValue(type, out var cached))
+            if (instanceCache.TryGetValue(type, out var cached))
                 return cached as T;
 
-            if (!_registry.TryGetEntry<T>(out var entry))
+            if (!registry.TryGetEntry<T>(out var entry))
             {
                 Debug.LogError($"[RcUIManager] 레지스트리에 없는 패널: {type.Name}");
                 return null;
             }
 
-            var root = _canvasLayer.GetRoot(entry.Layer);
+            var root = canvasLayer.GetRoot(entry.Layer);
             var instance = Instantiate(entry.Prefab, root);
             instance.gameObject.SetActive(false);
 
             var panel = instance as T;
-            _instanceCache[type] = panel;
+            instanceCache[type] = panel;
 
             return panel;
         }
 
         private RcUIPanel PopStack()
         {
-            var last = _panelStack[^1];
-            _panelStack.RemoveAt(_panelStack.Count - 1);
+            var last = panelStack[^1];
+            panelStack.RemoveAt(panelStack.Count - 1);
             return last;
         }
     }

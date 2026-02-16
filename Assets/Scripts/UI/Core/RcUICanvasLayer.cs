@@ -6,14 +6,33 @@ namespace Engine.UI
 {
     public class RcUICanvasLayer
     {
-        private readonly Transform _root;
-        private readonly Camera _uiCamera;
-        private readonly Dictionary<RcUILayer, Canvas> _canvases = new();
+        private readonly Transform root;
+        private Camera camera;
+        private readonly Dictionary<RcUILayer, Canvas> canvases = new();
 
-        public RcUICanvasLayer(Transform root, Camera uiCamera = null)
+        public RcUICanvasLayer(Transform root, Camera camera = null)
         {
-            _root = root;
-            _uiCamera = uiCamera;
+            this.root = root;
+            this.camera = camera;
+        }
+
+        public void UpdateCamera(Camera camera)
+        {
+            this.camera = camera;
+            foreach (var kvp in canvases)
+            {
+                if (kvp.Value == null) continue;
+
+                if (camera != null)
+                {
+                    kvp.Value.renderMode = RenderMode.ScreenSpaceCamera;
+                    kvp.Value.worldCamera = camera;
+                }
+                else
+                {
+                    kvp.Value.renderMode = RenderMode.ScreenSpaceOverlay;
+                }
+            }
         }
 
         public Transform GetRoot(RcUILayer layer)
@@ -28,18 +47,19 @@ namespace Engine.UI
 
         private Canvas GetOrCreateCanvas(RcUILayer layer)
         {
-            if (_canvases.TryGetValue(layer, out var existing))
+            if (canvases.TryGetValue(layer, out var existing))
                 return existing;
 
             var go = new GameObject($"Canvas_{layer}");
-            go.transform.SetParent(_root, false);
+            go.transform.SetParent(root, false);
 
             var canvas = go.AddComponent<Canvas>();
 
-            if (_uiCamera != null)
+            if (camera != null)
             {
                 canvas.renderMode = RenderMode.ScreenSpaceCamera;
-                canvas.worldCamera = _uiCamera;
+                canvas.worldCamera = camera;
+                canvas.planeDistance = 0f;
             }
             else
             {
@@ -56,19 +76,19 @@ namespace Engine.UI
             go.AddComponent<GraphicRaycaster>();
             go.AddComponent<CanvasGroup>();
 
-            _canvases[layer] = canvas;
+            canvases[layer] = canvas;
             return canvas;
         }
 
         public void Dispose()
         {
-            foreach (var kvp in _canvases)
+            foreach (var kvp in canvases)
             {
                 if (kvp.Value != null)
                     Object.Destroy(kvp.Value.gameObject);
             }
 
-            _canvases.Clear();
+            canvases.Clear();
         }
     }
 }

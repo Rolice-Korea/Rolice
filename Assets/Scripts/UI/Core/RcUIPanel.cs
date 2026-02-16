@@ -5,7 +5,7 @@ namespace Engine.UI
 {
     public abstract class RcUIPanel : MonoBehaviour
     {
-        private RcTweenAnimator _animator;
+        private RcTweenAnimator animator;
 
         public bool IsOpen { get; private set; }
 
@@ -14,7 +14,7 @@ namespace Engine.UI
             if (GetComponent<CanvasGroup>() == null)
                 gameObject.AddComponent<CanvasGroup>();
 
-            _animator = GetComponent<RcTweenAnimator>();
+            animator = GetComponent<RcTweenAnimator>();
         }
 
         public void Open()
@@ -25,10 +25,10 @@ namespace Engine.UI
             gameObject.SetActive(true);
             OnOpen();
 
-            if (_animator != null)
+            if (animator != null)
             {
-                _animator.OnComplete = null;
-                _animator.PlayOnOpen();
+                animator.OnComplete = null;
+                animator.PlayOnOpen();
             }
         }
 
@@ -40,14 +40,14 @@ namespace Engine.UI
             IsOpen = false;
             OnBeforeClose();
 
-            if (_animator != null)
+            if (animator != null)
             {
-                _animator.OnComplete = () =>
+                animator.OnComplete = () =>
                 {
                     FinishClose();
                     onComplete?.Invoke();
                 };
-                _animator.PlayOnClose();
+                animator.PlayOnClose();
             }
             else
             {

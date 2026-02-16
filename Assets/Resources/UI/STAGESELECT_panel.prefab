@@ -482,8 +482,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98637b90356f47648814fa626d842468, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rolice.UI.RcStageSelectPanel
-  _contentParent: {fileID: 2557187577055997973}
-  _itemTemplate: {fileID: 121940014187516097}
+  contentParent: {fileID: 2557187577055997973}
+  itemTemplate: {fileID: 121940014187516097}
 --- !u!1 &6267142248363964908
 GameObject:
   m_ObjectHideFlags: 0
@@ -579,17 +579,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fbbc01e12bf664418759b7163467166, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rolice.UI.RcStageItemWidget
-  _button: {fileID: 181725489713167703}
-  _stageNumberText: {fileID: 168007110260681544}
-  _glowFrame: {fileID: 3968952138751095120}
-  _starImages:
+  button: {fileID: 181725489713167703}
+  stageNumberText: {fileID: 168007110260681544}
+  glowFrame: {fileID: 3968952138751095120}
+  starImages:
   - {fileID: 6138563911641578087}
   - {fileID: 7259613554043670985}
   - {fileID: 2002625381834795123}
-  _lockedTextAlpha: 0.25
-  _unlockedTextAlpha: 0.4
-  _glowDimmedAlpha: 0.15
-  _starDimmedAlpha: 0.2
+  lockedTextAlpha: 0.25
+  unlockedTextAlpha: 0.7
+  glowDimmedAlpha: 0.15
+  starDimmedAlpha: 0.2
 --- !u!114 &1306640314531711544
 MonoBehaviour:
   m_ObjectHideFlags: 0

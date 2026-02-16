@@ -16,52 +16,52 @@ namespace Rolice.UI
     public class RcStageItemWidget : RcUIWidget
     {
         [Header("UI References")]
-        [SerializeField] private Button _button;
-        [SerializeField] private TMP_Text _stageNumberText;
-        [SerializeField] private Image _glowFrame;
-        [SerializeField] private Image[] _starImages;
+        [SerializeField] private Button button;
+        [SerializeField] private TMP_Text stageNumberText;
+        [SerializeField] private Image glowFrame;
+        [SerializeField] private Image[] starImages;
 
         [Header("Text Alpha")]
-        [SerializeField, Range(0f, 1f)] private float _lockedTextAlpha = 0.25f;
-        [SerializeField, Range(0f, 1f)] private float _unlockedTextAlpha = 0.7f;
+        [SerializeField, Range(0f, 1f)] private float lockedTextAlpha = 0.25f;
+        [SerializeField, Range(0f, 1f)] private float unlockedTextAlpha = 0.7f;
 
         [Header("Glow / Star Alpha")]
-        [SerializeField, Range(0f, 1f)] private float _glowDimmedAlpha = 0.15f;
-        [SerializeField, Range(0f, 1f)] private float _starDimmedAlpha = 0.2f;
+        [SerializeField, Range(0f, 1f)] private float glowDimmedAlpha = 0.15f;
+        [SerializeField, Range(0f, 1f)] private float starDimmedAlpha = 0.2f;
 
-        private int _stageNumber;
-        private RcStageState _state;
-        private int _stars;
-        private bool _isSelected;
+        private int stageNumber;
+        private RcStageState state;
+        private int stars;
+        private bool isSelected;
 
-        public int StageNumber => _stageNumber;
-        public RcStageState State => _state;
+        public int StageNumber => stageNumber;
+        public RcStageState State => state;
         public event Action<int> OnStageSelected;
 
         public override void Initialize()
         {
-            _button.onClick.AddListener(HandleClick);
-            if (_glowFrame != null) _glowFrame.raycastTarget = false;
-            if (_stageNumberText != null) _stageNumberText.raycastTarget = false;
+            button.onClick.AddListener(HandleClick);
+            if (glowFrame != null) glowFrame.raycastTarget = false;
+            if (stageNumberText != null) stageNumberText.raycastTarget = false;
         }
 
         public override void Cleanup()
         {
-            _button.onClick.RemoveListener(HandleClick);
+            button.onClick.RemoveListener(HandleClick);
             OnStageSelected = null;
         }
 
         public void SetData(int stageNumber, RcStageState state, int stars = 0)
         {
-            _stageNumber = stageNumber;
-            _state = state;
-            _stars = Mathf.Clamp(stars, 0, 3);
+            this.stageNumber = stageNumber;
+            this.state = state;
+            this.stars = Mathf.Clamp(stars, 0, 3);
             UpdateVisual();
         }
 
         public void SetSelected(bool selected)
         {
-            _isSelected = selected;
+            isSelected = selected;
             UpdateVisual();
         }
 
@@ -70,51 +70,51 @@ namespace Rolice.UI
             UpdateStageNumber();
             UpdateStars();
             UpdateGlow();
-            _button.interactable = _state != RcStageState.Locked;
+            button.interactable = state != RcStageState.Locked;
         }
 
         private void UpdateStageNumber()
         {
-            if (_stageNumberText == null) return;
+            if (stageNumberText == null) return;
 
-            _stageNumberText.text = _stageNumber.ToString();
-            SetAlpha(_stageNumberText, GetTextAlpha());
+            stageNumberText.text = stageNumber.ToString();
+            SetAlpha(stageNumberText, GetTextAlpha());
         }
 
         private void UpdateStars()
         {
-            if (_starImages == null) return;
+            if (starImages == null) return;
 
-            for (int i = 0; i < _starImages.Length; i++)
+            for (int i = 0; i < starImages.Length; i++)
             {
-                if (_starImages[i] == null) continue;
+                if (starImages[i] == null) continue;
 
-                bool isEarned = _state == RcStageState.Cleared && i < _stars;
-                SetAlpha(_starImages[i], isEarned ? 1f : _starDimmedAlpha);
+                bool isEarned = state == RcStageState.Cleared && i < stars;
+                SetAlpha(starImages[i], isEarned ? 1f : starDimmedAlpha);
             }
         }
 
         private void UpdateGlow()
         {
-            if (_glowFrame == null) return;
+            if (glowFrame == null) return;
 
-            bool show = _state != RcStageState.Locked;
-            _glowFrame.gameObject.SetActive(show);
+            bool show = state != RcStageState.Locked;
+            glowFrame.gameObject.SetActive(show);
 
             if (show)
-                SetAlpha(_glowFrame, _isSelected ? 1f : _glowDimmedAlpha);
+                SetAlpha(glowFrame, isSelected ? 1f : glowDimmedAlpha);
         }
 
         private float GetTextAlpha()
         {
-            if (_isSelected || _state == RcStageState.Cleared) return 1f;
-            return _state == RcStageState.Locked ? _lockedTextAlpha : _unlockedTextAlpha;
+            if (isSelected || state == RcStageState.Cleared) return 1f;
+            return state == RcStageState.Locked ? lockedTextAlpha : unlockedTextAlpha;
         }
 
         private void HandleClick()
         {
-            if (_state == RcStageState.Locked) return;
-            OnStageSelected?.Invoke(_stageNumber);
+            if (state == RcStageState.Locked) return;
+            OnStageSelected?.Invoke(stageNumber);
         }
 
         private static void SetAlpha(Image image, float alpha)

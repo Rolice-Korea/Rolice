@@ -124,8 +124,6 @@ public class RcDiceFaceController : MonoBehaviour
 
         faceToSlot = BuildFaceToSlotByNormal(mf);
         UnityEditor.EditorUtility.SetDirty(this);
-
-        Debug.Log("Dice faceToSlot baked 완료");
     }
 #endif
 }

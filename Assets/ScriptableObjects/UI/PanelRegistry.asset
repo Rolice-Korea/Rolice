@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b69d7843fb68a374ab01012a4302906b, type: 3}
   m_Name: PanelRegistry
   m_EditorClassIdentifier: Assembly-CSharp::Engine.UI.RcUIPanelRegistry
-  _entries:
-  - Prefab: {fileID: 3897423192581192989, guid: 4bf8735e4afb36a479d5f2fc46f172f6, type: 3}
-    Layer: 100
+  entries:
+  - Prefab: {fileID: 9053536482874168351, guid: a8a272e9ab009ad43a29220e538bb6c2, type: 3}
+    Layer: 0
+  - Prefab: {fileID: 4373641295874532565, guid: e5d8a4c07d73b554686f26c536ea6767, type: 3}
+    Layer: 200
   - Prefab: {fileID: 3244917718109596645, guid: d1df15f5b20ed8849a7d7e31c29d148b, type: 3}
     Layer: 100
