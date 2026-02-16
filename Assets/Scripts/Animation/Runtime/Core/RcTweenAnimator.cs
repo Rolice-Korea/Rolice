@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class RcTweenAnimator : MonoBehaviour
 {
@@ -20,47 +19,47 @@ public class RcTweenAnimator : MonoBehaviour
         public LoopType loopType = LoopType.Restart;
     }
 
-    [SerializeField] private List<AnimationSequence> _sequences = new();
-    [SerializeField] private bool _playOnEnable = false;
-    [SerializeField] private RcOnDisableBehaviorType _onDisableBehaviorType = RcOnDisableBehaviorType.Rewind;
+    [SerializeField] private List<AnimationSequence> sequences = new();
+    [SerializeField] private bool playOnEnable = false;
+    [SerializeField] private RcOnDisableBehaviorType onDisableBehaviorType = RcOnDisableBehaviorType.Rewind;
 
     public Action OnComplete;
     public Action OnStart;
 
-    private Sequence _currentSequence;
-    private string _currentSequenceName;
+    private Sequence currentSequence;
+    private string currentSequenceName;
 
     private void OnEnable()
     {
-        if (_playOnEnable)
+        if (playOnEnable)
             Play("Default");
     }
 
     private void OnDisable()
     {
-        if (_currentSequence == null || !_currentSequence.IsActive())
+        if (currentSequence == null || !currentSequence.IsActive())
             return;
 
-        switch (_onDisableBehaviorType)
+        switch (onDisableBehaviorType)
         {
             case RcOnDisableBehaviorType.Kill:
-                _currentSequence.Kill();
+                currentSequence.Kill();
                 break;
             case RcOnDisableBehaviorType.Rewind:
-                _currentSequence.Rewind();
-                _currentSequence.Kill();
+                currentSequence.Rewind();
+                currentSequence.Kill();
                 break;
             case RcOnDisableBehaviorType.Complete:
-                _currentSequence.Complete();
+                currentSequence.Complete();
                 break;
         }
 
-        _currentSequence = null;
+        currentSequence = null;
     }
 
     public void Play(string sequenceName = "Default")
     {
-        var sequence = _sequences.Find(s => s.name == sequenceName);
+        var sequence = sequences.Find(s => s.name == sequenceName);
         if (sequence == null)
         {
             Debug.LogWarning($"[RcTweenAnimator] Sequence '{sequenceName}' not found.", this);
@@ -75,10 +74,10 @@ public class RcTweenAnimator : MonoBehaviour
 
         Stop();
 
-        _currentSequenceName = sequenceName;
+        currentSequenceName = sequenceName;
         OnStart?.Invoke();
 
-        _currentSequence = DOTween.Sequence();
+        currentSequence = DOTween.Sequence();
 
         foreach (var animation in sequence.animations)
         {
@@ -88,50 +87,50 @@ public class RcTweenAnimator : MonoBehaviour
             if (tween == null) continue;
 
             if (animation.sequenceMode == RcTweenConfig.SequenceMode.Append)
-                _currentSequence.Append(tween);
+                currentSequence.Append(tween);
             else
-                _currentSequence.Join(tween);
+                currentSequence.Join(tween);
         }
 
         if (sequence.loop)
-            _currentSequence.SetLoops(sequence.loopCount, sequence.loopType);
+            currentSequence.SetLoops(sequence.loopCount, sequence.loopType);
 
-        _currentSequence.OnComplete(() => OnComplete?.Invoke());
-        _currentSequence.Play();
+        currentSequence.OnComplete(() => OnComplete?.Invoke());
+        currentSequence.Play();
     }
 
     public void Stop()
     {
-        if (_currentSequence != null && _currentSequence.IsActive())
+        if (currentSequence != null && currentSequence.IsActive())
         {
-            _currentSequence.Kill();
-            _currentSequence = null;
+            currentSequence.Kill();
+            currentSequence = null;
         }
-        _currentSequenceName = null;
+        currentSequenceName = null;
     }
 
     public void Pause()
     {
-        if (_currentSequence != null && _currentSequence.IsActive() && _currentSequence.IsPlaying())
-            _currentSequence.Pause();
+        if (currentSequence != null && currentSequence.IsActive() && currentSequence.IsPlaying())
+            currentSequence.Pause();
     }
 
     public void Resume()
     {
-        if (_currentSequence != null && _currentSequence.IsActive() && !_currentSequence.IsPlaying())
-            _currentSequence.Play();
+        if (currentSequence != null && currentSequence.IsActive() && !currentSequence.IsPlaying())
+            currentSequence.Play();
     }
 
     public void Restart()
     {
-        if (!string.IsNullOrEmpty(_currentSequenceName))
-            Play(_currentSequenceName);
-        else if (_currentSequence != null && _currentSequence.IsActive())
-            _currentSequence.Restart();
+        if (!string.IsNullOrEmpty(currentSequenceName))
+            Play(currentSequenceName);
+        else if (currentSequence != null && currentSequence.IsActive())
+            currentSequence.Restart();
     }
 
     public bool IsPlaying() =>
-        _currentSequence != null && _currentSequence.IsActive() && _currentSequence.IsPlaying();
+        currentSequence != null && currentSequence.IsActive() && currentSequence.IsPlaying();
 
     public void PlayOnClick() => Play("OnClick");
     public void PlayOnEnter() => Play("OnEnter");

@@ -1,50 +1,64 @@
+using Engine.UI;
+using Rolice.UI;
 using UnityEngine;
-
 
 public class RcGameBootstrap : MonoBehaviour
 {
     [Header("Level Settings")]
-    [SerializeField] private RcLevelDataSO startingLevel;
     [SerializeField] private Transform tilesParent;
-    
-    [Header("Temp")]
-    [SerializeField] private RcLevelDataSO tempLevelData;
-    
+
+    [Header("Fallback (에디터 직접 실행용)")]
+    [SerializeField] private RcLevelDataSO fallbackLevel;
+
+    private int currentStageNumber;
+
     private void Awake()
     {
-        GameLoad(startingLevel);
+        RcLevelDataSO levelData = ResolveLevel();
+        if (levelData != null)
+        {
+            GameLoad(levelData);
+        }
+        else
+        {
+            Debug.LogError("[Bootstrap] 로드할 레벨을 찾을 수 없습니다!");
+        }
     }
 
-    private void Update()
+    private RcLevelDataSO ResolveLevel()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        int stageNumber = RcGameContext.SelectedStageNumber;
+
+        if (stageNumber > 0)
         {
-            GameLoad(tempLevelData);
+            var levelData = RcProgressManager.Instance.StageDatabase.GetStage(stageNumber);
+            if (levelData != null)
+            {
+                currentStageNumber = stageNumber;
+                return levelData;
+            }
+
+            Debug.LogWarning($"[Bootstrap] 스테이지 {stageNumber} 데이터를 찾을 수 없습니다. fallback 사용");
         }
+
+        if (fallbackLevel == null) return null;
+
+        currentStageNumber = fallbackLevel.StageInfo.StageNumber;
+        return fallbackLevel;
     }
 
     private void GameLoad(RcLevelDataSO levelData)
     {
         UnsubscribeEventConnections();
-        
-        Debug.Log("=== Game Bootstrap 시작 ===");
-        
-        // 1. 시작 레벨 로드
-        if (levelData != null)
-        {
-            LoadLevel(levelData);
-        }
-        else
-        {
-            Debug.LogWarning("[Bootstrap] 시작 레벨이 설정되지 않았습니다!");
-        }
-        
-        // 2. 이벤트 연결
+        LoadLevel(levelData);
         SetupEventConnections();
-        
-        Debug.Log("=== Game Bootstrap 완료 ===");
     }
-    
+
+    private void Start()
+    {
+        RcUIManager.Instance.Open<RcGameHudPanel>();
+    }
+
     private void OnDestroy()
     {
         UnsubscribeEventConnections();
@@ -52,21 +66,16 @@ public class RcGameBootstrap : MonoBehaviour
 
     private void LoadLevel(RcLevelDataSO levelData)
     {
-        // 레벨 로드
         RcLevelLoadResult result = RcLevelManager.Instance.LoadLevel(levelData, tilesParent);
-        
+
         if (!result.Success)
         {
             Debug.LogError($"[Bootstrap] 레벨 로드 실패: {result.ErrorMessage}");
             return;
         }
-        
-        Debug.Log($"[Bootstrap] ✓ 레벨 로드 완료: {startingLevel.name}");
-        
-        // 게임 룰 매니저 초기화
+
         InitializeGameRules(levelData);
     }
-    
 
     private void InitializeGameRules(RcLevelDataSO levelData)
     {
@@ -75,41 +84,58 @@ public class RcGameBootstrap : MonoBehaviour
             Debug.LogWarning("[Bootstrap] LevelRules가 없습니다!");
             return;
         }
-        
+
         RcGameRuleManager.Instance.Initialize(levelData.Rules);
     }
-    
+
     private void SetupEventConnections()
     {
         RcGameEvents.Instance.Subscribe(RcGameEvent.GameWin, OnGameWin);
         RcGameEvents.Instance.Subscribe(RcGameEvent.GameLose, OnGameLose);
-        RcGameEvents.Instance.Subscribe(RcGameEvent.TurnChanged, OnTurnChanged);
     }
 
     private void UnsubscribeEventConnections()
     {
         RcGameEvents.Instance.Unsubscribe(RcGameEvent.GameWin, OnGameWin);
         RcGameEvents.Instance.Unsubscribe(RcGameEvent.GameLose, OnGameLose);
-        RcGameEvents.Instance.Unsubscribe(RcGameEvent.TurnChanged, OnTurnChanged);
     }
-
-    // === 이벤트 핸들러 ===
 
     private void OnGameWin()
     {
-        Debug.Log("[Bootstrap] 승리 처리");
-        // TODO: 승리 UI 표시, 다음 레벨 로드 등
+        int turnUsed = RcGameRuleManager.Instance.CurrentTurn;
+
+        if (currentStageNumber > 0)
+            RcProgressManager.Instance.RecordStageClear(currentStageNumber, turnUsed);
+
+        int stars = 0;
+        if (currentStageNumber > 0)
+        {
+            var levelData = RcProgressManager.Instance.StageDatabase.GetStage(currentStageNumber);
+            stars = levelData.StageInfo.CalculateStars(turnUsed);
+        }
+
+        bool hasNext = currentStageNumber > 0
+            && currentStageNumber < RcProgressManager.Instance.TotalStageCount;
+
+        OpenResultPanel(true, turnUsed, stars, hasNext);
     }
 
     private void OnGameLose()
     {
-        Debug.Log("[Bootstrap] 패배 처리");
-        // TODO: 패배 UI 표시, 재시작 옵션 등
+        int turnUsed = RcGameRuleManager.Instance.CurrentTurn;
+        OpenResultPanel(false, turnUsed, 0, false);
     }
 
-    private void OnTurnChanged(int currentTurn)
+    private void OpenResultPanel(bool isVictory, int turnUsed, int starCount, bool hasNextStage)
     {
-        // TODO: UI 업데이트
-        // Debug.Log($"[Bootstrap] 턴 UI 업데이트: {currentTurn}");
+        var data = new RcGameResultData
+        {
+            IsVictory = isVictory,
+            TurnUsed = turnUsed,
+            StarCount = starCount,
+            HasNextStage = hasNextStage
+        };
+
+        RcUIManager.Instance.Open<RcGameResultPanel, RcGameResultData>(data);
     }
 }

@@ -3,9 +3,6 @@ using UnityEngine;
 
 namespace Rolice.Data
 {
-    /// <summary>
-    /// 스테이지 메타 정보 (레벨 선택 화면용)
-    /// </summary>
     [Serializable]
     public class RcStageInfo
     {
@@ -21,17 +18,11 @@ namespace Rolice.Data
         [Tooltip("별 획득 기준 턴 수 (3성, 2성, 1성 순서)")]
         public int[] StarThresholds = { 10, 15, 20 };
 
-        /// <summary>
-        /// 표시용 이름 반환
-        /// </summary>
         public string GetDisplayName()
         {
             return string.IsNullOrEmpty(DisplayName) ? $"Stage {StageNumber}" : DisplayName;
         }
 
-        /// <summary>
-        /// 턴 수 기반 별 계산
-        /// </summary>
         public int CalculateStars(int turnCount)
         {
             if (StarThresholds == null || StarThresholds.Length == 0)
@@ -43,7 +34,7 @@ namespace Rolice.Data
                     return MaxStars - i;
             }
 
-            return 1; // 최소 1성
+            return 1;
         }
 
         public void Validate()

@@ -268,5 +268,3 @@ MonoBehaviour:
   Rules:
     HasTurnLimit: 1
     MaxTurns: 30
-    HasTimeLimit: 0
-    MaxTime: 60

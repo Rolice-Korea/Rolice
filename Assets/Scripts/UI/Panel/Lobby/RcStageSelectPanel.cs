@@ -8,26 +8,26 @@ namespace Rolice.UI
     public class RcStageSelectPanel : RcUIPanel
     {
         [Header("References")]
-        [SerializeField] private Transform _contentParent;
-        [SerializeField] private RcStageItemWidget _itemTemplate;
+        [SerializeField] private Transform contentParent;
+        [SerializeField] private RcStageItemWidget itemTemplate;
 
-        private readonly List<RcStageItemWidget> _items = new();
-        private RcStageSelectPresenter _presenter;
-        private int _selectedIndex = -1;
+        private readonly List<RcStageItemWidget> items = new();
+        private RcStageSelectPresenter presenter;
+        private int selectedIndex = -1;
 
         public event Action<int> OnStageSelected;
-        public int ItemCount => _items.Count;
+        public int ItemCount => items.Count;
 
         protected override void OnOpen()
         {
-            _presenter = new RcStageSelectPresenter();
-            _presenter.Bind(this);
+            presenter = new RcStageSelectPresenter();
+            presenter.Bind(this);
         }
 
         protected override void OnBeforeClose()
         {
-            _presenter?.Unbind();
-            _presenter = null;
+            presenter?.Unbind();
+            presenter = null;
         }
 
         public void CreateItems(int count)
@@ -36,50 +36,50 @@ namespace Rolice.UI
 
             for (int i = 0; i < count; i++)
             {
-                var item = Instantiate(_itemTemplate, _contentParent);
+                var item = Instantiate(itemTemplate, contentParent);
                 item.gameObject.SetActive(true);
                 item.Initialize();
                 item.OnStageSelected += HandleStageSelected;
-                _items.Add(item);
+                items.Add(item);
             }
         }
 
         public void SetItemData(int index, int stageNumber, RcStageState state, int stars)
         {
-            if (index < 0 || index >= _items.Count) return;
-            _items[index].SetData(stageNumber, state, stars);
+            if (index < 0 || index >= items.Count) return;
+            items[index].SetData(stageNumber, state, stars);
         }
 
         public void SelectItem(int index)
         {
-            if (index < 0 || index >= _items.Count) return;
-            if (_items[index].State == RcStageState.Locked) return;
+            if (index < 0 || index >= items.Count) return;
+            if (items[index].State == RcStageState.Locked) return;
 
-            if (_selectedIndex >= 0 && _selectedIndex < _items.Count)
-                _items[_selectedIndex].SetSelected(false);
+            if (selectedIndex >= 0 && selectedIndex < items.Count)
+                items[selectedIndex].SetSelected(false);
 
-            _selectedIndex = index;
-            _items[_selectedIndex].SetSelected(true);
+            selectedIndex = index;
+            items[selectedIndex].SetSelected(true);
         }
 
         public void ClearItems()
         {
-            foreach (var item in _items)
+            foreach (var item in items)
             {
                 item.OnStageSelected -= HandleStageSelected;
                 item.Cleanup();
                 Destroy(item.gameObject);
             }
 
-            _items.Clear();
-            _selectedIndex = -1;
+            items.Clear();
+            selectedIndex = -1;
         }
 
         private void HandleStageSelected(int stageNumber)
         {
-            for (int i = 0; i < _items.Count; i++)
+            for (int i = 0; i < items.Count; i++)
             {
-                if (_items[i].StageNumber == stageNumber)
+                if (items[i].StageNumber == stageNumber)
                 {
                     SelectItem(i);
                     break;

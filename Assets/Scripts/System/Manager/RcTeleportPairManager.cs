@@ -24,7 +24,6 @@ public class RcTeleportPairManager
         if (!pairs[pairID].Contains(position))
         {
             pairs[pairID].Add(position);
-            Debug.Log($"[TeleportPairManager] 텔레포트 페어 등록: {pairID} at {position}");
         }
     }
     

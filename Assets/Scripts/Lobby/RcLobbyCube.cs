@@ -3,30 +3,30 @@ using UnityEngine;
 public class RcLobbyCube : MonoBehaviour
 {
     [Header("자동 회전")]
-    [SerializeField] private float _autoRotateSpeed = 15f;
-    [SerializeField] private Vector3 _autoRotateAxis = Vector3.up;
+    [SerializeField] private float autoRotateSpeed = 15f;
+    [SerializeField] private Vector3 autoRotateAxis = Vector3.up;
 
     [Header("드래그 회전")]
-    [SerializeField] private float _dragSensitivity = 0.3f;
-    [SerializeField] private float _inertiaDecaySpeed = 2f;
-    [SerializeField] private float _minInertiaSpeed = 0.1f;
+    [SerializeField] private float dragSensitivity = 0.3f;
+    [SerializeField] private float inertiaDecaySpeed = 2f;
+    [SerializeField] private float minInertiaSpeed = 0.1f;
 
     [Header("플로팅 연동")]
-    [SerializeField] private RcTweenAnimator _floatAnimator;
-    [SerializeField] private bool _pauseFloatOnDrag = true;
+    [SerializeField] private RcTweenAnimator floatAnimator;
+    [SerializeField] private bool pauseFloatOnDrag = true;
 
-    private Camera _mainCamera;
-    private Vector2 _lastPointerPos;
-    private Vector2 _dragVelocity;
-    private bool _isDragging;
-    private bool _isFloatPaused;
+    private Camera mainCamera;
+    private Vector2 lastPointerPos;
+    private Vector2 dragVelocity;
+    private bool isDragging;
+    private bool isFloatPaused;
 
-    public bool IsDragging => _isDragging;
-    public bool HasInertia => _dragVelocity.magnitude > _minInertiaSpeed;
+    public bool IsDragging => isDragging;
+    public bool HasInertia => dragVelocity.magnitude > minInertiaSpeed;
 
     private void Start()
     {
-        _mainCamera = Camera.main;
+        mainCamera = Camera.main;
 
         if (GetComponent<Collider>() == null)
             gameObject.AddComponent<BoxCollider>();
@@ -45,52 +45,52 @@ public class RcLobbyCube : MonoBehaviour
         else if (Input.GetMouseButtonUp(0))
             EndDrag();
 
-        if (_isDragging)
+        if (isDragging)
             UpdateDrag();
     }
 
     private void BeginDrag()
     {
-        if (_mainCamera == null) return;
+        if (mainCamera == null) return;
 
-        var ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+        var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out var hit) || hit.transform != transform)
             return;
 
-        _isDragging = true;
-        _lastPointerPos = Input.mousePosition;
-        _dragVelocity = Vector2.zero;
+        isDragging = true;
+        lastPointerPos = Input.mousePosition;
+        dragVelocity = Vector2.zero;
         SetFloatPaused(true);
     }
 
     private void EndDrag()
     {
-        _isDragging = false;
+        isDragging = false;
     }
 
     private void UpdateDrag()
     {
         Vector2 currentPos = Input.mousePosition;
-        _dragVelocity = (currentPos - _lastPointerPos) * _dragSensitivity;
-        _lastPointerPos = currentPos;
+        dragVelocity = (currentPos - lastPointerPos) * dragSensitivity;
+        lastPointerPos = currentPos;
     }
 
     private void UpdateRotation()
     {
-        if (_isDragging)
+        if (isDragging)
         {
-            RotateByCamera(_dragVelocity);
+            RotateByCamera(dragVelocity);
             return;
         }
 
         if (HasInertia)
         {
-            RotateByCamera(_dragVelocity);
-            _dragVelocity = Vector2.Lerp(_dragVelocity, Vector2.zero, _inertiaDecaySpeed * Time.deltaTime);
+            RotateByCamera(dragVelocity);
+            dragVelocity = Vector2.Lerp(dragVelocity, Vector2.zero, inertiaDecaySpeed * Time.deltaTime);
         }
         else
         {
-            _dragVelocity = Vector2.zero;
+            dragVelocity = Vector2.zero;
             SetFloatPaused(false);
             ApplyAutoRotation();
         }
@@ -98,25 +98,25 @@ public class RcLobbyCube : MonoBehaviour
 
     private void RotateByCamera(Vector2 velocity)
     {
-        if (_mainCamera == null) return;
+        if (mainCamera == null) return;
 
-        transform.Rotate(_mainCamera.transform.up, -velocity.x, Space.World);
-        transform.Rotate(_mainCamera.transform.right, velocity.y, Space.World);
+        transform.Rotate(mainCamera.transform.up, -velocity.x, Space.World);
+        transform.Rotate(mainCamera.transform.right, velocity.y, Space.World);
     }
 
     private void ApplyAutoRotation()
     {
-        transform.Rotate(_autoRotateAxis * _autoRotateSpeed * Time.deltaTime, Space.World);
+        transform.Rotate(autoRotateAxis * autoRotateSpeed * Time.deltaTime, Space.World);
     }
 
     private void SetFloatPaused(bool paused)
     {
-        if (_floatAnimator == null || !_pauseFloatOnDrag) return;
-        if (_isFloatPaused == paused) return;
+        if (floatAnimator == null || !pauseFloatOnDrag) return;
+        if (isFloatPaused == paused) return;
 
-        if (paused) _floatAnimator.Pause();
-        else _floatAnimator.Resume();
+        if (paused) floatAnimator.Pause();
+        else floatAnimator.Resume();
 
-        _isFloatPaused = paused;
+        isFloatPaused = paused;
     }
 }

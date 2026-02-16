@@ -1,10 +1,6 @@
 using UnityEngine;
 using UnityEditor;
 
-/// <summary>
-/// 레벨 템플릿 생성 유틸리티
-/// 빠른 프로토타입용 미리 정의된 레이아웃 제공
-/// </summary>
 public class RcLevelTemplateCreator : EditorWindow
 {
     private TemplateType selectedTemplate = TemplateType.Small5x5;
@@ -41,8 +37,7 @@ public class RcLevelTemplateCreator : EditorWindow
         
         GUILayout.Space(10);
         
-        // === 템플릿 선택 ===
-        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         
         GUILayout.Label("Template Type:", EditorStyles.miniBoldLabel);
         
@@ -57,16 +52,14 @@ public class RcLevelTemplateCreator : EditorWindow
         
         GUILayout.Space(10);
         
-        // === 레벨 이름 ===
-        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         GUILayout.Label("Level Name:", EditorStyles.miniBoldLabel);
         levelName = EditorGUILayout.TextField(levelName);
         EditorGUILayout.EndVertical();
         
         GUILayout.Space(10);
         
-        // === 생성 버튼 ===
-        if (GUILayout.Button("Create Template", GUILayout.Height(40)))
+if (GUILayout.Button("Create Template", GUILayout.Height(40)))
         {
             CreateTemplate();
         }
@@ -118,7 +111,6 @@ public class RcLevelTemplateCreator : EditorWindow
         
         Selection.activeObject = level;
         
-        Debug.Log($"템플릿 생성 완료: {path}");
         EditorUtility.DisplayDialog(
             "Template Created",
             $"템플릿이 생성되었습니다!\n\n{path}\n\nLevel Editor에서 편집할 수 있습니다.",
@@ -126,11 +118,7 @@ public class RcLevelTemplateCreator : EditorWindow
         );
     }
     
-    // ========================================
-    // 템플릿 생성 메서드
-    // ========================================
-    
-    RcLevelDataSO CreateEmptyLevel()
+RcLevelDataSO CreateEmptyLevel()
     {
         return CreateLevel(7, 7, (x, y) => null);
     }
@@ -200,10 +188,6 @@ public class RcLevelTemplateCreator : EditorWindow
         });
     }
     
-    // ========================================
-    // 헬퍼 메서드
-    // ========================================
-    
     RcLevelDataSO CreateLevel(int width, int height, System.Func<int, int, RcTileData> tileFactory)
     {
         RcLevelDataSO level = CreateInstance<RcLevelDataSO>();
@@ -227,9 +211,7 @@ public class RcLevelTemplateCreator : EditorWindow
         level.Rules = new RcLevelRules
         {
             HasTurnLimit = true,
-            MaxTurns = 15,
-            HasTimeLimit = false,
-            MaxTime = 60f
+            MaxTurns = 15
         };
         
         return level;
