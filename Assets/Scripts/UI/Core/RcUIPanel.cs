@@ -22,6 +22,7 @@ namespace Engine.UI
             if (IsOpen) return;
 
             IsOpen = true;
+            
             gameObject.SetActive(true);
             OnOpen();
 
@@ -54,6 +55,42 @@ namespace Engine.UI
                 FinishClose();
                 onComplete?.Invoke();
             }
+        }
+
+        public void CloseImmediate()
+        {
+            if (!IsOpen) return;
+
+            IsOpen = false;
+            OnBeforeClose();
+
+            if (animator != null)
+                animator.Stop();
+
+            FinishClose();
+        }
+
+        // 애니메이션 재생만 하고 비활성화는 하지 않음 (씬 전환 시 사용)
+        public void CloseAnimated()
+        {
+            if (!IsOpen) return;
+
+            IsOpen = false;
+            OnBeforeClose();
+
+            if (animator != null)
+            {
+                animator.OnComplete = null;
+                animator.PlayOnClose();
+            }
+        }
+
+        public void Deactivate()
+        {
+            if (animator != null)
+                animator.Stop();
+
+            FinishClose();
         }
 
         private void FinishClose()

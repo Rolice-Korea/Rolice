@@ -26,6 +26,8 @@ public class RcDicePawn : MonoBehaviour
 
         movement.OnMoveStarted += OnMoveStarted;
         movement.OnMoveCompleted += OnMoveCompleted;
+
+        RcGameEvents.Instance.Subscribe(RcGameEvent.GameLose, OnGameLose);
     }
 
     private void Start()
@@ -39,6 +41,7 @@ public class RcDicePawn : MonoBehaviour
 
         movement.OnMoveStarted -= OnMoveStarted;
         movement.OnMoveCompleted -= OnMoveCompleted;
+        RcGameEvents.Instance.Unsubscribe(RcGameEvent.GameLose, OnGameLose);
     }
 
     public void Move(Vector2Int direction)
@@ -92,6 +95,16 @@ public class RcDicePawn : MonoBehaviour
             return false;
 
         return true;
+    }
+
+    private void OnGameLose()
+    {
+        faceController.FadeToGray();
+    }
+
+    public void FlashEmission(System.Action onComplete = null)
+    {
+        faceController.FlashEmission(onComplete);
     }
 
     private void OnMoveStarted(Vector2Int fromPos)

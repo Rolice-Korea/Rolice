@@ -27,11 +27,10 @@ namespace Engine.UI
                 {
                     kvp.Value.renderMode = RenderMode.ScreenSpaceCamera;
                     kvp.Value.worldCamera = camera;
+                    kvp.Value.planeDistance = camera.nearClipPlane + 0.01f;
                 }
-                else
-                {
-                    kvp.Value.renderMode = RenderMode.ScreenSpaceOverlay;
-                }
+                // 카메라가 null이어도 Overlay로 전환하지 않음
+                // 씬 전환 중 렌더 모드 변경으로 깜빡임 방지
             }
         }
 
@@ -59,7 +58,7 @@ namespace Engine.UI
             {
                 canvas.renderMode = RenderMode.ScreenSpaceCamera;
                 canvas.worldCamera = camera;
-                canvas.planeDistance = 0f;
+                canvas.planeDistance = camera.nearClipPlane + 0.01f;
             }
             else
             {
@@ -78,6 +77,16 @@ namespace Engine.UI
 
             canvases[layer] = canvas;
             return canvas;
+        }
+
+        public void SetVisible(bool visible)
+        {
+            foreach (var kvp in canvases)
+            {
+                if (kvp.Value == null) continue;
+                var cg = kvp.Value.GetComponent<CanvasGroup>();
+                if (cg != null) cg.alpha = visible ? 1f : 0f;
+            }
         }
 
         public void Dispose()

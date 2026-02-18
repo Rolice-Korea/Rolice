@@ -109,10 +109,24 @@ namespace Engine.UI
             {
                 var panel = panelStack[i];
                 if (panel.IsOpen)
-                    panel.Close();
+                    panel.CloseAnimated();
             }
 
             panelStack.Clear();
+        }
+
+        public void DeactivateAll()
+        {
+            foreach (var panel in instanceCache.Values)
+            {
+                if (panel.gameObject.activeSelf)
+                    panel.Deactivate();
+            }
+        }
+
+        public void SetCanvasVisible(bool visible)
+        {
+            canvasLayer.SetVisible(visible);
         }
 
         public void Toggle<T>() where T : RcUIPanel

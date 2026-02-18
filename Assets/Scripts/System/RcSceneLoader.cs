@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using DG.Tweening;
 using Engine;
+using Engine.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -40,6 +41,9 @@ public class RcSceneLoader : RcSingletonMono<RcSceneLoader>
         var fadeOutTween = RcScreenFader.Instance.FadeOut(fadeOutDuration);
         yield return fadeOutTween.WaitForCompletion(true);
 
+        // 화면이 완전히 검은 상태 — UI Canvas를 숨겨서 씬 전환 중 깜빡임 방지
+        RcUIManager.Instance.SetCanvasVisible(false);
+
         var asyncOp = SceneManager.LoadSceneAsync(sceneName);
         asyncOp.allowSceneActivation = false;
 
@@ -58,6 +62,8 @@ public class RcSceneLoader : RcSingletonMono<RcSceneLoader>
 
         // 씬 Awake/Start 완료 보장
         yield return null;
+
+        RcUIManager.Instance.SetCanvasVisible(true);
 
         var fadeInTween = RcScreenFader.Instance.FadeIn(fadeInDuration);
         yield return fadeInTween.WaitForCompletion(true);

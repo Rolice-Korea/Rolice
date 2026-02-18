@@ -49,19 +49,13 @@ public class RcGameBootstrap : MonoBehaviour
 
     private void GameLoad(RcLevelDataSO levelData)
     {
-        UnsubscribeEventConnections();
         LoadLevel(levelData);
-        SetupEventConnections();
     }
 
     private void Start()
     {
         RcUIManager.Instance.Open<RcGameHudPanel>();
-    }
-
-    private void OnDestroy()
-    {
-        UnsubscribeEventConnections();
+        RcGameResultManager.Instance.Initialize(currentStageNumber);
     }
 
     private void LoadLevel(RcLevelDataSO levelData)
@@ -86,56 +80,5 @@ public class RcGameBootstrap : MonoBehaviour
         }
 
         RcGameRuleManager.Instance.Initialize(levelData.Rules);
-    }
-
-    private void SetupEventConnections()
-    {
-        RcGameEvents.Instance.Subscribe(RcGameEvent.GameWin, OnGameWin);
-        RcGameEvents.Instance.Subscribe(RcGameEvent.GameLose, OnGameLose);
-    }
-
-    private void UnsubscribeEventConnections()
-    {
-        RcGameEvents.Instance.Unsubscribe(RcGameEvent.GameWin, OnGameWin);
-        RcGameEvents.Instance.Unsubscribe(RcGameEvent.GameLose, OnGameLose);
-    }
-
-    private void OnGameWin()
-    {
-        int turnUsed = RcGameRuleManager.Instance.CurrentTurn;
-
-        if (currentStageNumber > 0)
-            RcProgressManager.Instance.RecordStageClear(currentStageNumber, turnUsed);
-
-        int stars = 0;
-        if (currentStageNumber > 0)
-        {
-            var levelData = RcProgressManager.Instance.StageDatabase.GetStage(currentStageNumber);
-            stars = levelData.StageInfo.CalculateStars(turnUsed);
-        }
-
-        bool hasNext = currentStageNumber > 0
-            && currentStageNumber < RcProgressManager.Instance.TotalStageCount;
-
-        OpenResultPanel(true, turnUsed, stars, hasNext);
-    }
-
-    private void OnGameLose()
-    {
-        int turnUsed = RcGameRuleManager.Instance.CurrentTurn;
-        OpenResultPanel(false, turnUsed, 0, false);
-    }
-
-    private void OpenResultPanel(bool isVictory, int turnUsed, int starCount, bool hasNextStage)
-    {
-        var data = new RcGameResultData
-        {
-            IsVictory = isVictory,
-            TurnUsed = turnUsed,
-            StarCount = starCount,
-            HasNextStage = hasNextStage
-        };
-
-        RcUIManager.Instance.Open<RcGameResultPanel, RcGameResultData>(data);
     }
 }

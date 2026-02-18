@@ -200,6 +200,11 @@ public class RcTweenAnimatorEditor : Editor
         EditorGUILayout.EndHorizontal();
 
         EditorGUI.indentLevel++;
+
+        var sequenceModeProp = element.FindPropertyRelative("sequenceMode");
+        if (sequenceModeProp != null)
+            EditorGUILayout.PropertyField(sequenceModeProp, new GUIContent("Sequence Mode"));
+
         var iter = element.Copy();
         var end = iter.GetEndProperty();
         iter.NextVisible(true);

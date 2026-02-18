@@ -8,6 +8,7 @@ namespace Rolice.UI
     {
         [Header("Turn")]
         [SerializeField] private TMP_Text turnText;
+        [SerializeField] private RcTweenAnimator animatorGameOver;
 
         private RcGameHudPresenter presenter;
 
@@ -28,6 +29,20 @@ namespace Rolice.UI
             if (turnText == null) return;
 
             turnText.text = $"{remaining}";
+        }
+
+        public void PlayGameOverAnimation()
+        {
+            if (animatorGameOver != null && !animatorGameOver.IsPlaying())
+            {
+                animatorGameOver.OnComplete = OnGameOverAnimationComplete;
+                animatorGameOver.Play("GameOver");
+            }
+        }
+
+        private void OnGameOverAnimationComplete()
+        {
+            RcGameResultManager.Instance.ShowGameOverResult();
         }
     }
 }

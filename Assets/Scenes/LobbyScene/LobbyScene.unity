@@ -321,12 +321,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04bb4365cdb4fd541bd2d7bf3b5e0141, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RcTweenAnimator
-  sequences: []
-  playOnEnable: 0
+  sequences:
+  - name: Default
+    animations:
+    - rid: 615818144037732418
+    loop: 1
+    loopCount: -1
+    loopType: 1
+  playOnEnable: 1
   onDisableBehaviorType: 1
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 615818144037732418
+      type: {class: RcMoveConfig, ns: , asm: Assembly-CSharp}
+      data:
+        sequenceMode: 0
+        target: {fileID: 0}
+        duration: 1.2
+        ease: 1
+        delay: 0
+        targetPosition: {x: 0, y: 0.2, z: 0}
+        useLocalPosition: 1
+        fromCurrentPosition: 1
+        startPosition: {x: 0, y: 0, z: 0}
+        snapping: 0
 --- !u!1 &379843695
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,7 +677,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 56627522}
-  m_PlaneDistance: 100
+  m_PlaneDistance: -5
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0

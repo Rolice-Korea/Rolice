@@ -55,6 +55,7 @@ public class RcScreenFader : RcSingletonMono<RcScreenFader>
             .DOFade(targetAlpha, duration)
             .SetEase(Ease.InOutSine)
             .SetUpdate(true)
+            .SetLink(gameObject)
             .OnComplete(() =>
             {
                 if (targetAlpha <= 0f)

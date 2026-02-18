@@ -1,9 +1,12 @@
 using Engine.UI;
+using UnityEngine;
 
 namespace Rolice.UI
 {
     public class RcGameHudPresenter : RcUIPresenter<RcGameHudPanel>
     {
+        private int lastRemainingTurns = -1;
+
         protected override void OnInitialize()
         {
             RcGameEvents.Instance.Subscribe(RcGameEvent.TurnChanged, OnTurnChanged);
@@ -23,6 +26,7 @@ namespace Rolice.UI
 
             int remainingTurns = ruleManager.GetRemainingTurns();
             Panel.SetRemainingTurns(remainingTurns >= 0 ? remainingTurns : 0);
+            lastRemainingTurns = remainingTurns;
         }
 
         private void OnTurnChanged(int currentTurn)
@@ -31,6 +35,13 @@ namespace Rolice.UI
 
             int remainingTurns = ruleManager.GetRemainingTurns();
             Panel.SetRemainingTurns(remainingTurns >= 0 ? remainingTurns : 0);
+
+            if (lastRemainingTurns > 0 && remainingTurns <= 0)
+            {
+                Panel.PlayGameOverAnimation();
+            }
+
+            lastRemainingTurns = remainingTurns;
         }
     }
 }

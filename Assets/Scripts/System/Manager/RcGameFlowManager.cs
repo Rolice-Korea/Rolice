@@ -17,7 +17,7 @@ public class RcGameFlowManager : RcSingletonMono<RcGameFlowManager>
 
         RcUIManager.Instance.CloseAll();
         RcGameContext.SetStage(stageNumber);
-        RcSceneLoader.Instance.LoadScene(MainSceneName);
+        RcSceneLoader.Instance.LoadScene(MainSceneName, OnBeforeSceneActivate);
     }
 
     public void RetryStage()
@@ -25,7 +25,7 @@ public class RcGameFlowManager : RcSingletonMono<RcGameFlowManager>
         if (RcSceneLoader.Instance.IsLoading) return;
 
         RcUIManager.Instance.CloseAll();
-        RcSceneLoader.Instance.LoadScene(MainSceneName);
+        RcSceneLoader.Instance.LoadScene(MainSceneName, OnBeforeSceneActivate);
     }
 
     public void GoToNextStage()
@@ -36,7 +36,7 @@ public class RcGameFlowManager : RcSingletonMono<RcGameFlowManager>
 
         RcUIManager.Instance.CloseAll();
         RcGameContext.SetStage(next);
-        RcSceneLoader.Instance.LoadScene(MainSceneName);
+        RcSceneLoader.Instance.LoadScene(MainSceneName, OnBeforeSceneActivate);
     }
 
     public void GoToLobby()
@@ -44,6 +44,11 @@ public class RcGameFlowManager : RcSingletonMono<RcGameFlowManager>
         if (RcSceneLoader.Instance.IsLoading) return;
 
         RcUIManager.Instance.CloseAll();
-        RcSceneLoader.Instance.LoadScene(LobbySceneName);
+        RcSceneLoader.Instance.LoadScene(LobbySceneName, OnBeforeSceneActivate);
+    }
+
+    private void OnBeforeSceneActivate()
+    {
+        RcUIManager.Instance.DeactivateAll();
     }
 }

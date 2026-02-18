@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class RcDiceFaceController : MonoBehaviour
@@ -12,7 +13,16 @@ public class RcDiceFaceController : MonoBehaviour
     [Header("Initial Face Colors")]
     [SerializeField] private RcColorSO[] initialFaces = new RcColorSO[6];
 
+    [Header("Defeat Effect")]
+    [SerializeField] private float grayFadeDuration = 0.6f;
+
+    [Header("Victory Effect")]
+    [SerializeField] private float flashIntensity = 3f;
+    [SerializeField] private float flashDuration = 0.5f;
+
     private RcDiceFaceData faceData;
+    private Tween grayTween;
+    private Tween flashTween;
 
     public void Initialize()
     {
@@ -55,6 +65,74 @@ public class RcDiceFaceController : MonoBehaviour
         }
 
         diceRenderer.materials = mats;
+    }
+
+    private static readonly int BaseColorID = Shader.PropertyToID("_BaseColor");
+    private static readonly int EmissionColorID = Shader.PropertyToID("_EmissionColor");
+
+    public void FadeToGray()
+    {
+        if (diceRenderer == null) return;
+
+        var mats = diceRenderer.materials;
+        var originalBaseColors = new Color[mats.Length];
+        var originalEmissionColors = new Color[mats.Length];
+
+        for (int i = 0; i < mats.Length; i++)
+        {
+            originalBaseColors[i] = mats[i].GetColor(BaseColorID);
+            originalEmissionColors[i] = mats[i].GetColor(EmissionColorID);
+        }
+
+        Color grayTarget = new Color(0.25f, 0.25f, 0.25f, 1f);
+
+        float progress = 0f;
+        grayTween = DOTween.To(() => progress, x =>
+        {
+            progress = x;
+            for (int i = 0; i < mats.Length; i++)
+            {
+                mats[i].SetColor(EmissionColorID,
+                    Color.Lerp(originalEmissionColors[i], Color.black, progress));
+                mats[i].SetColor(BaseColorID,
+                    Color.Lerp(originalBaseColors[i], grayTarget, progress));
+            }
+        }, 1f, grayFadeDuration).SetEase(Ease.OutQuad);
+    }
+
+    public void FlashEmission(System.Action onComplete = null)
+    {
+        if (diceRenderer == null)
+        {
+            onComplete?.Invoke();
+            return;
+        }
+
+        var mats = diceRenderer.materials;
+        var originalEmissionColors = new Color[mats.Length];
+
+        for (int i = 0; i < mats.Length; i++)
+            originalEmissionColors[i] = mats[i].GetColor(EmissionColorID);
+
+        float progress = 0f;
+        flashTween = DOTween.To(() => progress, x =>
+        {
+            progress = x;
+            float curve = 1f - Mathf.Abs(2f * progress - 1f);
+            for (int i = 0; i < mats.Length; i++)
+            {
+                Color boosted = originalEmissionColors[i] * (1f + flashIntensity * curve);
+                mats[i].SetColor(EmissionColorID, boosted);
+            }
+        }, 1f, flashDuration)
+        .SetEase(Ease.Linear)
+        .OnComplete(() => onComplete?.Invoke());
+    }
+
+    private void OnDestroy()
+    {
+        grayTween?.Kill();
+        flashTween?.Kill();
     }
 
     private void OnValidate()

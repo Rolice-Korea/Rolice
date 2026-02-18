@@ -49,7 +49,20 @@ namespace Rolice.UI
 
         private void HandleStageSelected(int stageNumber)
         {
-            RcGameFlowManager.Instance.GoToStage(stageNumber);
+            var levelData = RcProgressManager.Instance.StageDatabase.GetStage(stageNumber);
+            if (levelData == null)
+            {
+                Debug.LogError($"[StageSelectPresenter] 스테이지 {stageNumber} 데이터 없음");
+                return;
+            }
+
+            var stageInfo = levelData.StageInfo;
+            int currentStars = RcProgressManager.Instance.GetStageStars(stageNumber);
+
+            var dialog = RcUIManager.Instance.Open<RcStageStartDialog>();
+            dialog.SetStageInfo(stageNumber, stageInfo.GetDisplayName(), stageInfo.StarThresholds, currentStars);
+
+            dialog.OnStartStage += (selectedStage) => RcGameFlowManager.Instance.GoToStage(selectedStage);
         }
     }
 }

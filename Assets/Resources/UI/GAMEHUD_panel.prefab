@@ -90,6 +90,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rolice.UI.RcGameHudPanel
   turnText: {fileID: 5359883065570499321}
+  animatorGameOver: {fileID: 1448597262149683689}
 --- !u!1 &3569056829485302403
 GameObject:
   m_ObjectHideFlags: 0
@@ -101,6 +102,7 @@ GameObject:
   - component: {fileID: 117421030824129545}
   - component: {fileID: 2329594954709831575}
   - component: {fileID: 5359883065570499321}
+  - component: {fileID: 1448597262149683689}
   m_Layer: 5
   m_Name: turn_text
   m_TagString: Untagged
@@ -227,3 +229,50 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1448597262149683689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3569056829485302403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04bb4365cdb4fd541bd2d7bf3b5e0141, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RcTweenAnimator
+  sequences:
+  - name: GameOver
+    animations:
+    - rid: 615818144037732414
+    - rid: 615818144037732417
+    loop: 0
+    loopCount: -1
+    loopType: 0
+  playOnEnable: 0
+  onDisableBehaviorType: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 615818144037732414
+      type: {class: RcShakeConfig, ns: , asm: Assembly-CSharp}
+      data:
+        sequenceMode: 0
+        target: {fileID: 117421030824129545}
+        duration: 0.6
+        ease: 6
+        delay: 0
+        shakeType: 0
+        strength: 7
+        vibrato: 15
+        randomness: 90
+        fadeOut: 1
+    - rid: 615818144037732417
+      type: {class: RcColorConfig, ns: , asm: Assembly-CSharp}
+      data:
+        sequenceMode: 1
+        target: {fileID: 117421030824129545}
+        duration: 0.6
+        ease: 35
+        delay: 0
+        targetColor: {r: 1, g: 0.3537736, b: 0.3537736, a: 1}
