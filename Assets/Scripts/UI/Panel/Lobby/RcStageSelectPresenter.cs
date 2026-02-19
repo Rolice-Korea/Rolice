@@ -34,6 +34,21 @@ namespace Rolice.UI
                 int stars = RcProgressManager.Instance.GetStageStars(stageNumber);
                 Panel.SetItemData(i, stageNumber, state, stars);
             }
+
+            Panel.FocusIndex(GetInitialFocusIndex());
+            Panel.PlayEntryAnimation();
+        }
+
+        /// <summary>첫 번째 미클리어 스테이지(= 다음 플레이 대상)를 초기 포커스로.</summary>
+        private int GetInitialFocusIndex()
+        {
+            int total = RcProgressManager.Instance.TotalStageCount;
+            for (int i = 0; i < total; i++)
+            {
+                if (GetStageState(i + 1) != RcStageState.Cleared)
+                    return i;
+            }
+            return total - 1; // 전부 클리어 → 마지막 스테이지
         }
 
         private RcStageState GetStageState(int stageNumber)

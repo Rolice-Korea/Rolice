@@ -612,7 +612,7 @@ MonoBehaviour:
       type: {class: RcScaleConfig, ns: , asm: Assembly-CSharp}
       data:
         sequenceMode: 0
-        target: {fileID: 0}
+        target: {fileID: 1827694967466735285}
         duration: 0.25
         ease: 9
         delay: 0
@@ -623,7 +623,7 @@ MonoBehaviour:
       type: {class: RcScaleConfig, ns: , asm: Assembly-CSharp}
       data:
         sequenceMode: 0
-        target: {fileID: 0}
+        target: {fileID: 1827694967466735285}
         duration: 0.3
         ease: 8
         delay: 0

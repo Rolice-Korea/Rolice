@@ -33,9 +33,11 @@ namespace Rolice.UI
         private RcStageState state;
         private int stars;
         private bool isSelected;
+        private CanvasGroup canvasGroup;
 
         public int StageNumber => stageNumber;
         public RcStageState State => state;
+        public float CarouselAlpha => canvasGroup != null ? canvasGroup.alpha : 1f;
         public event Action<int> OnStageSelected;
 
         public override void Initialize()
@@ -43,6 +45,10 @@ namespace Rolice.UI
             button.onClick.AddListener(HandleClick);
             if (glowFrame != null) glowFrame.raycastTarget = false;
             if (stageNumberText != null) stageNumberText.raycastTarget = false;
+
+            canvasGroup = GetComponent<CanvasGroup>();
+            if (canvasGroup == null)
+                canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
 
         public override void Cleanup()
@@ -63,6 +69,18 @@ namespace Rolice.UI
         {
             isSelected = selected;
             UpdateVisual();
+        }
+
+        public void SetCarouselAlpha(float alpha)
+        {
+            if (canvasGroup != null)
+                canvasGroup.alpha = alpha;
+        }
+
+        public void SetCarouselVisual(float scale, float alpha)
+        {
+            transform.localScale = Vector3.one * scale;
+            SetCarouselAlpha(alpha);
         }
 
         private void UpdateVisual()
