@@ -23,6 +23,7 @@ public class RcLobbyReflection : MonoBehaviour
     [SerializeField] private bool useFade = true;
     [SerializeField] private float fadeSize = 30f;
     [SerializeField] private float fadeRadius = 2.5f;
+    [SerializeField] private float reflectionFadeDist = 1.5f;
 
     private Material[] reflectionMaterials;
     private GameObject fadeQuad;
@@ -85,7 +86,7 @@ public class RcLobbyReflection : MonoBehaviour
     {
         mat.SetFloat("_Surface", 1f);
         mat.SetFloat("_Blend", 0f);
-        mat.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+        mat.SetInt("_SrcBlend", (int)BlendMode.One);
         mat.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
         mat.SetInt("_ZWrite", 0);
         mat.renderQueue = ReflectionQueue;
@@ -104,6 +105,18 @@ public class RcLobbyReflection : MonoBehaviour
         {
             var emission = mat.GetColor("_EmissionColor");
             mat.SetColor("_EmissionColor", emission * emissionMultiplier);
+        }
+
+        if (mat.HasProperty("_GlowColor"))
+        {
+            var glow = mat.GetColor("_GlowColor");
+            mat.SetColor("_GlowColor", glow * emissionMultiplier);
+        }
+
+        if (mat.HasProperty("_ReflectionFadeDist"))
+        {
+            mat.SetFloat("_ReflectionFadeFloorY", floorHeight);
+            mat.SetFloat("_ReflectionFadeDist", reflectionFadeDist);
         }
     }
 

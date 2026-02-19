@@ -36,7 +36,7 @@ public class RcColorMatchBehavior : ITileBehavior
         this.settings = settings;
         this.tileObject = tileObject;
         this.tileData = tileData;
-        tileRenderer = tileObject.GetComponent<MeshRenderer>();
+        tileRenderer = tileObject.GetComponentInChildren<MeshRenderer>();
         tilePosition = RcMapGenerator.WorldToGrid(tileObject.transform.position);
         isCleared = false;
     }
@@ -85,7 +85,7 @@ public class RcColorMatchBehavior : ITileBehavior
         {
             GameObject effect = Object.Instantiate(
                 settings.matchEffectPrefab,
-                this.tileObject.transform.position + Vector3.up * 0.5f,
+                tileObject.transform.position + Vector3.up * 0.5f,
                 Quaternion.identity
             );
             Object.Destroy(effect, 2f);

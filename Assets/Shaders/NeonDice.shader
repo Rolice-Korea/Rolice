@@ -1,40 +1,25 @@
-Shader "Rolice/NeonFloor"
+Shader "Rolice/NeonDice"
 {
     Properties
     {
-        _BaseColor ("Base Color", Color) = (0.05, 0.05, 0.12, 1)
-        _Smoothness ("Smoothness", Range(0, 1)) = 0.65
-        _Metallic ("Metallic", Range(0, 1)) = 0.0
+        _BaseColor ("Base Color", Color) = (0.08, 0.08, 0.08, 1)
+        _Smoothness ("Smoothness", Range(0, 1)) = 0.7
+        _Metallic ("Metallic", Range(0, 1)) = 0.8
 
-        [Header(Fresnel Edge Glow)]
-        _FresnelColor ("Fresnel Color", Color) = (0.3, 0.4, 0.8, 1)
-        _FresnelPower ("Fresnel Power", Range(1, 10)) = 3.0
-        _FresnelIntensity ("Fresnel Intensity", Range(0, 2)) = 0.5
+        [Header(Face Glow)]
+        [HDR] _GlowColor ("Glow Color", Color) = (1, 0, 0, 1)
+        _GlowIntensity ("Glow Intensity", Range(0, 5)) = 1.5
+        _GlowWidth ("Glow Width", Range(0, 0.5)) = 0.15
+        _GlowSoftness ("Glow Softness", Range(0.01, 0.5)) = 0.2
+        _FaceHalfSize ("Face Half Size", Range(0.01, 2)) = 0.5
 
         [Header(Light Bleed)]
         _LightBleedStrength ("Light Bleed Strength", Range(0, 3)) = 1.5
 
-        [Header(Tile Edge Line)]
-        [HDR] _EdgeColor ("Edge Color", Color) = (0.2, 0.3, 0.8, 1)
-        _EdgeWidth ("Edge Width", Range(0.001, 0.1)) = 0.03
-        _EdgeSoftness ("Edge Softness", Range(0.001, 0.05)) = 0.01
-        _EdgeGlow ("Edge Glow Intensity", Range(0, 5)) = 1.5
-
-        [Header(Inner Glow)]
-        [HDR] _InnerGlowColor ("Inner Glow Color", Color) = (0, 0, 0, 1)
-        _InnerGlowWidth ("Inner Glow Width", Range(0, 0.5)) = 0.15
-        _InnerGlowSoftness ("Inner Glow Softness", Range(0.01, 0.5)) = 0.2
-        _InnerGlowIntensity ("Inner Glow Intensity", Range(0, 5)) = 0.0
-
-        [Header(Edge Pulse)]
-        [HDR] _PulseEdgeColor ("Pulse Edge Color", Color) = (0, 0, 0, 1)
-        _PulseEdgeIntensity ("Pulse Edge Intensity", Range(0, 5)) = 0.0
-        _PulseSpeed ("Pulse Speed", Range(0, 5)) = 1.5
-        _PulseMin ("Pulse Min", Range(0, 1)) = 0.4
-
         [HideInInspector] _SrcBlend ("Src Blend", Float) = 1
         [HideInInspector] _DstBlend ("Dst Blend", Float) = 0
         [HideInInspector] _ZWrite ("ZWrite", Float) = 1
+        [HideInInspector] _Surface ("Surface Type", Float) = 0
         [HideInInspector] _ReflectionFadeFloorY ("Reflection Floor Y", Float) = 0
         [HideInInspector] _ReflectionFadeDist ("Reflection Fade Dist", Float) = 0
     }
@@ -82,28 +67,19 @@ Shader "Rolice/NeonFloor"
                 float3 normalWS : TEXCOORD1;
                 float3 viewDirWS : TEXCOORD2;
                 float3 positionOS : TEXCOORD3;
+                float3 normalOS : TEXCOORD4;
             };
 
             CBUFFER_START(UnityPerMaterial)
                 half4 _BaseColor;
                 half _Smoothness;
                 half _Metallic;
-                half4 _FresnelColor;
-                half _FresnelPower;
-                half _FresnelIntensity;
+                half4 _GlowColor;
+                half _GlowIntensity;
+                half _GlowWidth;
+                half _GlowSoftness;
+                half _FaceHalfSize;
                 half _LightBleedStrength;
-                half4 _EdgeColor;
-                half _EdgeWidth;
-                half _EdgeSoftness;
-                half _EdgeGlow;
-                half4 _InnerGlowColor;
-                half _InnerGlowWidth;
-                half _InnerGlowSoftness;
-                half _InnerGlowIntensity;
-                half4 _PulseEdgeColor;
-                half _PulseEdgeIntensity;
-                half _PulseSpeed;
-                half _PulseMin;
                 float _ReflectionFadeFloorY;
                 float _ReflectionFadeDist;
             CBUFFER_END
@@ -119,6 +95,7 @@ Shader "Rolice/NeonFloor"
                 output.normalWS = normalInput.normalWS;
                 output.viewDirWS = GetWorldSpaceNormalizeViewDir(vertexInput.positionWS);
                 output.positionOS = input.positionOS.xyz;
+                output.normalOS = input.normalOS;
                 return output;
             }
 
@@ -141,7 +118,7 @@ Shader "Rolice/NeonFloor"
                 half NdotH = saturate(dot(normalWS, halfDir));
                 half3 specular = mainLight.color * pow(NdotH, specPower) * _Smoothness;
 
-                // === 추가 라이트 (Forward+ 호환) ===
+                // === 추가 라이트 ===
                 half3 additionalDiffuse = 0;
                 half3 additionalSpecular = 0;
 
@@ -154,52 +131,40 @@ Shader "Rolice/NeonFloor"
                 uint additionalLightCount = GetAdditionalLightsCount();
                 LIGHT_LOOP_BEGIN(additionalLightCount)
                     Light light = GetAdditionalLight(lightIndex, positionWS);
-
-                    // Wrap lighting - 빛이 넓게 번지도록
                     half NdotL_add = dot(normalWS, light.direction);
                     half wrapNdotL = saturate(NdotL_add * 0.5 + 0.5);
-
                     half atten = light.distanceAttenuation * light.shadowAttenuation;
                     half3 lightContrib = light.color * wrapNdotL * atten;
                     additionalDiffuse += _BaseColor.rgb * lightContrib * _LightBleedStrength;
 
-                    // 스페큘러
                     half3 halfDir_add = normalize(light.direction + viewDirWS);
                     half NdotH_add = saturate(dot(normalWS, halfDir_add));
                     additionalSpecular += light.color * pow(NdotH_add, specPower * 0.5) * _Smoothness * atten;
                 LIGHT_LOOP_END
 
-                // === 프레넬 엣지 글로우 ===
-                half fresnel = pow(1.0 - saturate(dot(normalWS, viewDirWS)), _FresnelPower);
-                half3 fresnelGlow = _FresnelColor.rgb * fresnel * _FresnelIntensity;
+                // === 면 글로우 ===
+                // 오브젝트 스페이스 좌표 + 노멀 방향으로 면 UV 결정
+                // 큐브: -0.5~0.5 범위, 노멀 방향에 수직인 두 축을 사용
+                float3 absNorm = abs(input.normalOS);
+                float2 rawCoords;
+                if (absNorm.x > absNorm.y && absNorm.x > absNorm.z)
+                    rawCoords = input.positionOS.yz;
+                else if (absNorm.y > absNorm.z)
+                    rawCoords = input.positionOS.xz;
+                else
+                    rawCoords = input.positionOS.xy;
 
-                // === 타일 엣지 라인 ===
-                // Unity Cube: 로컬 좌표 -0.5~0.5 → 0~1로 매핑
-                float2 tileUV = input.positionOS.xz + 0.5;
-                // 각 축에서 가장 가까운 엣지까지 거리
-                float2 edgeDist = min(tileUV, 1.0 - tileUV);
+                float2 faceUV = saturate(rawCoords / (_FaceHalfSize * 2.0) + 0.5);
+                float2 edgeDist = min(faceUV, 1.0 - faceUV);
                 float minEdgeDist = min(edgeDist.x, edgeDist.y);
-                // smoothstep으로 부드러운 엣지 라인
-                half edgeMask = 1.0 - smoothstep(_EdgeWidth - _EdgeSoftness, _EdgeWidth + _EdgeSoftness, minEdgeDist);
-                half3 edgeGlow = _EdgeColor.rgb * edgeMask * _EdgeGlow;
-
-                // === 이너 글로우 ===
-                // 엣지에서 안쪽으로 퍼지는 색상 글로우 (색 타일용)
-                half innerGlowMask = 1.0 - smoothstep(_InnerGlowWidth, _InnerGlowWidth + _InnerGlowSoftness, minEdgeDist);
-                half3 innerGlow = _InnerGlowColor.rgb * innerGlowMask * _InnerGlowIntensity;
-
-                // === 엣지 펄스 ===
-                // 엣지 라인 색상이 숨쉬듯 펄스 (텔레포트 타일용)
-                half sinWave = sin(_Time.y * _PulseSpeed) * 0.5 + 0.5;
-                half edgePulse = lerp(_PulseMin, 1.0, sinWave * sinWave);
-                half3 pulseEdgeGlow = _PulseEdgeColor.rgb * edgeMask * _PulseEdgeIntensity * edgePulse;
+                half glowMask = 1.0 - smoothstep(_GlowWidth, _GlowWidth + _GlowSoftness, minEdgeDist);
+                half3 faceGlow = _GlowColor.rgb * glowMask * _GlowIntensity;
 
                 // === 앰비언트 ===
                 half3 ambient = SampleSH(normalWS) * _BaseColor.rgb;
 
                 // === 최종 합성 ===
                 half3 baseLight = ambient + diffuse + specular + additionalDiffuse + additionalSpecular;
-                half3 glowTotal = fresnelGlow + edgeGlow + innerGlow + pulseEdgeGlow;
 
                 half alpha = _BaseColor.a;
                 half glowFade = 1.0;
@@ -211,13 +176,12 @@ Shader "Rolice/NeonFloor"
                     glowFade = distFactor * distFactor;
                 }
 
-                half3 finalColor = baseLight * alpha + glowTotal * glowFade;
+                half3 finalColor = baseLight * alpha + faceGlow * glowFade;
                 return half4(finalColor, alpha);
             }
             ENDHLSL
         }
 
-        // 그림자 캐스터
         Pass
         {
             Name "ShadowCaster"
@@ -234,7 +198,6 @@ Shader "Rolice/NeonFloor"
             ENDHLSL
         }
 
-        // 뎁스 패스
         Pass
         {
             Name "DepthOnly"

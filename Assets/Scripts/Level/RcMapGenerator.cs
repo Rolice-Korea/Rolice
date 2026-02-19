@@ -3,6 +3,7 @@ using UnityEngine;
 public static class RcMapGenerator
 {
     private const string TILE_PREFAB_PATH = "Tiles/";
+    private const float TILE_HEIGHT_OFFSET = -0.5f;
 
     public static GameObject CreateTile(string tileID, Vector2Int gridPos, Transform parent = null)
     {
@@ -28,7 +29,7 @@ public static class RcMapGenerator
 
     public static Vector3 GridToWorld(Vector2Int gridPos)
     {
-        return new Vector3(gridPos.x, 0f, gridPos.y);
+        return new Vector3(gridPos.x, TILE_HEIGHT_OFFSET, gridPos.y);
     }
 
     public static Vector2Int WorldToGrid(Vector3 worldPos)

@@ -11,6 +11,7 @@ public class RcDiceMovement : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float rollDuration = 0.3f;
     [SerializeField] private float teleportDuration = 0.5f;
+    [SerializeField] private float heightOffset = 0.5f;
 
     private Vector2Int gridPos;
     private bool isMoving;
@@ -97,7 +98,7 @@ public class RcDiceMovement : MonoBehaviour
         gridPos = targetPos;
 
         Vector3 startPos = transform.position;
-        Vector3 endPos = new Vector3(targetPos.x, 1f, targetPos.y);
+        Vector3 endPos = new Vector3(targetPos.x, heightOffset, targetPos.y);
         Quaternion startRot = modelTransform.localRotation;
 
         Vector3 axis, moveDir;
@@ -147,7 +148,7 @@ public class RcDiceMovement : MonoBehaviour
         OnMoveStarted?.Invoke(gridPos);
 
         Vector3 startPos = transform.position;
-        Vector3 endPos = new Vector3(targetPos.x, 1f, targetPos.y);
+        Vector3 endPos = new Vector3(targetPos.x, heightOffset, targetPos.y);
 
         float halfDuration = teleportDuration * 0.5f;
 
@@ -186,6 +187,6 @@ public class RcDiceMovement : MonoBehaviour
 
     private void UpdatePosition(Vector2Int pos)
     {
-        transform.position = new Vector3(pos.x, 1f, pos.y);
+        transform.position = new Vector3(pos.x, heightOffset, pos.y);
     }
 }

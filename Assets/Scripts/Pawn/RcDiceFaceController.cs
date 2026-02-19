@@ -68,7 +68,7 @@ public class RcDiceFaceController : MonoBehaviour
     }
 
     private static readonly int BaseColorID = Shader.PropertyToID("_BaseColor");
-    private static readonly int EmissionColorID = Shader.PropertyToID("_EmissionColor");
+    private static readonly int GlowColorID = Shader.PropertyToID("_GlowColor");
 
     public void FadeToGray()
     {
@@ -81,7 +81,7 @@ public class RcDiceFaceController : MonoBehaviour
         for (int i = 0; i < mats.Length; i++)
         {
             originalBaseColors[i] = mats[i].GetColor(BaseColorID);
-            originalEmissionColors[i] = mats[i].GetColor(EmissionColorID);
+            originalEmissionColors[i] = mats[i].GetColor(GlowColorID);
         }
 
         Color grayTarget = new Color(0.25f, 0.25f, 0.25f, 1f);
@@ -92,7 +92,7 @@ public class RcDiceFaceController : MonoBehaviour
             progress = x;
             for (int i = 0; i < mats.Length; i++)
             {
-                mats[i].SetColor(EmissionColorID,
+                mats[i].SetColor(GlowColorID,
                     Color.Lerp(originalEmissionColors[i], Color.black, progress));
                 mats[i].SetColor(BaseColorID,
                     Color.Lerp(originalBaseColors[i], grayTarget, progress));
@@ -112,7 +112,7 @@ public class RcDiceFaceController : MonoBehaviour
         var originalEmissionColors = new Color[mats.Length];
 
         for (int i = 0; i < mats.Length; i++)
-            originalEmissionColors[i] = mats[i].GetColor(EmissionColorID);
+            originalEmissionColors[i] = mats[i].GetColor(GlowColorID);
 
         float progress = 0f;
         flashTween = DOTween.To(() => progress, x =>
@@ -122,7 +122,7 @@ public class RcDiceFaceController : MonoBehaviour
             for (int i = 0; i < mats.Length; i++)
             {
                 Color boosted = originalEmissionColors[i] * (1f + flashIntensity * curve);
-                mats[i].SetColor(EmissionColorID, boosted);
+                mats[i].SetColor(GlowColorID, boosted);
             }
         }, 1f, flashDuration)
         .SetEase(Ease.Linear)
