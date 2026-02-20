@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using Engine.UI;
 using TMPro;
 using UnityEngine;
@@ -29,11 +30,17 @@ namespace Rolice.UI
         [SerializeField, Range(0f, 1f)] private float glowDimmedAlpha = 0.15f;
         [SerializeField, Range(0f, 1f)] private float starDimmedAlpha = 0.2f;
 
+        private static readonly Color GlowColorSelected = new Color(0.1f, 0.9f, 1f, 1f);
+        private static readonly Color GlowColorIdle = Color.white;
+
         private int stageNumber;
         private RcStageState state;
         private int stars;
         private bool isSelected;
         private CanvasGroup canvasGroup;
+        private RcUIHDRImage glowHDRImage;
+        private Tweener pulseTween;
+        private RcTweenAnimator tweenAnimator;
 
         public int StageNumber => stageNumber;
         public RcStageState State => state;
@@ -43,16 +50,33 @@ namespace Rolice.UI
         public override void Initialize()
         {
             button.onClick.AddListener(HandleClick);
-            if (glowFrame != null) glowFrame.raycastTarget = false;
+            if (glowFrame != null)
+            {
+                glowFrame.raycastTarget = false;
+                glowHDRImage = glowFrame.GetComponent<RcUIHDRImage>();
+            }
             if (stageNumberText != null) stageNumberText.raycastTarget = false;
 
             canvasGroup = GetComponent<CanvasGroup>();
             if (canvasGroup == null)
                 canvasGroup = gameObject.AddComponent<CanvasGroup>();
+
+            tweenAnimator = GetComponent<RcTweenAnimator>();
+        }
+
+        public void PlaySelectAnimation()
+        {
+            tweenAnimator?.Play("OnSelect");
+        }
+        
+        public void EvaluateCarousel(float t)
+        {
+            tweenAnimator?.Evaluate(t, "CarouselState");
         }
 
         public override void Cleanup()
         {
+            pulseTween?.Kill();
             button.onClick.RemoveListener(HandleClick);
             OnStageSelected = null;
         }
@@ -119,8 +143,32 @@ namespace Rolice.UI
             bool show = state != RcStageState.Locked;
             glowFrame.gameObject.SetActive(show);
 
-            if (show)
-                SetAlpha(glowFrame, isSelected ? 1f : glowDimmedAlpha);
+            pulseTween?.Kill();
+            pulseTween = null;
+
+            if (!show) return;
+
+            if (isSelected)
+            {
+                SetAlpha(glowFrame, 1f);
+                if (glowHDRImage != null)
+                {
+                    glowHDRImage.HDRColor = GlowColorSelected;
+                    glowHDRImage.Intensity = 3.5f;
+                    pulseTween = DOVirtual.Float(3.5f, 7f, 1.4f, v => glowHDRImage.Intensity = v)
+                        .SetLoops(-1, LoopType.Yoyo)
+                        .SetEase(Ease.InOutSine);
+                }
+            }
+            else
+            {
+                SetAlpha(glowFrame, glowDimmedAlpha);
+                if (glowHDRImage != null)
+                {
+                    glowHDRImage.HDRColor = GlowColorIdle;
+                    glowHDRImage.Intensity = 1f;
+                }
+            }
         }
 
         private float GetTextAlpha()

@@ -17,9 +17,7 @@ namespace Rolice.UI
         [Header("Carousel — Layout")]
         [SerializeField] private float itemSpacing = 220f;
 
-        [Header("Carousel — Scale & Alpha")]
-        [SerializeField] private float centerScale = 1.0f;
-        [SerializeField] private float neighborScale = 0.70f;
+        [Header("Carousel — Alpha (dist > 1 페이드)")]
         [SerializeField] private float neighborAlpha = 0.40f;
 
         [Header("Carousel — Snap")]
@@ -118,13 +116,13 @@ namespace Rolice.UI
             carouselSequence?.Kill();
             physicsActive = false;
 
-            for (int i = 0; i < items.Count; i++)
-                items[i].SetCarouselVisual(0f, 0f);
+            foreach (var t in items)
+                t.EvaluateCarousel(0f);
 
             carouselSequence = DOTween.Sequence();
 
             float staggerStep = 0.07f;
-            for (int dist = 0; dist <= 2; dist++)
+            for (int dist = 0; dist <= 1; dist++)
             {
                 float delay = dist * staggerStep;
                 if (dist == 0)
@@ -191,9 +189,18 @@ namespace Rolice.UI
             float dist = Mathf.Abs(i - centerPos);
             var rt = items[i].GetComponent<RectTransform>();
             rt.anchoredPosition = new Vector2((i - centerPos) * itemSpacing, 0f);
-            items[i].transform.localScale = Vector3.one * GetScaleForDist(dist);
-            items[i].SetCarouselAlpha(GetAlphaForDist(dist));
+
+            items[i].EvaluateCarousel(Mathf.Clamp01(1f - dist));   // scale 전담
+            items[i].SetCarouselAlpha(GetAlphaForDist(dist));       // alpha 전담
+
             items[i].SetSelected(dist < 0.5f);
+        }
+
+        private float GetAlphaForDist(float dist)
+        {
+            if (dist <= 1f) return Mathf.Lerp(1f, neighborAlpha, dist);
+            if (dist <= 2f) return Mathf.Lerp(neighborAlpha, 0f, dist - 1f);
+            return 0f;
         }
 
         private void SnapToIndex(int index)
@@ -212,7 +219,7 @@ namespace Rolice.UI
                 {
                     scrollPos = index;
                     if (index >= 0 && index < items.Count)
-                        items[index].transform.DOPunchScale(Vector3.one * 0.05f, 0.18f, 5, 0.5f);
+                        items[index].PlaySelectAnimation();
                 });
             carouselSequence.Play();
         }
@@ -222,31 +229,15 @@ namespace Rolice.UI
             if (index < 0 || index >= items.Count) return;
 
             int idx = index;
-            float dist = Mathf.Abs(index - currentIndex);
+            float targetT = Mathf.Clamp01(1f - Mathf.Abs(index - currentIndex));
 
             var rt = items[index].GetComponent<RectTransform>();
             rt.anchoredPosition = new Vector2((index - currentIndex) * itemSpacing, 0f);
             items[index].SetSelected(index == currentIndex);
 
-            carouselSequence
-                .Insert(delay, items[idx].transform
-                    .DOScale(GetScaleForDist(dist), 0.22f).SetEase(Ease.OutBack))
-                .Insert(delay, DOTween.To(
-                    () => items[idx].CarouselAlpha,
-                    v  => items[idx].SetCarouselAlpha(v),
-                    GetAlphaForDist(dist), 0.18f).SetEase(Ease.OutQuad));
-        }
-
-        // ─── Scale / Alpha (연속 거리 기반) ───────────────────────────────
-
-        private float GetScaleForDist(float dist) =>
-            Mathf.Lerp(centerScale, neighborScale, Mathf.Clamp01(dist));
-
-        private float GetAlphaForDist(float dist)
-        {
-            if (dist <= 1f) return Mathf.Lerp(1f, neighborAlpha, dist);
-            if (dist <= 2f) return Mathf.Lerp(neighborAlpha, 0f, dist - 1f);
-            return 0f;
+            carouselSequence.Insert(delay,
+                DOTween.To(() => 0f, v => items[idx].EvaluateCarousel(v), targetT, 0.22f)
+                       .SetEase(Ease.OutBack));
         }
 
         // ─── Drag (IDragHandler — 카드 버튼에서 부모로 버블링됨) ────────────
