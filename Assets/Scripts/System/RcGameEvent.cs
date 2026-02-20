@@ -5,5 +5,6 @@ public enum RcGameEvent
     GameWin,
     GameLose,
     TurnChanged,       // Value: int
+    MoveStarted,       // Value: Vector2Int
     MoveCompleted,     // Value: Vector2Int
 }

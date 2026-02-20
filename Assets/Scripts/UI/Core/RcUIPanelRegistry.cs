@@ -17,18 +17,15 @@ namespace Engine.UI
             public RcUILayer Layer;
         }
 
-        [SerializeField] private List<PanelEntry> _entries = new();
+        [SerializeField] private List<PanelEntry> entries = new();
 
-        private Dictionary<Type, PanelEntry> _cache;
+        private Dictionary<Type, PanelEntry> cache;
 
-        /// <summary>
-        /// 런타임 초기화. 타입별로 캐싱.
-        /// </summary>
         public void Initialize()
         {
-            _cache = new Dictionary<Type, PanelEntry>();
+            cache = new Dictionary<Type, PanelEntry>();
 
-            foreach (var entry in _entries)
+            foreach (var entry in entries)
             {
                 if (entry.Prefab == null)
                 {
@@ -38,29 +35,23 @@ namespace Engine.UI
 
                 var type = entry.Prefab.GetType();
 
-                if (!_cache.TryAdd(type, entry))
+                if (!cache.TryAdd(type, entry))
                 {
                     Debug.LogWarning($"[RcUIPanelRegistry] 중복 패널 타입: {type.Name}");
                 }
             }
         }
 
-        /// <summary>
-        /// 타입으로 패널 엔트리 조회.
-        /// </summary>
         public bool TryGetEntry<T>(out PanelEntry entry) where T : RcUIPanel
         {
-            if (_cache == null) Initialize();
-            return _cache.TryGetValue(typeof(T), out entry);
+            if (cache == null) Initialize();
+            return cache.TryGetValue(typeof(T), out entry);
         }
 
-        /// <summary>
-        /// 타입으로 패널 엔트리 조회 (non-generic).
-        /// </summary>
         public bool TryGetEntry(Type panelType, out PanelEntry entry)
         {
-            if (_cache == null) Initialize();
-            return _cache.TryGetValue(panelType, out entry);
+            if (cache == null) Initialize();
+            return cache.TryGetValue(panelType, out entry);
         }
     }
 }

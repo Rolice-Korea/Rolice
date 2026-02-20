@@ -2,10 +2,8 @@ using UnityEngine;
 
 public struct RcDiceFaceData
 {
-    // === 면 인덱스 상수 ===
     public const int TOP = 0, BOTTOM = 1, FRONT = 2, BACK = 3, LEFT = 4, RIGHT = 5;
 
-    // === 회전 맵 (방향별 면 재배치) ===
     private static readonly int[][] RollMaps = {
         new[] { BACK, FRONT, TOP, BOTTOM, LEFT, RIGHT },    // UP
         new[] { FRONT, BACK, BOTTOM, TOP, LEFT, RIGHT },    // DOWN
@@ -47,7 +45,6 @@ public struct RcDiceFaceData
         if (faceIndex >= 0 && faceIndex < 6)
             return faces[faceIndex];
 
-        Debug.LogError($"[DiceFaceData] 잘못된 면 인덱스: {faceIndex}");
         return null;
     }
 
@@ -59,8 +56,6 @@ public struct RcDiceFaceData
         if (direction == Vector2Int.down) return 1;
         if (direction == Vector2Int.right) return 2;
         if (direction == Vector2Int.left) return 3;
-
-        Debug.LogWarning($"[DiceFaceData] 알 수 없는 방향: {direction}");
         return 0;
     }
 }

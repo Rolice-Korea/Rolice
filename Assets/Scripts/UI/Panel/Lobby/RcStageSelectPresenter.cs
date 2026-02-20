@@ -1,8 +1,5 @@
-using DG.Tweening;
 using Engine.UI;
-using UnityEditor.Timeline.Actions;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Rolice.UI
 {
@@ -37,6 +34,21 @@ namespace Rolice.UI
                 int stars = RcProgressManager.Instance.GetStageStars(stageNumber);
                 Panel.SetItemData(i, stageNumber, state, stars);
             }
+
+            Panel.FocusIndex(GetInitialFocusIndex());
+            Panel.PlayEntryAnimation();
+        }
+
+        /// <summary>첫 번째 미클리어 스테이지(= 다음 플레이 대상)를 초기 포커스로.</summary>
+        private int GetInitialFocusIndex()
+        {
+            int total = RcProgressManager.Instance.TotalStageCount;
+            for (int i = 0; i < total; i++)
+            {
+                if (GetStageState(i + 1) != RcStageState.Cleared)
+                    return i;
+            }
+            return total - 1; // 전부 클리어 → 마지막 스테이지
         }
 
         private RcStageState GetStageState(int stageNumber)
@@ -52,13 +64,20 @@ namespace Rolice.UI
 
         private void HandleStageSelected(int stageNumber)
         {
-            Debug.Log($"[StageSelectPresenter] 스테이지 {stageNumber} 선택됨");
-            
-            DOVirtual.DelayedCall(1f, () =>
+            var levelData = RcProgressManager.Instance.StageDatabase.GetStage(stageNumber);
+            if (levelData == null)
             {
-                SceneManager.LoadScene("MainScene");
-                Debug.Log("1초 뒤 실행됨");
-            });
+                Debug.LogError($"[StageSelectPresenter] 스테이지 {stageNumber} 데이터 없음");
+                return;
+            }
+
+            var stageInfo = levelData.StageInfo;
+            int currentStars = RcProgressManager.Instance.GetStageStars(stageNumber);
+
+            var dialog = RcUIManager.Instance.Open<RcStageStartDialog>();
+            dialog.SetStageInfo(stageNumber, stageInfo.GetDisplayName(), stageInfo.StarThresholds, currentStars);
+
+            dialog.OnStartStage += (selectedStage) => RcGameFlowManager.Instance.GoToStage(selectedStage);
         }
     }
 }

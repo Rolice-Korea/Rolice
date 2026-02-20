@@ -12,7 +12,6 @@ public class RcColorMatchBehaviorSO : RcTileBehaviorSO
 
     private void OnEnable()
     {
-        // 색깔 타일은 항상 클리어 추적이 필요함
         RequiresClearTracking = true;
     }
 
@@ -24,22 +23,22 @@ public class RcColorMatchBehaviorSO : RcTileBehaviorSO
 
 public class RcColorMatchBehavior : ITileBehavior
 {
-    private RcColorMatchBehaviorSO _settings;
-    private GameObject _tileObject;
-    private RcTileData _tileData;
-    private MeshRenderer _tileRenderer;
+    private readonly RcColorMatchBehaviorSO settings;
+    private readonly GameObject tileObject;
+    private readonly RcTileData tileData;
+    private readonly MeshRenderer tileRenderer;
+    private readonly Vector2Int tilePosition;
 
-    private bool _isCleared;
-    private Vector2Int _tilePosition;
+    private bool isCleared;
 
     public RcColorMatchBehavior(RcColorMatchBehaviorSO settings, GameObject tileObject, RcTileData tileData)
     {
-        _settings = settings;
-        _tileObject = tileObject;
-        _tileData = tileData;
-        _tileRenderer = tileObject.GetComponent<MeshRenderer>();
-        _tilePosition = RcMapGenerator.WorldToGrid(tileObject.transform.position);
-        _isCleared = false;
+        this.settings = settings;
+        this.tileObject = tileObject;
+        this.tileData = tileData;
+        tileRenderer = tileObject.GetComponentInChildren<MeshRenderer>();
+        tilePosition = RcMapGenerator.WorldToGrid(tileObject.transform.position);
+        isCleared = false;
     }
 
     public bool CanEnter(RcDicePawn pawn)
@@ -49,33 +48,19 @@ public class RcColorMatchBehavior : ITileBehavior
 
     public void OnEnter(RcDicePawn pawn)
     {
-        if (_isCleared)
-        {
-            Debug.Log($"[ColorMatchBehavior] 이미 클리어된 타일: {_tileObject.name}");
-            return;
-        }
+        if (isCleared) return;
 
-        RcColorSO tileColor = _tileData.Color;
-
+        RcColorSO tileColor = this.tileData.Color;
         if (tileColor == null)
         {
-            Debug.LogWarning($"[ColorMatchBehavior] 타일에 Color가 할당되지 않았습니다: {_tileObject.name}");
+            Debug.LogWarning($"[ColorMatchBehavior] 타일에 Color가 할당되지 않았습니다: {this.tileObject.name}");
             return;
         }
 
         RcColorSO diceBottomColor = pawn.GetBottomColor();
 
-        Debug.Log($"[ColorMatchBehavior] 색깔 비교: 타일={tileColor.DisplayName}, 주사위={diceBottomColor?.DisplayName}");
-
         if (diceBottomColor == tileColor)
-        {
-            Debug.Log($"[ColorMatchBehavior] ✓ 색깔 매칭! 타일 클리어 진행");
             ClearTile();
-        }
-        else
-        {
-            Debug.Log($"[ColorMatchBehavior] ✗ 색깔 불일치 (타일: {tileColor.DisplayName} vs 주사위: {diceBottomColor?.DisplayName})");
-        }
     }
 
     public void OnExit(RcDicePawn pawn)
@@ -84,29 +69,23 @@ public class RcColorMatchBehavior : ITileBehavior
 
     private void ClearTile()
     {
-        if (_isCleared) return;
+        if (isCleared) return;
 
-        _isCleared = true;
-
+        isCleared = true;
         ApplyVisualFeedback();
-
-        RcLevelManager.Instance.ClearColorTile(_tilePosition);
-
-        Debug.Log($"[ColorMatchBehavior] 타일 클리어 완료: {_tileObject.name} at {_tilePosition}");
+        RcLevelManager.Instance.ClearColorTile(tilePosition);
     }
 
     private void ApplyVisualFeedback()
     {
-        if (_settings.clearedMaterial != null && _tileRenderer != null)
-        {
-            _tileRenderer.material = _settings.clearedMaterial;
-        }
+        if (settings.clearedMaterial != null && tileRenderer != null)
+            tileRenderer.material = settings.clearedMaterial;
 
-        if (_settings.matchEffectPrefab != null)
+        if (settings.matchEffectPrefab != null)
         {
             GameObject effect = Object.Instantiate(
-                _settings.matchEffectPrefab,
-                _tileObject.transform.position + Vector3.up * 0.5f,
+                settings.matchEffectPrefab,
+                tileObject.transform.position + Vector3.up * 0.5f,
                 Quaternion.identity
             );
             Object.Destroy(effect, 2f);

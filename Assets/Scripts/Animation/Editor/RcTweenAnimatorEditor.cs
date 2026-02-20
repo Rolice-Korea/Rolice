@@ -7,33 +7,33 @@ using UnityEngine;
 [CustomEditor(typeof(RcTweenAnimator))]
 public class RcTweenAnimatorEditor : Editor
 {
-    private SerializedProperty _sequencesProperty;
-    private SerializedProperty _playOnEnableProperty;
-    private SerializedProperty _onDisableBehaviorProperty;
+    private SerializedProperty sequencesProperty;
+    private SerializedProperty playOnEnableProperty;
+    private SerializedProperty onDisableBehaviorProperty;
 
     private void OnEnable()
     {
-        _sequencesProperty = serializedObject.FindProperty("_sequences");
-        _playOnEnableProperty = serializedObject.FindProperty("_playOnEnable");
-        _onDisableBehaviorProperty = serializedObject.FindProperty("_onDisableBehaviorType");
+        sequencesProperty = serializedObject.FindProperty("sequences");
+        playOnEnableProperty = serializedObject.FindProperty("playOnEnable");
+        onDisableBehaviorProperty = serializedObject.FindProperty("onDisableBehaviorType");
     }
 
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
 
-        EditorGUILayout.PropertyField(_playOnEnableProperty, new GUIContent("Play On Enable"));
-        EditorGUILayout.PropertyField(_onDisableBehaviorProperty, new GUIContent("On Disable Behavior"));
+        EditorGUILayout.PropertyField(playOnEnableProperty, new GUIContent("Play On Enable"));
+        EditorGUILayout.PropertyField(onDisableBehaviorProperty, new GUIContent("On Disable Behavior"));
         EditorGUILayout.Space(5);
 
         EditorGUILayout.LabelField("Sequences", EditorStyles.boldLabel);
 
-        if (_sequencesProperty.arraySize == 0)
+        if (sequencesProperty.arraySize == 0)
             EditorGUILayout.HelpBox("No sequences.", MessageType.Info);
         else
         {
             CheckDuplicateSequenceNames();
-            for (int i = 0; i < _sequencesProperty.arraySize; i++)
+            for (int i = 0; i < sequencesProperty.arraySize; i++)
                 DrawSequenceElement(i);
         }
 
@@ -60,8 +60,8 @@ public class RcTweenAnimatorEditor : Editor
 
     private void CheckDuplicateSequenceNames()
     {
-        var names = Enumerable.Range(0, _sequencesProperty.arraySize)
-            .Select(i => _sequencesProperty.GetArrayElementAtIndex(i).FindPropertyRelative("name").stringValue)
+        var names = Enumerable.Range(0, sequencesProperty.arraySize)
+            .Select(i => sequencesProperty.GetArrayElementAtIndex(i).FindPropertyRelative("name").stringValue)
             .ToList();
 
         var duplicates = names.GroupBy(n => n).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
@@ -71,7 +71,7 @@ public class RcTweenAnimatorEditor : Editor
 
     private void DrawSequenceElement(int index)
     {
-        var seq = _sequencesProperty.GetArrayElementAtIndex(index);
+        var seq = sequencesProperty.GetArrayElementAtIndex(index);
         var nameProp = seq.FindPropertyRelative("name");
         var animsProp = seq.FindPropertyRelative("animations");
         var loopProp = seq.FindPropertyRelative("loop");
@@ -92,15 +92,15 @@ public class RcTweenAnimatorEditor : Editor
         GUI.enabled = index > 0;
         if (GUILayout.Button("▲", GUILayout.Width(25)))
         {
-            _sequencesProperty.MoveArrayElement(index, index - 1);
+            sequencesProperty.MoveArrayElement(index, index - 1);
             serializedObject.ApplyModifiedProperties();
             return;
         }
 
-        GUI.enabled = index < _sequencesProperty.arraySize - 1;
+        GUI.enabled = index < sequencesProperty.arraySize - 1;
         if (GUILayout.Button("▼", GUILayout.Width(25)))
         {
-            _sequencesProperty.MoveArrayElement(index, index + 1);
+            sequencesProperty.MoveArrayElement(index, index + 1);
             serializedObject.ApplyModifiedProperties();
             return;
         }
@@ -109,7 +109,7 @@ public class RcTweenAnimatorEditor : Editor
         GUI.backgroundColor = new Color(1f, 0.5f, 0.5f);
         if (GUILayout.Button("✕", GUILayout.Width(25)))
         {
-            _sequencesProperty.DeleteArrayElementAtIndex(index);
+            sequencesProperty.DeleteArrayElementAtIndex(index);
             serializedObject.ApplyModifiedProperties();
             return;
         }
@@ -200,6 +200,11 @@ public class RcTweenAnimatorEditor : Editor
         EditorGUILayout.EndHorizontal();
 
         EditorGUI.indentLevel++;
+
+        var sequenceModeProp = element.FindPropertyRelative("sequenceMode");
+        if (sequenceModeProp != null)
+            EditorGUILayout.PropertyField(sequenceModeProp, new GUIContent("Sequence Mode"));
+
         var iter = element.Copy();
         var end = iter.GetEndProperty();
         iter.NextVisible(true);
@@ -216,10 +221,10 @@ public class RcTweenAnimatorEditor : Editor
 
     private void AddNewSequence()
     {
-        int idx = _sequencesProperty.arraySize;
-        _sequencesProperty.InsertArrayElementAtIndex(idx);
+        int idx = sequencesProperty.arraySize;
+        sequencesProperty.InsertArrayElementAtIndex(idx);
 
-        var seq = _sequencesProperty.GetArrayElementAtIndex(idx);
+        var seq = sequencesProperty.GetArrayElementAtIndex(idx);
         seq.FindPropertyRelative("name").stringValue = "";
         seq.FindPropertyRelative("animations").ClearArray();
         seq.FindPropertyRelative("loop").boolValue = false;

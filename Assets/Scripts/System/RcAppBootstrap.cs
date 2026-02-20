@@ -1,21 +1,31 @@
 using Rolice.Data;
 using UnityEngine;
 
-/// <summary>
-/// 앱 전체 초기화 (씬 로드 전 자동 실행)
-/// </summary>
 public static class RcAppBootstrap
 {
+    private const string CorePrefabPath = "Core";
     private const string StageDatabasePath = "Data/StageDatabase";
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Initialize()
     {
-        Debug.Log("[AppBootstrap] 앱 초기화 시작");
-
+        LoadCorePrefab();
         InitializeProgressManager();
+    }
 
-        Debug.Log("[AppBootstrap] 앱 초기화 완료");
+    private static void LoadCorePrefab()
+    {
+        var prefab = Resources.Load<GameObject>(CorePrefabPath);
+
+        if (prefab == null)
+        {
+            Debug.LogError($"[AppBootstrap] Core 프리팹을 찾을 수 없습니다: Resources/{CorePrefabPath}");
+            return;
+        }
+
+        var instance = Object.Instantiate(prefab);
+        instance.name = "Core";
+        Object.DontDestroyOnLoad(instance);
     }
 
     private static void InitializeProgressManager()

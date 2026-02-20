@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using UnityEngine;
 
 namespace Engine
@@ -10,23 +9,22 @@ namespace Engine
         public void InitializeSingleton();
         public void ReleaseSingleton();
     }
-    
+
     public abstract class RcSingletonMono<T> : MonoBehaviour, ISingletonMonoInterface where T : RcSingletonMono<T>
     {
-        private static T _instance;
+        private static T instance;
 
-        private static bool HasInstance => _instance != null;
-        private float InitializationTime { get; set; }
-        
+        private static bool HasInstance => instance != null;
+
         public static T Instance
         {
             get
             {
-                if (HasInstance) return _instance;
+                if (HasInstance) return instance;
 
-                _instance = FindAnyObjectByType<T>();
-            
-                if (HasInstance) return _instance;
+                instance = FindAnyObjectByType<T>();
+
+                if (HasInstance) return instance;
 
                 var go = new GameObject
                 {
@@ -34,9 +32,9 @@ namespace Engine
                     hideFlags = HideFlags.DontSave
                 };
 
-                _instance = go.AddComponent<T>();
-            
-                return _instance;
+                instance = go.AddComponent<T>();
+
+                return instance;
             }
         }
 
@@ -49,22 +47,14 @@ namespace Engine
         {
             if (!Application.isPlaying) return;
 
-            InitializationTime = Time.time;
-
-            var oldInstances = FindObjectsByType<T>(FindObjectsSortMode.None);
-
-            if (null != oldInstances)
+            // 이미 등록된 인스턴스가 있으면 자신을 파괴
+            if (instance != null && instance != this)
             {
-                if (oldInstances.Any(old => InitializationTime > old.GetComponent<RcSingletonMono<T>>().InitializationTime))
-                {
-                    Destroy(gameObject);
-                    return;
-                }
+                Destroy(gameObject);
+                return;
             }
 
-            if (_instance != null) return;
-            
-            _instance = this as T;
+            instance = this as T;
         }
 
         public virtual void ReleaseSingleton()
