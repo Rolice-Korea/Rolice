@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Level_0003
   m_EditorClassIdentifier: 
   StageInfo:
-    StageNumber: 1
-    DisplayName: stage_1
+    StageNumber: 3
+    DisplayName: STAGE 3
     MaxStars: 3
     StarThresholds: 110000001400000019000000
   Width: 7
@@ -268,5 +268,3 @@ MonoBehaviour:
   Rules:
     HasTurnLimit: 1
     MaxTurns: 30
-    HasTimeLimit: 0
-    MaxTime: 60

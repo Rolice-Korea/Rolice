@@ -6,17 +6,20 @@ using UnityEngine.UI;
 
 namespace Rolice.UI
 {
-    /// <summary>
-    /// 스테이지 시작 확인 다이얼로그
-    /// 스테이지 정보 표시 및 시작/취소 선택
-    /// </summary>
-    public class RcStageStartDialog : RcUIPanel
+    public class RcStageStartDialog : RcUIPanel<RcStageStartDialogData>
     {
+        [Serializable]
+        private class ConditionRow
+        {
+            public Image[] starImages;
+            public TMP_Text turnText;
+        }
+
         [Header("Title")]
         [SerializeField] private TMP_Text titleText;
 
-        [Header("Star Info")]
-        [SerializeField] private TMP_Text starInfoText;
+        [Header("Star Conditions")]
+        [SerializeField] private ConditionRow[] conditionRows;
 
         [Header("Current Progress")]
         [SerializeField] private TMP_Text progressText;
@@ -26,83 +29,54 @@ namespace Rolice.UI
         [SerializeField] private Button startButton;
         [SerializeField] private Button cancelButton;
 
-    private int selectedStageNumber = -1;
+        private static readonly Color StarEarnedColor = Color.white;
+        private static readonly Color StarDimColor = new Color(0.33f, 0.33f, 0.33f, 0.4f);
 
-        public event Action<int> OnStartStage;
-        public event Action OnCanceled;
+        private RcStageStartDialogPresenter presenter;
 
         protected override void OnOpen()
         {
-            startButton?.onClick.AddListener(HandleStartClick);
-            cancelButton?.onClick.AddListener(HandleCancelClick);
+            presenter = new RcStageStartDialogPresenter();
+            presenter.Bind(this);
         }
 
         protected override void OnBeforeClose()
         {
-            startButton?.onClick.RemoveListener(HandleStartClick);
-            cancelButton?.onClick.RemoveListener(HandleCancelClick);
+            presenter?.Unbind();
+            presenter = null;
         }
 
-        public void SetStageInfo(int stageNumber, string stageName, int[] starThresholds, int currentStars)
+        public void SetTitle(string title) => titleText.text = title;
+
+        public void SetConditionRow(int index, int starCount, int turnThreshold)
         {
-            selectedStageNumber = stageNumber;
+            if (index >= conditionRows.Length) return;
+            var row = conditionRows[index];
+            row.turnText.text = $"{turnThreshold} TURNS";
+            for (int i = 0; i < row.starImages.Length; i++)
+                row.starImages[i].color = i < starCount ? StarEarnedColor : StarDimColor;
+        }
 
-            titleText.text = stageName;
+        public void SetProgress(int currentStars)
+        {
+            progressText.text = currentStars > 0
+                ? $"<color=#FFF700>CLEARED</color>\nBEST: {currentStars} STAR"
+                : "NOT CLEARED";
 
-            if (starThresholds != null && starThresholds.Length > 0)
-            {
-                string info = "STAR CONDITIONS\n";
-                for (int i = 0; i < starThresholds.Length; i++)
-                {
-                    int stars = starThresholds.Length - i;
-                    info += $"<color=#FFF700>{stars} STAR</color>: {starThresholds[i]} turns\n";
-                }
-                starInfoText.text = info;
-            }
-
-            if (currentStars > 0)
-            {
-                progressText.text = $"<color=#FFF700>CLEARED</color>\nBest: {currentStars} STAR";
-                UpdateStarDisplay(currentStars);
-            }
-            else
-            {
-                progressText.text = "Not Cleared";
-                UpdateStarDisplay(0);
-            }
+            UpdateStarDisplay(currentStars);
         }
 
         private void UpdateStarDisplay(int stars)
         {
             if (currentStarImages == null) return;
-
             for (int i = 0; i < currentStarImages.Length; i++)
             {
                 if (currentStarImages[i] == null) continue;
-                bool isEarned = i < stars;
-                SetAlpha(currentStarImages[i], isEarned ? 1f : 0.2f);
+                currentStarImages[i].color = i < stars ? StarEarnedColor : StarDimColor;
             }
         }
 
-        private void HandleStartClick()
-        {
-            int stageToStart = selectedStageNumber;
-            Close();
-            OnStartStage?.Invoke(stageToStart);
-        }
-
-        private void HandleCancelClick()
-        {
-            Close();
-            OnCanceled?.Invoke();
-        }
-
-        private static void SetAlpha(Image image, float alpha)
-        {
-            var color = image.color;
-            color.a = alpha;
-            image.color = color;
-        }
-
+        public Button StartButton => startButton;
+        public Button CancelButton => cancelButton;
     }
 }

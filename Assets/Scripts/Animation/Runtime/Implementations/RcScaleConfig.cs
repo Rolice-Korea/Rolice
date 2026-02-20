@@ -10,14 +10,19 @@ public class RcScaleConfig : RcTweenConfig
     public bool fromCurrentScale = true;
     public Vector3 startScale = Vector3.one;
 
+    [Header("Restore")]
+    public bool restoreToOriginal = false;
+
     public override Tween CreateTween(Transform defaultTarget)
     {
         var t = target != null ? target : defaultTarget;
         if (t == null) return null;
 
+        var resolvedTarget = restoreToOriginal ? t.localScale : targetScale;
+
         if (!fromCurrentScale)
             t.localScale = startScale;
 
-        return t.DOScale(targetScale, duration).SetEase(ease).SetDelay(delay);
+        return t.DOScale(resolvedTarget, duration).SetEase(ease).SetDelay(delay);
     }
 }

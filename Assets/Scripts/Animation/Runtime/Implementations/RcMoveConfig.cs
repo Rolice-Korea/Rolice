@@ -12,10 +12,17 @@ public class RcMoveConfig : RcTweenConfig
     public Vector3 startPosition = Vector3.zero;
     public bool snapping = false;
 
+    [Header("Restore")]
+    public bool restoreToOriginal = false;
+
     public override Tween CreateTween(Transform defaultTarget)
     {
         var t = target != null ? target : defaultTarget;
         if (t == null) return null;
+
+        var resolvedTarget = restoreToOriginal
+            ? (useLocalPosition ? t.localPosition : t.position)
+            : targetPosition;
 
         if (!fromCurrentPosition)
         {
@@ -26,8 +33,8 @@ public class RcMoveConfig : RcTweenConfig
         }
 
         var tween = useLocalPosition
-            ? t.DOLocalMove(targetPosition, duration, snapping)
-            : t.DOMove(targetPosition, duration, snapping);
+            ? t.DOLocalMove(resolvedTarget, duration, snapping)
+            : t.DOMove(resolvedTarget, duration, snapping);
 
         return tween.SetEase(ease).SetDelay(delay);
     }

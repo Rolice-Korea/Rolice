@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   StageInfo:
     StageNumber: 2
-    DisplayName: stage_1
+    DisplayName: STAGE 2
     MaxStars: 3
     StarThresholds: 110000001400000019000000
   Width: 7

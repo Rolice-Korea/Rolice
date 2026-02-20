@@ -74,10 +74,13 @@ namespace Rolice.UI
             var stageInfo = levelData.StageInfo;
             int currentStars = RcProgressManager.Instance.GetStageStars(stageNumber);
 
-            var dialog = RcUIManager.Instance.Open<RcStageStartDialog>();
-            dialog.SetStageInfo(stageNumber, stageInfo.GetDisplayName(), stageInfo.StarThresholds, currentStars);
-
-            dialog.OnStartStage += (selectedStage) => RcGameFlowManager.Instance.GoToStage(selectedStage);
+            RcUIManager.Instance.Open<RcStageStartDialog, RcStageStartDialogData>(new RcStageStartDialogData
+            {
+                StageNumber = stageNumber,
+                StageName = stageInfo.GetDisplayName(),
+                StarThresholds = stageInfo.StarThresholds,
+                CurrentStars = currentStars,
+            });
         }
     }
 }
