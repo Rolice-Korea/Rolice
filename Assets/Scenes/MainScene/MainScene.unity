@@ -163,6 +163,7 @@ GameObject:
   - component: {fileID: 415295204}
   - component: {fileID: 415295203}
   - component: {fileID: 415295206}
+  - component: {fileID: 415295207}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -288,6 +289,24 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &415295207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 415295202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c9090fa1ab650e4dae2d64c68a18add, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RcDiceCamera
+  target: {fileID: 893243767}
+  distance: 12
+  heightOffset: 0.5
+  rotationSmoothSpeed: 8
+  pitch: 35
+  targetYaw: 45
 --- !u!1001 &549549652
 PrefabInstance:
   m_ObjectHideFlags: 0

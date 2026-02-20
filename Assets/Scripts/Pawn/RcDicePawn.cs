@@ -32,6 +32,13 @@ public class RcDicePawn : MonoBehaviour
 
     private void Start()
     {
+        // 카메라 타겟 설정
+        if (RcDiceCamera.Instance != null)
+        {
+            RcDiceCamera.Instance.SetTarget(transform);
+        }
+
+        // 시작 타일에 진입
         tileInteractor.OnEnterTile(movement.GetGridPos());
     }
 
