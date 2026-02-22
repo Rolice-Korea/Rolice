@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -10,6 +11,8 @@ public class RcTweenAnimatorEditor : Editor
     private SerializedProperty sequencesProperty;
     private SerializedProperty playOnEnableProperty;
     private SerializedProperty onDisableBehaviorProperty;
+
+    private readonly List<bool> sequenceFoldouts = new List<bool>();
 
     private void OnEnable()
     {
@@ -71,6 +74,9 @@ public class RcTweenAnimatorEditor : Editor
 
     private void DrawSequenceElement(int index)
     {
+        while (sequenceFoldouts.Count <= index)
+            sequenceFoldouts.Add(true);
+
         var seq = sequencesProperty.GetArrayElementAtIndex(index);
         var nameProp = seq.FindPropertyRelative("name");
         var animsProp = seq.FindPropertyRelative("animations");
@@ -81,7 +87,7 @@ public class RcTweenAnimatorEditor : Editor
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
         EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField($"[{index}]", EditorStyles.boldLabel, GUILayout.Width(30));
+        sequenceFoldouts[index] = EditorGUILayout.Foldout(sequenceFoldouts[index], $"[{index}]", true, EditorStyles.foldoutHeader);
         nameProp.stringValue = EditorGUILayout.TextField(nameProp.stringValue);
 
         if (GUILayout.Button("▾", GUILayout.Width(20)))
@@ -117,31 +123,34 @@ public class RcTweenAnimatorEditor : Editor
 
         EditorGUILayout.EndHorizontal();
 
-        EditorGUI.indentLevel++;
-        EditorGUILayout.PropertyField(loopProp);
-        if (loopProp.boolValue)
+        if (sequenceFoldouts[index])
         {
             EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(loopCountProp, new GUIContent("Count (-1 = ∞)"));
-            EditorGUILayout.PropertyField(loopTypeProp, new GUIContent("Type"));
+            EditorGUILayout.PropertyField(loopProp);
+            if (loopProp.boolValue)
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(loopCountProp, new GUIContent("Count (-1 = ∞)"));
+                EditorGUILayout.PropertyField(loopTypeProp, new GUIContent("Type"));
+                EditorGUI.indentLevel--;
+            }
             EditorGUI.indentLevel--;
+
+            EditorGUILayout.Space(3);
+            EditorGUILayout.LabelField("Animations", EditorStyles.boldLabel);
+
+            if (animsProp.arraySize == 0)
+                EditorGUILayout.HelpBox("Empty", MessageType.Info);
+            else
+            {
+                for (int i = 0; i < animsProp.arraySize; i++)
+                    DrawAnimationElement(animsProp, i);
+            }
+
+            EditorGUILayout.Space(3);
+            if (GUILayout.Button("+ Add Animation", GUILayout.Height(25)))
+                ShowAddAnimationMenu(animsProp);
         }
-        EditorGUI.indentLevel--;
-
-        EditorGUILayout.Space(3);
-        EditorGUILayout.LabelField("Animations", EditorStyles.boldLabel);
-
-        if (animsProp.arraySize == 0)
-            EditorGUILayout.HelpBox("Empty", MessageType.Info);
-        else
-        {
-            for (int i = 0; i < animsProp.arraySize; i++)
-                DrawAnimationElement(animsProp, i);
-        }
-
-        EditorGUILayout.Space(3);
-        if (GUILayout.Button("+ Add Animation", GUILayout.Height(25)))
-            ShowAddAnimationMenu(animsProp);
 
         EditorGUILayout.EndVertical();
         EditorGUILayout.Space(5);

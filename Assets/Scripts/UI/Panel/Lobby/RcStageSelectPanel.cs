@@ -46,8 +46,6 @@ namespace Rolice.UI
         public int ItemCount => items.Count;
         public int CurrentIndex => currentIndex;
 
-        // ─── Lifecycle ────────────────────────────────────────────────────
-
         protected override void Awake()
         {
             base.Awake();
@@ -83,8 +81,6 @@ namespace Rolice.UI
 
         private void OnDestroy() => ClearItems();
 
-        // ─── Public API ───────────────────────────────────────────────────
-
         public void CreateItems(int count)
         {
             ClearItems();
@@ -108,7 +104,7 @@ namespace Rolice.UI
         {
             currentIndex = Mathf.Clamp(index, 0, Mathf.Max(0, items.Count - 1));
             scrollPos = currentIndex;
-            ApplyLayoutImmediate();
+            RefreshLayout();
         }
 
         public void PlayEntryAnimation()
@@ -152,8 +148,6 @@ namespace Rolice.UI
             scrollPos = 0f;
         }
 
-        // ─── Navigation ───────────────────────────────────────────────────
-
         public void NavigateTo(int targetIndex, bool animated = true)
         {
             targetIndex = Mathf.Clamp(targetIndex, 0, items.Count - 1);
@@ -166,19 +160,11 @@ namespace Rolice.UI
             else
             {
                 scrollPos = targetIndex;
-                ApplyLayoutImmediate();
+                RefreshLayout();
             }
         }
 
-        // ─── Layout ───────────────────────────────────────────────────────
-
-        private void ApplyLayoutImmediate()
-        {
-            for (int i = 0; i < items.Count; i++)
-                ApplyItemVisual(i, scrollPos);
-        }
-
-        private void UpdateCarouselFromScrollPos()
+        private void RefreshLayout()
         {
             for (int i = 0; i < items.Count; i++)
                 ApplyItemVisual(i, scrollPos);
@@ -190,8 +176,8 @@ namespace Rolice.UI
             var rt = items[i].GetComponent<RectTransform>();
             rt.anchoredPosition = new Vector2((i - centerPos) * itemSpacing, 0f);
 
-            items[i].EvaluateCarousel(Mathf.Clamp01(1f - dist));   // scale 전담
-            items[i].SetCarouselAlpha(GetAlphaForDist(dist));       // alpha 전담
+            items[i].EvaluateCarousel(Mathf.Clamp01(1f - dist));
+            items[i].SetCarouselAlpha(GetAlphaForDist(dist));
 
             items[i].SetSelected(dist < 0.5f);
         }
@@ -213,13 +199,12 @@ namespace Rolice.UI
             carouselSequence
                 .Append(DOTween.To(
                     () => scrollPos,
-                    v  => { scrollPos = v; UpdateCarouselFromScrollPos(); },
+                    v  => { scrollPos = v; RefreshLayout(); },
                     (float)index, snapDuration).SetEase(Ease.OutQuad))
                 .OnComplete(() =>
                 {
                     scrollPos = index;
-                    if (index >= 0 && index < items.Count)
-                        items[index].PlaySelectAnimation();
+                    items[index].PlaySelectAnimation();
                 });
             carouselSequence.Play();
         }
@@ -228,7 +213,6 @@ namespace Rolice.UI
         {
             if (index < 0 || index >= items.Count) return;
 
-            int idx = index;
             float targetT = Mathf.Clamp01(1f - Mathf.Abs(index - currentIndex));
 
             var rt = items[index].GetComponent<RectTransform>();
@@ -236,16 +220,14 @@ namespace Rolice.UI
             items[index].SetSelected(index == currentIndex);
 
             carouselSequence.Insert(delay,
-                DOTween.To(() => 0f, v => items[idx].EvaluateCarousel(v), targetT, 0.22f)
+                DOTween.To(() => 0f, v => items[index].EvaluateCarousel(v), targetT, 0.22f)
                        .SetEase(Ease.OutBack));
         }
-
-        // ─── Drag (IDragHandler — 카드 버튼에서 부모로 버블링됨) ────────────
 
         public void OnBeginDrag(PointerEventData eventData)
         {
             carouselSequence?.Kill();
-            physicsActive = false;      // 물리/스냅 즉시 정지 — 드래그 중 충돌 방지
+            physicsActive = false;
             scrollVelocity = 0f;
             dragLastX    = eventData.position.x;
             dragVelocity = 0f;
@@ -267,7 +249,7 @@ namespace Rolice.UI
                 ? rawVel
                 : Mathf.Lerp(dragVelocity, rawVel, 0.4f);
 
-            UpdateCarouselFromScrollPos();
+            RefreshLayout();
         }
 
         public void OnEndDrag(PointerEventData eventData)
@@ -275,8 +257,6 @@ namespace Rolice.UI
             scrollVelocity = dragVelocity * 0.6f;
             physicsActive  = true;
         }
-
-        // ─── Scroll Physics ───────────────────────────────────────────────
 
         private void HandleScrollWheel()
         {
@@ -297,20 +277,16 @@ namespace Rolice.UI
         {
             if (!physicsActive) return;
 
-            // 위치 업데이트
             scrollPos += scrollVelocity * Time.deltaTime;
 
-            // 경계 처리
             float maxPos = items.Count - 1;
-            if (scrollPos <= 0f)      { scrollPos = 0f;    scrollVelocity = 0f; }
-            if (scrollPos >= maxPos)  { scrollPos = maxPos; scrollVelocity = 0f; }
+            if (scrollPos <= 0f)     { scrollPos = 0f;     scrollVelocity = 0f; }
+            if (scrollPos >= maxPos) { scrollPos = maxPos; scrollVelocity = 0f; }
 
-            // 감속 (지수 감쇠)
             scrollVelocity = Mathf.Lerp(scrollVelocity, 0f, scrollFriction * Time.deltaTime);
 
-            UpdateCarouselFromScrollPos();
+            RefreshLayout();
 
-            // 속도가 충분히 낮으면 가장 가까운 카드에 스냅
             if (Mathf.Abs(scrollVelocity) < snapVelocityThreshold)
             {
                 scrollVelocity = 0f;
@@ -319,8 +295,6 @@ namespace Rolice.UI
                 SnapToIndex(target);
             }
         }
-
-        // ─── Item Click ───────────────────────────────────────────────────
 
         private void HandleItemClicked(int stageNumber)
         {

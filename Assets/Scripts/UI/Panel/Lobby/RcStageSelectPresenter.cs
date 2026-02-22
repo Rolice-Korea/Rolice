@@ -39,7 +39,6 @@ namespace Rolice.UI
             Panel.PlayEntryAnimation();
         }
 
-        /// <summary>첫 번째 미클리어 스테이지(= 다음 플레이 대상)를 초기 포커스로.</summary>
         private int GetInitialFocusIndex()
         {
             int total = RcProgressManager.Instance.TotalStageCount;
