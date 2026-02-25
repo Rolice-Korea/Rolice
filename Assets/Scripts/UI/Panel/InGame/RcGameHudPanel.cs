@@ -1,6 +1,7 @@
 using Engine.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Rolice.UI
 {
@@ -9,6 +10,11 @@ namespace Rolice.UI
         [Header("Turn")]
         [SerializeField] private TMP_Text turnText;
         [SerializeField] private RcTweenAnimator animatorGameOver;
+
+        [Header("Pause")]
+        [SerializeField] private Button pauseButton;
+
+        public Button PauseButton => pauseButton;
 
         private RcGameHudPresenter presenter;
 

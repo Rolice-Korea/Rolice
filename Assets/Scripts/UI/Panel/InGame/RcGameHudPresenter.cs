@@ -10,6 +10,7 @@ namespace Rolice.UI
         protected override void OnInitialize()
         {
             RcGameEvents.Instance.Subscribe(RcGameEvent.TurnChanged, OnTurnChanged);
+            Panel.PauseButton.onClick.AddListener(OnPauseClicked);
 
             InitializeDisplay();
         }
@@ -17,6 +18,7 @@ namespace Rolice.UI
         protected override void OnDispose()
         {
             RcGameEvents.Instance.Unsubscribe(RcGameEvent.TurnChanged, OnTurnChanged);
+            Panel.PauseButton.onClick.RemoveListener(OnPauseClicked);
         }
 
         private void InitializeDisplay()
@@ -28,6 +30,8 @@ namespace Rolice.UI
             Panel.SetRemainingTurns(remainingTurns >= 0 ? remainingTurns : 0);
             lastRemainingTurns = remainingTurns;
         }
+
+        private void OnPauseClicked() => RcUIManager.Instance.Open<RcPausePanel>();
 
         private void OnTurnChanged(int currentTurn)
         {

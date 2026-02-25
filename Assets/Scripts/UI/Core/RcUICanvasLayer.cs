@@ -23,7 +23,7 @@ namespace Engine.UI
             {
                 if (kvp.Value == null) continue;
 
-                if (camera != null)
+                if (camera != null && kvp.Key != RcUILayer.AbsoluteOverlay)
                 {
                     kvp.Value.renderMode = RenderMode.ScreenSpaceCamera;
                     kvp.Value.worldCamera = camera;
@@ -54,7 +54,7 @@ namespace Engine.UI
 
             var canvas = go.AddComponent<Canvas>();
 
-            if (camera != null)
+            if (camera != null && layer != RcUILayer.AbsoluteOverlay)
             {
                 canvas.renderMode = RenderMode.ScreenSpaceCamera;
                 canvas.worldCamera = camera;
