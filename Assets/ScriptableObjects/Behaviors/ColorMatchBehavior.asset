@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bbb1bdbc76b0f742933a6337d909cab, type: 3}
   m_Name: ColorMatchBehavior
   m_EditorClassIdentifier: 
-  matchEffectPrefab: {fileID: 0}
+  RequiresClearTracking: 1
+  matchEffectPrefab: {fileID: 6946120282878016763, guid: eb882837d6b728646989edec6f51f41a, type: 3}
   clearedMaterial: {fileID: 2100000, guid: 6a0dc9aa9c6eefc419085009c5ae5e2a, type: 2}

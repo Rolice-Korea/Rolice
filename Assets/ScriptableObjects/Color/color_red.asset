@@ -15,4 +15,5 @@ MonoBehaviour:
   DisplayName: red
   DiceMaterial: {fileID: 2100000, guid: 8715c26143c030648918b69184d99523, type: 2}
   TileMaterial: {fileID: 2100000, guid: cb8132b58c81c4e41b0862a2d3db7316, type: 2}
-  EffectMaterial: {fileID: 0}
+  EffectMaterial: {fileID: 2100000, guid: e840acc29cb7f9a4184cb3cd9543d378, type: 2}
+  MatchEffectPrefab: {fileID: 6946120282878016763, guid: eb882837d6b728646989edec6f51f41a, type: 3}

@@ -1,12 +1,11 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Rolice.Particle;
 
 [CreateAssetMenu(fileName = "ColorMatchBehavior", menuName = "Rolice/Behaviors/Color Match")]
 public class RcColorMatchBehaviorSO : RcTileBehaviorSO
 {
     [Header("Visual Feedback")]
-    [Tooltip("색깔이 매칭되었을 때 재생할 파티클")]
-    public GameObject matchEffectPrefab;
-
     [Tooltip("클리어된 타일의 Material")]
     public Material clearedMaterial;
 
@@ -60,35 +59,51 @@ public class RcColorMatchBehavior : ITileBehavior
         RcColorSO diceBottomColor = pawn.GetBottomColor();
 
         if (diceBottomColor == tileColor)
-            ClearTile();
+            ClearTile(pawn);
     }
 
     public void OnExit(RcDicePawn pawn)
     {
     }
 
-    private void ClearTile()
+    private void ClearTile(RcDicePawn pawn)
     {
         if (isCleared) return;
 
         isCleared = true;
-        ApplyVisualFeedback();
+
+        // 마지막 타일이면 승리 이미션이 바로 뒤따르므로 색 매칭 이미션 스킵
+        bool isLastTile = RcLevelManager.Instance.GetRemainingColorTiles() == 1;
+        ApplyVisualFeedback(pawn, skipEmission: isLastTile);
         RcLevelManager.Instance.ClearColorTile(tilePosition);
     }
 
-    private void ApplyVisualFeedback()
+    private void ApplyVisualFeedback(RcDicePawn pawn, bool skipEmission = false)
     {
         if (settings.clearedMaterial != null && tileRenderer != null)
             tileRenderer.material = settings.clearedMaterial;
 
-        if (settings.matchEffectPrefab != null)
+        if (!skipEmission)
+            pawn.FlashEmission();
+
+        var prefab = tileData.Color?.MatchEffectPrefab;
+        if (prefab == null) return;
+
+        var go = Object.Instantiate(
+            prefab,
+            tileObject.transform.position + Vector3.up * 0.7f,
+            Quaternion.identity
+        );
+
+        var effect = go.GetComponent<RcParticleEffect>();
+        if (effect != null)
         {
-            GameObject effect = Object.Instantiate(
-                settings.matchEffectPrefab,
-                tileObject.transform.position + Vector3.up * 0.5f,
-                Quaternion.identity
-            );
-            Object.Destroy(effect, 2f);
+            effect.OnCompleted += () => Object.Destroy(go);
+            effect.PlayAsync().Forget();
+        }
+        else
+        {
+            Object.Destroy(go, 2f);
         }
     }
 }

@@ -15,4 +15,4 @@ MonoBehaviour:
   DisplayName: cyan
   DiceMaterial: {fileID: 2100000, guid: ee32cda6f158a7241ada424afcdda4e3, type: 2}
   TileMaterial: {fileID: 2100000, guid: ee32cda6f158a7241ada424afcdda4e3, type: 2}
-  EffectMaterial: {fileID: 0}
+  EffectMaterial: {fileID: -876546973899608171, guid: 5484f6815180c7b4683540017ff41c42, type: 3}

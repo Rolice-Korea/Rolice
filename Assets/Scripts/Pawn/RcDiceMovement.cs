@@ -11,7 +11,7 @@ public class RcDiceMovement : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float rollDuration = 0.3f;
     [SerializeField] private float teleportDuration = 0.5f;
-    [SerializeField] private float heightOffset = 0.5f;
+    [SerializeField] private float heightOffset = 0f;
 
     private Vector2Int gridPos;
     private bool isMoving;

@@ -9,4 +9,7 @@ public class RcColorSO : ScriptableObject
     public Material DiceMaterial;
     public Material TileMaterial;
     public Material EffectMaterial;
+
+    [Header("Effects")]
+    public GameObject MatchEffectPrefab;
 }
