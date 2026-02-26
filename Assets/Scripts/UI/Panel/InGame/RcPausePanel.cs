@@ -44,7 +44,7 @@ namespace Rolice.UI
         public void SetCurrentTurn(int turn)
         {
             if (currentTurnText != null)
-                currentTurnText.text = $"현재  {turn}턴";
+                currentTurnText.text = $"{turn} TURN";
         }
 
         // thresholds[0] = ★★★ 기준턴, thresholds[1] = ★★☆ 기준턴, ★☆☆는 항상 "클리어"
@@ -59,12 +59,12 @@ namespace Rolice.UI
                 if (i < 2)
                 {
                     starThresholdTexts[i].text = (thresholds != null && i < thresholds.Length)
-                        ? $"{thresholds[i]}턴 이하"
+                        ? $"{thresholds[i]}TURN"
                         : "-";
                 }
                 else
                 {
-                    starThresholdTexts[i].text = "클리어";
+                    starThresholdTexts[i].text = "CLEAR";
                 }
             }
         }

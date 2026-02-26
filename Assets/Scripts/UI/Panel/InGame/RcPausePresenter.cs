@@ -9,6 +9,7 @@ namespace Rolice.UI
         protected override void OnInitialize()
         {
             RcPauseManager.Instance.Pause();
+            RcUIManager.Instance.Close<RcGameHudPanel>();
 
             InitializeDisplay();
 
@@ -24,6 +25,7 @@ namespace Rolice.UI
             Panel.CloseButton.onClick.RemoveListener(OnCloseClicked);
 
             RcPauseManager.Instance.Resume();
+            RcUIManager.Instance.Open<RcGameHudPanel>();
         }
 
         private void InitializeDisplay()
