@@ -12,24 +12,14 @@ public class RcTileData
     [Header("Color (색깔 타일용)")]
     public RcColorSO Color;
 
-    [Header("Special Behavior (optional)")]
-    public RcTileBehaviorSO BehaviorSO;
-
-    [NonSerialized] private ITileBehavior behaviorInstance;
+    [Header("Runtime State")]
+    [NonSerialized] public int StoneCount;
 
     public GameObject TileObject;
 
     public void Setup(GameObject tileObject)
     {
         this.TileObject = tileObject;
-    }
-
-    public ITileBehavior GetBehavior(GameObject tileObject)
-    {
-        if (behaviorInstance == null && BehaviorSO != null)
-            behaviorInstance = BehaviorSO.CreateBehavior(tileObject, this);
-
-        return behaviorInstance;
     }
 
     public bool CanEnter(RcDicePawn pawn)
@@ -43,8 +33,7 @@ public class RcTileData
         {
             TileID = this.TileID,
             bCanEnter = this.bCanEnter,
-            Color = this.Color,
-            BehaviorSO = this.BehaviorSO
+            Color = this.Color
         };
     }
 }

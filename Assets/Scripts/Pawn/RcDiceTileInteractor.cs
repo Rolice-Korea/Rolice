@@ -15,17 +15,13 @@ public class RcDiceTileInteractor : MonoBehaviour
         RcTileData tile = LevelManager.GetRuntimeTile(pos);
         if (tile == null) return;
 
-        ITileBehavior behavior = tile.GetBehavior(tile.TileObject);
-        behavior?.OnEnter(pawn);
+        var runner = tile.TileObject.GetComponent<RcTileRuleRunner>();
+        runner?.OnDiceEnter(pawn, tile);
     }
 
     public void OnExitTile(Vector2Int pos)
     {
-        RcTileData tile = LevelManager.GetRuntimeTile(pos);
-        if (tile == null) return;
-
-        ITileBehavior behavior = tile.GetBehavior(tile.TileObject);
-        behavior?.OnExit(pawn);
+        // 현재 OnExit 동작을 사용하는 Rule이 없음
     }
 
     public bool CanEnterTile(Vector2Int pos)
@@ -33,7 +29,6 @@ public class RcDiceTileInteractor : MonoBehaviour
         RcTileData tile = LevelManager.GetRuntimeTile(pos);
         if (tile == null) return false;
 
-        ITileBehavior behavior = tile.GetBehavior(tile.TileObject);
-        return behavior == null || behavior.CanEnter(pawn);
+        return tile.CanEnter(pawn);
     }
 }

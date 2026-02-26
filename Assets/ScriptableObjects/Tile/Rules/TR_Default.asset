@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a2f4e5a162979a4e9aa8e092e80534c, type: 3}
+  m_Name: TR_Default
+  m_EditorClassIdentifier: Assembly-CSharp::RcTileRuleSO
+  Conditions:
+  - {fileID: 11400000, guid: f7c3781a82aa31c409e7ca5e663f0462, type: 2}
+  Actions:
+  - {fileID: 11400000, guid: 9b6ea3f84b9aac541a4f323f0c5efa11, type: 2}

@@ -90,9 +90,9 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
                 runtimeTile.Setup(tileObj);
                 tilesCreated++;
 
-                InitializeTileBehavior(tileObj, runtimeTile);
+                InitializeTileRules(tileObj, runtimeTile);
 
-                if (RequiresClearTracking(runtimeTile))
+                if (RequiresClearTracking(tileObj, runtimeTile))
                     colorTilesRemaining.Add(gridPos);
             }
         }
@@ -100,15 +100,22 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
         return tilesCreated;
     }
 
-    private void InitializeTileBehavior(GameObject tileObject, RcTileData tileData)
+    private void InitializeTileRules(GameObject tileObject, RcTileData tileData)
     {
-        if (tileData.BehaviorSO == null) return;
-        tileData.GetBehavior(tileObject);
+        var runner = tileObject.GetComponent<RcTileRuleRunner>();
+        runner?.Initialize(tileData);
     }
 
-    private bool RequiresClearTracking(RcTileData tile)
+    private bool RequiresClearTracking(GameObject tileObject, RcTileData tileData)
     {
-        return tile.BehaviorSO != null && tile.BehaviorSO.RequiresClearTracking;
+        var runner = tileObject.GetComponent<RcTileRuleRunner>();
+
+        // RuleRunner가 있으면 그 설정을 사용
+        if (runner != null)
+            return runner.RequiresClearTracking;
+
+        // RuleRunner가 없으면 Color 할당 여부로 폴백 (마이그레이션 호환)
+        return tileData.Color != null;
     }
 
     public RcTileData GetRuntimeTile(Vector2Int pos)

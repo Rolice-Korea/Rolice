@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6468555126259770517}
   - component: {fileID: 8328624931868187961}
   - component: {fileID: 9098644352187610352}
+  - component: {fileID: 2939822313271653249}
   m_Layer: 0
   m_Name: color_red
   m_TagString: Untagged
@@ -63,6 +64,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2939822313271653249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1480887570026557805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac338c5b5947d8a49a7715d37aaa0495, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RcTileRuleRunner
+  Rules:
+  - {fileID: 11400000, guid: 908806de45c94424d87d8d58ffba7a89, type: 2}
+  RequiresClearTracking: 1
 --- !u!1 &1895191560933672346
 GameObject:
   m_ObjectHideFlags: 0

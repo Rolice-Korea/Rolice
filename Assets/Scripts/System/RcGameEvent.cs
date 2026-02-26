@@ -7,4 +7,5 @@ public enum RcGameEvent
     TurnChanged,       // Value: int
     MoveStarted,       // Value: Vector2Int
     MoveCompleted,     // Value: Vector2Int
+    BreakableTileHit,  // Value: Vector2Int
 }
