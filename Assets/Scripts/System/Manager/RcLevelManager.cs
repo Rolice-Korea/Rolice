@@ -74,25 +74,27 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
                 Vector2Int gridPos = new Vector2Int(x, y);
                 RcTileData sourceTile = currentLevelData.GetTile(x, y);
 
-                if (sourceTile == null || string.IsNullOrEmpty(sourceTile.TileID))
+                if (sourceTile == null || sourceTile.IsEmpty)
                     continue;
 
                 RcTileData runtimeTile = sourceTile.Clone();
                 runtimeTiles[gridPos] = runtimeTile;
 
-                GameObject tileObj = RcMapGenerator.CreateTile(sourceTile.TileID, gridPos, tilesParent);
+                GameObject tileObj = SpawnTile(sourceTile.TileType, gridPos, tilesParent);
                 if (tileObj == null)
                 {
-                    Debug.LogError($"[LevelManager] 타일 생성 실패: {sourceTile.TileID} at ({x}, {y})");
+                    Debug.LogError($"[LevelManager] 타일 생성 실패: {sourceTile.TileType.name} at ({x}, {y})");
                     continue;
                 }
 
-                runtimeTile.Setup(tileObj);
+                // Runner를 동적으로 부착하고 TileTypeSO의 Rules로 구성
+                RcTileRuleRunner runner = tileObj.AddComponent<RcTileRuleRunner>();
+                runtimeTile.Setup(tileObj, runner);
+                runner.Initialize(sourceTile.TileType.Rules, sourceTile.TileType.RequiresClearTracking, runtimeTile);
+
                 tilesCreated++;
 
-                InitializeTileRules(tileObj, runtimeTile);
-
-                if (RequiresClearTracking(tileObj, runtimeTile))
+                if (runner.RequiresClearTracking)
                     colorTilesRemaining.Add(gridPos);
             }
         }
@@ -100,22 +102,18 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
         return tilesCreated;
     }
 
-    private void InitializeTileRules(GameObject tileObject, RcTileData tileData)
+    private GameObject SpawnTile(RcTileTypeSO tileType, Vector2Int gridPos, Transform parent)
     {
-        var runner = tileObject.GetComponent<RcTileRuleRunner>();
-        runner?.Initialize(tileData);
-    }
+        if (tileType.Prefab == null)
+        {
+            Debug.LogError($"[LevelManager] TileType '{tileType.name}'에 Prefab이 없습니다");
+            return null;
+        }
 
-    private bool RequiresClearTracking(GameObject tileObject, RcTileData tileData)
-    {
-        var runner = tileObject.GetComponent<RcTileRuleRunner>();
-
-        // RuleRunner가 있으면 그 설정을 사용
-        if (runner != null)
-            return runner.RequiresClearTracking;
-
-        // RuleRunner가 없으면 Color 할당 여부로 폴백 (마이그레이션 호환)
-        return tileData.Color != null;
+        Vector3 worldPos = RcMapGenerator.GridToWorld(gridPos);
+        GameObject tileObj = Object.Instantiate(tileType.Prefab, worldPos, Quaternion.identity, parent);
+        tileObj.name = $"Tile_{gridPos.x}_{gridPos.y}_{tileType.name}";
+        return tileObj;
     }
 
     public RcTileData GetRuntimeTile(Vector2Int pos)

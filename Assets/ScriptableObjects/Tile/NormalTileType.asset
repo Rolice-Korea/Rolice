@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d95b7218eea3d740a5f2ef9a861a51c, type: 3}
+  m_Name: NormalTileType
+  m_EditorClassIdentifier: Assembly-CSharp::RcTileTypeSO
+  Prefab: {fileID: 1480887570026557805, guid: f8784335a104d364d85a63d188425166, type: 3}
+  Rules: []
+  RequiresClearTracking: 0

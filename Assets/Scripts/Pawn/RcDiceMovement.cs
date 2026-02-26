@@ -74,7 +74,7 @@ public class RcDiceMovement : MonoBehaviour
     {
         RcTileData targetTile = LevelManager.GetRuntimeTile(targetPos);
 
-        if (targetTile == null || string.IsNullOrEmpty(targetTile.TileID))
+        if (targetTile == null || targetTile.IsEmpty)
             return false;
 
         if (!targetTile.bCanEnter)
@@ -86,7 +86,7 @@ public class RcDiceMovement : MonoBehaviour
     private bool IsValidTeleportTarget(Vector2Int targetPos)
     {
         RcTileData targetTile = LevelManager.GetRuntimeTile(targetPos);
-        return targetTile != null && !string.IsNullOrEmpty(targetTile.TileID);
+        return targetTile != null && !targetTile.IsEmpty;
     }
 
     private IEnumerator RollCo(Vector2Int dir, Vector2Int targetPos)

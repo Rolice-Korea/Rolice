@@ -479,7 +479,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RcGameBootstrap
   tilesParent: {fileID: 688716421}
-  fallbackLevel: {fileID: 11400000, guid: 591ceeb55a43394429658099123ccc35, type: 2}
+  fallbackLevel: {fileID: 11400000, guid: 56cb3cf7807f5104b922dcc81054e91f, type: 2}
 --- !u!1 &893243766
 GameObject:
   m_ObjectHideFlags: 0

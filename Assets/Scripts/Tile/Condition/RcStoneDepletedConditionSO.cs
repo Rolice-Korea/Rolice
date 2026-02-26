@@ -9,7 +9,7 @@ public class RcStoneDepletedConditionSO : RcTileConditionSO
 
     public override bool Evaluate(RcDicePawn pawn, RcTileData tileData)
     {
-        if (tileData == null) return false;
-        return tileData.StoneCount >= MaxStoneCount;
+        if (tileData is not RcStoneTileData stoneTile) return false;
+        return stoneTile.HitCount >= MaxStoneCount;
     }
 }

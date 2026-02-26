@@ -8,14 +8,18 @@ public class RcColorMatchConditionSO : RcTileConditionSO
     {
         if (pawn == null || tileData == null) return false;
 
-        RcColorSO tileColor = tileData.Color;
-        if (tileColor == null)
+        if (tileData is not RcColorTileData colorTile)
+        {
+            Debug.LogWarning($"[ColorMatchCondition] RcColorTileData가 아닌 타일에 적용되었습니다.");
+            return false;
+        }
+
+        if (colorTile.Color == null)
         {
             Debug.LogWarning($"[ColorMatchCondition] 타일에 Color가 할당되지 않았습니다.");
             return false;
         }
 
-        RcColorSO diceBottomColor = pawn.GetBottomColor();
-        return diceBottomColor == tileColor;
+        return pawn.GetBottomColor() == colorTile.Color;
     }
 }

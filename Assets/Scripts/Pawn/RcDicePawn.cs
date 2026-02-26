@@ -92,7 +92,7 @@ public class RcDicePawn : MonoBehaviour
     {
         RcTileData targetTile = RcLevelManager.Instance.GetRuntimeTile(targetPos);
 
-        if (targetTile == null || string.IsNullOrEmpty(targetTile.TileID))
+        if (targetTile == null || targetTile.IsEmpty)
             return false;
 
         if (!targetTile.bCanEnter)

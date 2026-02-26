@@ -11,6 +11,7 @@ public class RcLevelDataSO : ScriptableObject
     public int Width;
     public int Height;
 
+    [SerializeReference, RcPolymorphicReference(typeof(RcTileData))]
     public RcTileData[] Tiles;
 
     [Header("Game Rules")]
@@ -28,13 +29,8 @@ public class RcLevelDataSO : ScriptableObject
         {
             for (int i = 0; i < Mathf.Min(Tiles.Length, newTiles.Length); i++)
             {
-                newTiles[i] = Tiles[i];
+                newTiles[i] = Tiles[i]; // null = 빈 타일 (SerializeReference에서 유효)
             }
-        }
-
-        for (int i = 0; i < newTiles.Length; i++)
-        {
-            newTiles[i] ??= new RcTileData { TileID = "" };
         }
 
         Tiles = newTiles;

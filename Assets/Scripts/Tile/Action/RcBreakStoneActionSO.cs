@@ -14,10 +14,16 @@ public class RcBreakStoneActionSO : RcTileActionSO
 
     public override void Execute(RcDicePawn pawn, RcTileData tileData)
     {
-        tileData.StoneCount++;
+        if (tileData is not RcStoneTileData stoneTile)
+        {
+            Debug.LogWarning("[BreakStoneAction] RcStoneTileData가 아닌 타일에 적용되었습니다.");
+            return;
+        }
+
+        stoneTile.HitCount++;
 
         // 단계별 Material 변경
-        ApplyHitMaterial(tileData);
+        ApplyHitMaterial(tileData, stoneTile.HitCount);
 
         // 이펙트 재생
         PlayBreakEffect(tileData);
@@ -27,15 +33,14 @@ public class RcBreakStoneActionSO : RcTileActionSO
         RcGameEvents.Instance.Publish(RcGameEvent.BreakableTileHit, pos);
     }
 
-    private void ApplyHitMaterial(RcTileData tileData)
+    private void ApplyHitMaterial(RcTileData tileData, int hitCount)
     {
         if (HitMaterials == null || HitMaterials.Length == 0) return;
 
         MeshRenderer renderer = tileData.TileObject.GetComponentInChildren<MeshRenderer>();
         if (renderer == null) return;
 
-        // StoneCount는 이미 증가된 상태이므로 -1 인덱스 사용
-        int materialIndex = Mathf.Clamp(tileData.StoneCount - 1, 0, HitMaterials.Length - 1);
+        int materialIndex = Mathf.Clamp(hitCount - 1, 0, HitMaterials.Length - 1);
         if (HitMaterials[materialIndex] != null)
             renderer.material = HitMaterials[materialIndex];
     }

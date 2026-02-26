@@ -20,12 +20,19 @@ public class RcRandomizeColorActionSO : RcTileActionSO
             return;
         }
 
-        // 현재 색상과 다른 색상 선택
-        RcColorSO newColor = PickRandomColor(tileData.Color);
-        tileData.Color = newColor;
+        if (tileData is not RcColorTileData colorTile)
+        {
+            Debug.LogWarning("[RandomizeColorAction] RcColorTileData가 아닌 타일에 적용되었습니다.");
+            return;
+        }
 
-        // StoneCount 리셋
-        tileData.StoneCount = 0;
+        // 현재 색상과 다른 색상 선택
+        RcColorSO newColor = PickRandomColor(colorTile.Color);
+        colorTile.Color = newColor;
+
+        // HitCount 리셋 (스톤 타일인 경우)
+        if (tileData is RcStoneTileData stoneTile)
+            stoneTile.HitCount = 0;
 
         // Material 적용
         ApplyMaterial(tileData, newColor);

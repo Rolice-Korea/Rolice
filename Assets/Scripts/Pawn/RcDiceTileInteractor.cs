@@ -15,8 +15,7 @@ public class RcDiceTileInteractor : MonoBehaviour
         RcTileData tile = LevelManager.GetRuntimeTile(pos);
         if (tile == null) return;
 
-        var runner = tile.TileObject.GetComponent<RcTileRuleRunner>();
-        runner?.OnDiceEnter(pawn, tile);
+        tile.Runner?.OnDiceEnter(pawn, tile);
     }
 
     public void OnExitTile(Vector2Int pos)

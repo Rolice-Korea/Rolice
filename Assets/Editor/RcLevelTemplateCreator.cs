@@ -5,6 +5,7 @@ public class RcLevelTemplateCreator : EditorWindow
 {
     private TemplateType selectedTemplate = TemplateType.Small5x5;
     private string levelName = "NewLevel";
+    private RcTileTypeSO defaultTileType;
     
     private enum TemplateType
     {
@@ -55,6 +56,14 @@ EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         GUILayout.Label("Level Name:", EditorStyles.miniBoldLabel);
         levelName = EditorGUILayout.TextField(levelName);
+        EditorGUILayout.EndVertical();
+
+        GUILayout.Space(5);
+
+EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        GUILayout.Label("Default Tile Type:", EditorStyles.miniBoldLabel);
+        defaultTileType = (RcTileTypeSO)EditorGUILayout.ObjectField(defaultTileType, typeof(RcTileTypeSO), false);
+        EditorGUILayout.HelpBox("미설정 시 타일이 빈 상태로 생성됩니다. Level Editor에서 직접 할당하세요.", MessageType.None);
         EditorGUILayout.EndVertical();
         
         GUILayout.Space(10);
@@ -125,66 +134,60 @@ RcLevelDataSO CreateEmptyLevel()
     
     RcLevelDataSO CreateSmall5x5()
     {
-        return CreateLevel(5, 5, (x, y) => 
+        return CreateLevel(5, 5, (x, y) =>
         {
-            // 모든 타일에 기본 타일 배치
-            return new RcTileData { TileID = "normal", bCanEnter = true };
+            return new RcTileData { TileType = defaultTileType, bCanEnter = true };
         });
     }
-    
+
     RcLevelDataSO CreateMedium7x7()
     {
-        return CreateLevel(7, 7, (x, y) => 
+        return CreateLevel(7, 7, (x, y) =>
         {
-            return new RcTileData { TileID = "normal", bCanEnter = true };
+            return new RcTileData { TileType = defaultTileType, bCanEnter = true };
         });
     }
-    
+
     RcLevelDataSO CreateLarge10x10()
     {
-        return CreateLevel(10, 10, (x, y) => 
+        return CreateLevel(10, 10, (x, y) =>
         {
-            return new RcTileData { TileID = "normal", bCanEnter = true };
+            return new RcTileData { TileType = defaultTileType, bCanEnter = true };
         });
     }
-    
+
     RcLevelDataSO CreateCrossShape()
     {
-        return CreateLevel(7, 7, (x, y) => 
+        return CreateLevel(7, 7, (x, y) =>
         {
             // 십자 모양 (가운데 행과 열만 타일 배치)
             int centerX = 3;
             int centerY = 3;
-            
+
             if (x == centerX || y == centerY)
-            {
-                return new RcTileData { TileID = "normal", bCanEnter = true };
-            }
-            
+                return new RcTileData { TileType = defaultTileType, bCanEnter = true };
+
             return null;
         });
     }
-    
+
     RcLevelDataSO CreateLShape()
     {
-        return CreateLevel(7, 7, (x, y) => 
+        return CreateLevel(7, 7, (x, y) =>
         {
             // L자 모양 (왼쪽 열 + 아래 행)
             if (x == 0 || y == 0)
-            {
-                return new RcTileData { TileID = "normal", bCanEnter = true };
-            }
-            
+                return new RcTileData { TileType = defaultTileType, bCanEnter = true };
+
             return null;
         });
     }
-    
+
     RcLevelDataSO CreateTutorial()
     {
-        return CreateLevel(3, 3, (x, y) => 
+        return CreateLevel(3, 3, (x, y) =>
         {
-            // 3x3 간단한 맵
-            return new RcTileData { TileID = "normal", bCanEnter = true };
+            return new RcTileData { TileType = defaultTileType, bCanEnter = true };
         });
     }
     
@@ -203,7 +206,7 @@ RcLevelDataSO CreateEmptyLevel()
                 int index = y * width + x;
                 RcTileData tile = tileFactory(x, y);
                 
-                level.Tiles[index] = tile ?? new RcTileData { TileID = "" };
+                level.Tiles[index] = tile; // null = 빈 타일 (SerializeReference에서 유효)
             }
         }
         

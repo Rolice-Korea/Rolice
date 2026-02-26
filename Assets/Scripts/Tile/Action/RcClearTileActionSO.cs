@@ -14,6 +14,10 @@ public class RcClearTileActionSO : RcTileActionSO
 
     public override void Execute(RcDicePawn pawn, RcTileData tileData)
     {
+        if (tileData is not RcColorTileData colorTile) return;
+        if (colorTile.IsCleared) return;
+        colorTile.IsCleared = true;
+
         // Material 변경
         if (ClearedMaterial != null)
         {

@@ -4,22 +4,22 @@ using UnityEngine;
 [Serializable]
 public class RcTileData
 {
-    [Header("Basic Info")]
-    public string TileID;
+    [Header("Tile Type")]
+    [Tooltip("이 타일의 타입 정의 SO. null이면 빈 타일(이동 불가)")]
+    public RcTileTypeSO TileType;
 
     public bool bCanEnter = true;
 
-    [Header("Color (색깔 타일용)")]
-    public RcColorSO Color;
+    [Header("Runtime (에디터 무시)")]
+    [NonSerialized] public GameObject TileObject;
+    [NonSerialized] public RcTileRuleRunner Runner;
 
-    [Header("Runtime State")]
-    [NonSerialized] public int StoneCount;
+    public bool IsEmpty => TileType == null;
 
-    public GameObject TileObject;
-
-    public void Setup(GameObject tileObject)
+    public void Setup(GameObject tileObject, RcTileRuleRunner runner)
     {
-        this.TileObject = tileObject;
+        TileObject = tileObject;
+        Runner = runner;
     }
 
     public bool CanEnter(RcDicePawn pawn)
@@ -27,13 +27,12 @@ public class RcTileData
         return bCanEnter;
     }
 
-    public RcTileData Clone()
+    public virtual RcTileData Clone()
     {
         return new RcTileData
         {
-            TileID = this.TileID,
-            bCanEnter = this.bCanEnter,
-            Color = this.Color
+            TileType = this.TileType,
+            bCanEnter = this.bCanEnter
         };
     }
 }
