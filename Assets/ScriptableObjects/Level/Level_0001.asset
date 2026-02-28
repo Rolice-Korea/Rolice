@@ -27,7 +27,7 @@ MonoBehaviour:
   - rid: 615818367896650517
   - rid: 615818367896650518
   - rid: 615818367896650522
-  - rid: 615818367896650520
+  - rid: 615818380224495677
   - rid: 615818367896650521
   Rules:
     HasTurnLimit: 1
@@ -60,11 +60,6 @@ MonoBehaviour:
       data:
         TileType: {fileID: 11400000, guid: ffe54eef9f94e484fa036a44965efb48, type: 2}
         bCanEnter: 1
-    - rid: 615818367896650520
-      type: {class: RcTileData, ns: , asm: Assembly-CSharp}
-      data:
-        TileType: {fileID: 11400000, guid: ffe54eef9f94e484fa036a44965efb48, type: 2}
-        bCanEnter: 1
     - rid: 615818367896650521
       type: {class: RcTileData, ns: , asm: Assembly-CSharp}
       data:
@@ -81,3 +76,9 @@ MonoBehaviour:
       data:
         TileType: {fileID: 11400000, guid: ffe54eef9f94e484fa036a44965efb48, type: 2}
         bCanEnter: 1
+    - rid: 615818380224495677
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}

@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: TA_ClearTile
   m_EditorClassIdentifier: Assembly-CSharp::RcClearTileActionSO
   ClearedMaterial: {fileID: 2100000, guid: 6a0dc9aa9c6eefc419085009c5ae5e2a, type: 2}
-  ClearEffectPrefab: {fileID: 0}
+  ClearEffectPrefab: {fileID: 6946120282878016763, guid: eb882837d6b728646989edec6f51f41a, type: 3}
