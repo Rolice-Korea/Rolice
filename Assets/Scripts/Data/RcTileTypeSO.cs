@@ -9,6 +9,10 @@ public class RcTileTypeSO : ScriptableObject
     [Tooltip("타일 메쉬 프리팹 (RcTileRuleRunner 없어도 됨, 런타임에 동적 추가)")]
     public GameObject Prefab;
 
+    [Header("Data Template")]
+    [Tooltip("타일 데이터 프로토타입. RcColorTileData 할당 시 색상 타일로 취급. null이면 기본 RcTileData 사용.")]
+    [SerializeReference] public RcTileData TileDataTemplate;
+
     [Header("Rules")]
     [Tooltip("이 타일에 적용할 Rule 목록")]
     public RcTileRuleSO[] Rules;

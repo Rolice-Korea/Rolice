@@ -6,9 +6,8 @@ namespace Rolice.System.Manager
     {
         [Header("Level Clear")]
         [SerializeField] private AudioClip _levelClearBGM;
-        [SerializeField] private float _levelClearFadeOut              = 0.5f;
-        [SerializeField] private float _levelClearFadeIn               = 3.0f;
-        [SerializeField] [Range(0f, 1f)] private float _levelClearVolume = 0.6f;
+        [SerializeField] private float _levelClearFadeOut = 0.5f;
+        [SerializeField] private float _levelClearFadeIn  = 3.0f;
 
         [Header("Lose")]
         [SerializeField] private float _loseFadeOut = 2.0f;
@@ -31,7 +30,7 @@ namespace Rolice.System.Manager
 
         private void HandleLevelCompleted()
         {
-            RcSoundManager.Instance.TransitionBGM(_levelClearBGM, _levelClearFadeOut, _levelClearFadeIn, _levelClearVolume);
+            RcSoundManager.Instance.TransitionBGM(_levelClearBGM, _levelClearFadeOut, _levelClearFadeIn);
         }
 
         private void HandleGameLose()
