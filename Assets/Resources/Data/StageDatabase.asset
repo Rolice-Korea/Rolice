@@ -14,10 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Rolice.Data.RcStageDatabaseSO
   Stages:
   - {fileID: 11400000, guid: 56cb3cf7807f5104b922dcc81054e91f, type: 2}
-  - {fileID: 11400000, guid: 591ceeb55a43394429658099123ccc35, type: 2}
-  - {fileID: 11400000, guid: cf6280006a93f0444a1fdb07e70eefa6, type: 2}
-  - {fileID: 11400000, guid: d669df5700176564fa7d0f7fdf62edad, type: 2}
-  - {fileID: 11400000, guid: 8f1d9e1b2854f2c46ab633eed094ff5a, type: 2}
-  - {fileID: 11400000, guid: c968b784583a73842b89c8c97a694075, type: 2}
-  - {fileID: 11400000, guid: f1703f1a614b25f48bf8634c2f43a0d8, type: 2}
-  - {fileID: 11400000, guid: 5954447924209c04785fc65044ca36db, type: 2}
+  - {fileID: 11400000, guid: 0dba3a1c882f29c44a10f7fafa236193, type: 2}
+  - {fileID: 11400000, guid: adbff649672760042aa3bf3492c6e5c7, type: 2}
+  - {fileID: 11400000, guid: 2ed3514a8d697224d91e982159a9ae53, type: 2}
+  - {fileID: 11400000, guid: ab2a6a43b1e1c694595962f716b1b2ca, type: 2}
+  - {fileID: 11400000, guid: b21b9e63c04f6f648af01bf96b89a9cb, type: 2}
+  - {fileID: 11400000, guid: a33b6790ee72e24479841b5169d1db34, type: 2}
+  - {fileID: 11400000, guid: 73eb9ffdbd3ef8e44bb7e01f8b21c2ef, type: 2}
+  - {fileID: 11400000, guid: b26e6348b311f4745bf770453275edbd, type: 2}
+  - {fileID: 11400000, guid: 657c1c42056b45b40ac0ad2015587ad0, type: 2}

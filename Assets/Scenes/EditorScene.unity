@@ -241,7 +241,7 @@ Transform:
   m_GameObject: {fileID: 415295202}
   serializedVersion: 2
   m_LocalRotation: {x: 0.35355338, y: -0.35355338, z: 0.1464466, w: 0.8535535}
-  m_LocalPosition: {x: 0, y: -3, z: 0}
+  m_LocalPosition: {x: 4.2, y: -3.8, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -402,7 +402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06ee140107d0f0445ac9edc0c7bfe300, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RcLevelEditorProxy
-  LevelData: {fileID: 11400000, guid: 56cb3cf7807f5104b922dcc81054e91f, type: 2}
+  LevelData: {fileID: 11400000, guid: 0dba3a1c882f29c44a10f7fafa236193, type: 2}
 --- !u!1 &998976110
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,6 +6,7 @@ public class RcGameBootstrap : MonoBehaviour
 {
     [Header("Level Settings")]
     [SerializeField] private Transform tilesParent;
+    [SerializeField] private RcDicePawn dicePawn;
 
     [Header("Fallback (에디터 직접 실행용)")]
     [SerializeField] private RcLevelDataSO fallbackLevel;
@@ -50,6 +51,7 @@ public class RcGameBootstrap : MonoBehaviour
     private void GameLoad(RcLevelDataSO levelData)
     {
         LoadLevel(levelData);
+        InitializeDiceFaces(levelData);
     }
 
     private void Start()
@@ -69,6 +71,24 @@ public class RcGameBootstrap : MonoBehaviour
         }
 
         InitializeGameRules(levelData);
+    }
+
+    private void InitializeDiceFaces(RcLevelDataSO levelData)
+    {
+        if (dicePawn == null) return;
+
+        var faces = levelData.InitialDiceFaces;
+        if (faces == null || faces.Length != 6) return;
+
+        // 전부 null이면 레벨에서 다이스 면을 지정하지 않은 것 → 프리팹 기본값 유지
+        foreach (var face in faces)
+        {
+            if (face != null)
+            {
+                dicePawn.InitializeFaces(faces);
+                return;
+            }
+        }
     }
 
     private void InitializeGameRules(RcLevelDataSO levelData)

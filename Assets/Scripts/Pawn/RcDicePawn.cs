@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(-10)]
 [RequireComponent(typeof(RcDiceFaceController))]
 [RequireComponent(typeof(RcDiceMovement))]
 [RequireComponent(typeof(RcDiceTileInteractor))]
@@ -71,6 +72,12 @@ public class RcDicePawn : MonoBehaviour
     public void Teleport(Vector2Int targetPos, float duration = 0.5f, System.Action onComplete = null)
     {
         movement.Teleport(targetPos, onComplete);
+    }
+
+    /// <summary>레벨 로드 시 GameBootstrap에서 호출. 프리팹 기본값 대신 레벨 지정 면 색을 적용한다.</summary>
+    public void InitializeFaces(RcColorSO[] faces)
+    {
+        faceController.Initialize(faces);
     }
 
     public RcColorSO GetBottomColor()

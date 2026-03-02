@@ -180,7 +180,6 @@ MonoBehaviour:
   _levelClearBGM: {fileID: 8300000, guid: 91573454e9a1e0642a6d1209d5c094eb, type: 3}
   _levelClearFadeOut: 0.5
   _levelClearFadeIn: 3
-  _levelClearVolume: 0.6
   _loseFadeOut: 2
 --- !u!1 &117827840
 GameObject:
@@ -542,6 +541,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RcGameBootstrap
   tilesParent: {fileID: 688716421}
+  dicePawn: {fileID: 893243768}
   fallbackLevel: {fileID: 11400000, guid: 56cb3cf7807f5104b922dcc81054e91f, type: 2}
 --- !u!1 &893243766
 GameObject:

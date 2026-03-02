@@ -14,6 +14,10 @@ public class RcLevelDataSO : ScriptableObject
     [SerializeReference, RcPolymorphicReference(typeof(RcTileData))]
     public RcTileData[] Tiles;
 
+    [Header("Dice Setup")]
+    [Tooltip("레벨 시작 시 다이스 6면 초기 색상. null = 색 없는 면. 비워두면 프리팹 기본값 사용")]
+    public RcColorSO[] InitialDiceFaces = new RcColorSO[6];
+
     [Header("Game Rules")]
     public RcLevelRules Rules = new RcLevelRules();
 
@@ -34,6 +38,17 @@ public class RcLevelDataSO : ScriptableObject
         }
 
         Tiles = newTiles;
+
+        if (InitialDiceFaces == null || InitialDiceFaces.Length != 6)
+        {
+            var prev = InitialDiceFaces;
+            InitialDiceFaces = new RcColorSO[6];
+            if (prev != null)
+            {
+                for (int i = 0; i < Mathf.Min(prev.Length, 6); i++)
+                    InitialDiceFaces[i] = prev[i];
+            }
+        }
 
         Rules?.Validate();
 

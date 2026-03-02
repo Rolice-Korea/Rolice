@@ -29,7 +29,9 @@ public class RcLevelEditorProxyEditor : Editor
 
     void OnEnable()
     {
-        proxy = (RcLevelEditorProxy)target;
+        proxy = target as RcLevelEditorProxy;
+        if (proxy == null) return;
+
         RefreshAssetCache();
         RestoreBrushState();
         activeTab = SessionState.GetInt("RcLevelEditor.ActiveTab", 0);
@@ -48,6 +50,8 @@ public class RcLevelEditorProxyEditor : Editor
 
     public override void OnInspectorGUI()
     {
+        if (proxy == null) return;
+
         serializedObject.Update();
 
         DrawLevelSection();
@@ -60,6 +64,8 @@ public class RcLevelEditorProxyEditor : Editor
             DrawRulesSection();
             EditorGUILayout.Space(6);
             DrawStarsSection();
+            EditorGUILayout.Space(6);
+            DrawDiceSetupSection();
             EditorGUILayout.Space(6);
 
             int newTab = GUILayout.Toolbar(activeTab, new[] { "Paint", "Edit" }, GUILayout.Height(26));
@@ -156,6 +162,67 @@ public class RcLevelEditorProxyEditor : Editor
             EditorUtility.SetDirty(proxy.LevelData);
     }
 
+    static readonly string[] FaceNames = { "TOP", "BOTTOM", "FRONT", "BACK", "LEFT", "RIGHT" };
+
+    void DrawDiceSetupSection()
+    {
+        var ld = proxy.LevelData;
+        if (ld.InitialDiceFaces == null || ld.InitialDiceFaces.Length != 6)
+            ld.InitialDiceFaces = new RcColorSO[6];
+
+        EditorGUILayout.LabelField("Dice Setup", EditorStyles.boldLabel);
+        EditorGUILayout.HelpBox("전부 비워두면 프리팹 기본값 사용", MessageType.None);
+
+        var prevBg = GUI.backgroundColor;
+
+        for (int i = 0; i < 6; i++)
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(FaceNames[i], GUILayout.Width(58));
+
+            // None 버튼
+            GUI.backgroundColor = ld.InitialDiceFaces[i] == null ? Color.yellow : new Color(0.6f, 0.6f, 0.6f);
+            if (GUILayout.Button("None", GUILayout.Height(22), GUILayout.Width(46)))
+            {
+                Undo.RecordObject(ld, "Dice Face None");
+                ld.InitialDiceFaces[i] = null;
+                EditorUtility.SetDirty(ld);
+            }
+
+            // 색상 스와치 버튼
+            foreach (var color in allColors)
+            {
+                if (color == null) continue;
+                bool selected    = ld.InitialDiceFaces[i] == color;
+                var  swatchColor = GetSwatchColor(color);
+                GUI.backgroundColor = selected
+                    ? Color.Lerp(swatchColor, Color.yellow, 0.45f)
+                    : swatchColor;
+
+                string label = selected ? $"● {color.DisplayName}" : color.DisplayName;
+                if (GUILayout.Button(label, GUILayout.Height(22)))
+                {
+                    Undo.RecordObject(ld, "Dice Face Color");
+                    ld.InitialDiceFaces[i] = color;
+                    EditorUtility.SetDirty(ld);
+                }
+            }
+
+            GUI.backgroundColor = prevBg;
+            EditorGUILayout.EndHorizontal();
+        }
+
+        EditorGUILayout.Space(2);
+        GUI.backgroundColor = new Color(0.8f, 0.6f, 0.6f);
+        if (GUILayout.Button("Clear All (프리팹 기본값)", GUILayout.Height(20)))
+        {
+            Undo.RecordObject(ld, "Dice Faces Clear");
+            ld.InitialDiceFaces = new RcColorSO[6];
+            EditorUtility.SetDirty(ld);
+        }
+        GUI.backgroundColor = prevBg;
+    }
+
     void DrawBrushSection()
     {
         EditorGUILayout.LabelField("Brush", EditorStyles.boldLabel);
@@ -237,7 +304,7 @@ public class RcLevelEditorProxyEditor : Editor
 
     void OnSceneGUI()
     {
-        if (proxy.LevelData == null) return;
+        if (proxy == null || proxy.LevelData == null) return;
 
         UpdateHover();
         DrawOverlay();

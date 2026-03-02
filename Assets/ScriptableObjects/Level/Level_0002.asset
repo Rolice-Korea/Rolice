@@ -20,251 +20,235 @@ MonoBehaviour:
   Width: 7
   Height: 7
   Tiles:
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: teleport
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 11400000, guid: d8cd937270fd03c47b53e90c89d1113e, type: 2}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: color_red
-    bCanEnter: 1
-    Color: {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
-    BehaviorSO: {fileID: 11400000, guid: 72b5ee92c50276d46b6149b0dc212482, type: 2}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: 
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: 
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: color_red
-    bCanEnter: 1
-    Color: {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
-    BehaviorSO: {fileID: 11400000, guid: 72b5ee92c50276d46b6149b0dc212482, type: 2}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: teleport
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 11400000, guid: d8cd937270fd03c47b53e90c89d1113e, type: 2}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: 
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
-  - TileID: normal
-    bCanEnter: 1
-    Color: {fileID: 0}
-    BehaviorSO: {fileID: 0}
-    TileObject: {fileID: 0}
+  - rid: 345118056120058227
+  - rid: 345118056120058228
+  - rid: 345118056120058229
+  - rid: 345118056120058230
+  - rid: 345118056120058231
+  - rid: 345118056120058232
+  - rid: 345118056120058241
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: 345118056120058242
+  - rid: 345118056120058239
+  - rid: 345118056120058238
+  - rid: 345118056120058237
+  - rid: 345118056120058236
+  - rid: 345118056120058235
+  - rid: 345118056120058250
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: 345118056120058251
+  - rid: 345118056120058248
+  - rid: 345118056120058247
+  - rid: 345118056120058246
+  - rid: 345118056120058245
+  - rid: 345118056120058244
+  - rid: 345118056120058252
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: -2
+  - rid: 345118056120058261
+  - rid: 345118056120058258
+  - rid: 345118056120058257
+  - rid: 345118056120058256
+  - rid: 345118056120058255
+  - rid: 345118056120058262
+  - rid: 345118056120058263
+  InitialDiceFaces:
+  - {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   Rules:
     HasTurnLimit: 1
     MaxTurns: 30
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 345118056120058227
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
+    - rid: 345118056120058228
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
+    - rid: 345118056120058229
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
+    - rid: 345118056120058230
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
+    - rid: 345118056120058231
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
+    - rid: 345118056120058232
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
+    - rid: 345118056120058235
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: a1a07241612e7f2468f922b3cab4edc3, type: 2}
+    - rid: 345118056120058236
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: a1a07241612e7f2468f922b3cab4edc3, type: 2}
+    - rid: 345118056120058237
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: a1a07241612e7f2468f922b3cab4edc3, type: 2}
+    - rid: 345118056120058238
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: a1a07241612e7f2468f922b3cab4edc3, type: 2}
+    - rid: 345118056120058239
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: a1a07241612e7f2468f922b3cab4edc3, type: 2}
+    - rid: 345118056120058241
+      type: {class: RcTeleportTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 52f24b0cbada5f5428ad85fb7c1a36a9, type: 2}
+        bCanEnter: 1
+        PairID: TP_01
+    - rid: 345118056120058242
+      type: {class: RcTeleportTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 52f24b0cbada5f5428ad85fb7c1a36a9, type: 2}
+        bCanEnter: 1
+        PairID: TP_01
+    - rid: 345118056120058244
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 173576493ce7e9d448d5ba2d0cdf9fe1, type: 2}
+    - rid: 345118056120058245
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 173576493ce7e9d448d5ba2d0cdf9fe1, type: 2}
+    - rid: 345118056120058246
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 173576493ce7e9d448d5ba2d0cdf9fe1, type: 2}
+    - rid: 345118056120058247
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 173576493ce7e9d448d5ba2d0cdf9fe1, type: 2}
+    - rid: 345118056120058248
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 173576493ce7e9d448d5ba2d0cdf9fe1, type: 2}
+    - rid: 345118056120058250
+      type: {class: RcTeleportTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 52f24b0cbada5f5428ad85fb7c1a36a9, type: 2}
+        bCanEnter: 1
+        PairID: TP_01
+    - rid: 345118056120058251
+      type: {class: RcTeleportTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 52f24b0cbada5f5428ad85fb7c1a36a9, type: 2}
+        bCanEnter: 1
+        PairID: TP_01
+    - rid: 345118056120058252
+      type: {class: RcTeleportTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 52f24b0cbada5f5428ad85fb7c1a36a9, type: 2}
+        bCanEnter: 1
+        PairID: TP_01
+    - rid: 345118056120058255
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 6d3c4fd1a4475314197e081d1c62789a, type: 2}
+    - rid: 345118056120058256
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 6d3c4fd1a4475314197e081d1c62789a, type: 2}
+    - rid: 345118056120058257
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 6d3c4fd1a4475314197e081d1c62789a, type: 2}
+    - rid: 345118056120058258
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 6d3c4fd1a4475314197e081d1c62789a, type: 2}
+    - rid: 345118056120058261
+      type: {class: RcTeleportTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 52f24b0cbada5f5428ad85fb7c1a36a9, type: 2}
+        bCanEnter: 1
+        PairID: TP_01
+    - rid: 345118056120058262
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 6d3c4fd1a4475314197e081d1c62789a, type: 2}
+    - rid: 345118056120058263
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: 6d3c4fd1a4475314197e081d1c62789a, type: 2}

@@ -30,6 +30,12 @@ public class RcDiceFaceController : MonoBehaviour
         UpdateVisuals();
     }
 
+    public void Initialize(RcColorSO[] faces)
+    {
+        faceData = new RcDiceFaceData(faces);
+        UpdateVisuals();
+    }
+
     public void RotateFaces(Vector2Int direction)
     {
         faceData = faceData.Rotate(direction);

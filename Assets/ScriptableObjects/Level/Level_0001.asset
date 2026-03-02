@@ -20,69 +20,72 @@ MonoBehaviour:
   Width: 3
   Height: 3
   Tiles:
-  - rid: 345118051908453203
-  - rid: 345118051908453208
-  - rid: 345118051908453202
-  - rid: 345118051908453193
-  - rid: 345118051908453207
-  - rid: 345118051908453189
-  - rid: 345118051908453204
-  - rid: 345118051908453205
-  - rid: 345118051908453206
+  - rid: 345118051908453311
+  - rid: 345118051908453312
+  - rid: 345118051908453329
+  - rid: 345118051908453328
+  - rid: 345118051908453321
+  - rid: 345118051908453324
+  - rid: 345118051908453330
+  - rid: 345118051908453326
+  - rid: 345118051908453325
   Rules:
     HasTurnLimit: 1
     MaxTurns: 30
   references:
     version: 2
     RefIds:
-    - rid: 345118051908453189
+    - rid: 345118051908453311
       type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
       data:
         TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
         bCanEnter: 1
         Color: {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
-    - rid: 345118051908453193
+    - rid: 345118051908453312
       type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
       data:
         TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
         bCanEnter: 1
         Color: {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
-    - rid: 345118051908453202
-      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
-      data:
-        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-        bCanEnter: 1
-        Color: {fileID: 11400000, guid: ed5a589d5f5778343b766a9411881f26, type: 2}
-    - rid: 345118051908453203
-      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
-      data:
-        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-        bCanEnter: 1
-        Color: {fileID: 11400000, guid: ed5a589d5f5778343b766a9411881f26, type: 2}
-    - rid: 345118051908453204
-      type: {class: RcTileData, ns: , asm: Assembly-CSharp}
-      data:
-        TileType: {fileID: 11400000, guid: ffe54eef9f94e484fa036a44965efb48, type: 2}
-        bCanEnter: 1
-    - rid: 345118051908453205
-      type: {class: RcTileData, ns: , asm: Assembly-CSharp}
-      data:
-        TileType: {fileID: 11400000, guid: ffe54eef9f94e484fa036a44965efb48, type: 2}
-        bCanEnter: 1
-    - rid: 345118051908453206
-      type: {class: RcTileData, ns: , asm: Assembly-CSharp}
-      data:
-        TileType: {fileID: 11400000, guid: ffe54eef9f94e484fa036a44965efb48, type: 2}
-        bCanEnter: 1
-    - rid: 345118051908453207
+    - rid: 345118051908453321
       type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
       data:
         TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
         bCanEnter: 1
         Color: {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
-    - rid: 345118051908453208
+    - rid: 345118051908453324
       type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
       data:
         TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
         bCanEnter: 1
         Color: {fileID: 11400000, guid: ed5a589d5f5778343b766a9411881f26, type: 2}
+    - rid: 345118051908453325
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: ed5a589d5f5778343b766a9411881f26, type: 2}
+    - rid: 345118051908453326
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: ed5a589d5f5778343b766a9411881f26, type: 2}
+    - rid: 345118051908453328
+      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+        bCanEnter: 1
+        Color: {fileID: 11400000, guid: ed5a589d5f5778343b766a9411881f26, type: 2}
+    - rid: 345118051908453329
+      type: {class: RcTeleportTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 52f24b0cbada5f5428ad85fb7c1a36a9, type: 2}
+        bCanEnter: 1
+        PairID: TP_01
+    - rid: 345118051908453330
+      type: {class: RcTeleportTileData, ns: , asm: Assembly-CSharp}
+      data:
+        TileType: {fileID: 11400000, guid: 52f24b0cbada5f5428ad85fb7c1a36a9, type: 2}
+        bCanEnter: 1
+        PairID: TP_01
