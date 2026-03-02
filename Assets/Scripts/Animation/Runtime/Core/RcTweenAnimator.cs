@@ -104,10 +104,6 @@ public class RcTweenAnimator : MonoBehaviour
         currentSequence.Play();
     }
 
-    /// <summary>
-    /// t(0~1)에 해당하는 시퀀스 상태를 즉시 적용. 재생하지 않음.
-    /// Append/Join 구성 모두 DOTween 타임라인 기준으로 정확하게 평가됨.
-    /// </summary>
     public void Evaluate(float t, string sequenceName = "Default")
     {
         var seq = GetOrBuildEvaluateSequence(sequenceName);

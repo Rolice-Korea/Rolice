@@ -18,15 +18,9 @@ namespace Rolice.System.Manager
             _sfxVolumeParameterName = sfxParam;
         }
 
-        /// <summary>
-        /// Sets the volume of a specific mixer parameter.
-        /// Converts a linear volume (0-1) to a logarithmic decibel scale.
-        /// </summary>
-        /// <param name="parameterName">The name of the exposed parameter in the AudioMixer.</param>
-        /// <param name="linearVolume">The linear volume value (0 to 1).</param>
         public void SetVolume(string parameterName, float linearVolume)
         {
-            float volumeInDb = -80f; // Minimum volume (near mute)
+            float volumeInDb = -80f;
             if (linearVolume > 0f)
             {
                 volumeInDb = Mathf.Log10(linearVolume) * 20f;
@@ -34,12 +28,6 @@ namespace Rolice.System.Manager
             _masterMixer.SetFloat(parameterName, volumeInDb);
         }
 
-        /// <summary>
-        /// Gets the volume of a specific mixer parameter.
-        /// Converts a logarithmic decibel scale volume to a linear volume (0-1).
-        /// </summary>
-        /// <param name="parameterName">The name of the exposed parameter in the AudioMixer.</param>
-        /// <returns>The linear volume value (0 to 1).</returns>
         public float GetVolume(string parameterName)
         {
             float volumeInDb;
@@ -51,7 +39,7 @@ namespace Rolice.System.Manager
                 }
                 return Mathf.Pow(10f, volumeInDb / 20f);
             }
-            return 0f; // Error or parameter not found
+            return 0f;
         }
     }
 }

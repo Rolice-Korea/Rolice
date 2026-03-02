@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// 언리얼의 스프링 암처럼 작동하는 카메라.
-/// 타겟을 중심으로 완벽하게 공전(Orbit)하며, 직선 보간 없이 각도에 따른 좌표를 즉시 계산합니다.
-/// </summary>
 public class RcDiceCamera : MonoBehaviour
 {
     private static RcDiceCamera _instance;
