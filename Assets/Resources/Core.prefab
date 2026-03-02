@@ -34,6 +34,7 @@ Transform:
   - {fileID: 3751269422150211102}
   - {fileID: 6378613409147503811}
   - {fileID: 8319710894130584096}
+  - {fileID: 2296493018695304638}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7645422261376620935
@@ -92,8 +93,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8a851c204745cd4cbc22e5b68c31830, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RcGameResultManager
-  victoryFlashPrefab: {fileID: 4380487846613021783, guid: 26a1fc12b2147344fbc5ae953a8f5cb8, type: 3}
-  flashYOffset: 0.5
+  victoryEffectPrefab: {fileID: 0}
+  effectYOffset: 0.5
   zoomOutAmount: 0.4
   zoomDuration: 0.5
   defeatPauseDelay: 0.5
@@ -142,6 +143,81 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7edba9b559c7c8949bf4837158708128, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RcScreenFader
+--- !u!1 &7162575065833817812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2296493018695304638}
+  - component: {fileID: 5631036360785134217}
+  - component: {fileID: 1249084260282151078}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2296493018695304638
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7162575065833817812}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4573002009885458275}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5631036360785134217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7162575065833817812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3480a33b72d44744c91edb1ba770a72a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Rolice.System.Manager.RcSoundManager
+  _masterMixer: {fileID: 24100000, guid: 24151f3fe64e1c54b9f5b7929641b7c5, type: 2}
+  _bgmMixerGroup: {fileID: -4982085636469057685, guid: 24151f3fe64e1c54b9f5b7929641b7c5, type: 2}
+  _sfxMixerGroup: {fileID: -6493030360014906594, guid: 24151f3fe64e1c54b9f5b7929641b7c5, type: 2}
+  _masterVolumeParameterName: MasterVolume
+  _bgmVolumeParameterName: BGMVolume
+  _sfxVolumeParameterName: SFXVolume
+  _fadeDuration: 1
+  _maxSfxPlayers: 10
+--- !u!114 &1249084260282151078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7162575065833817812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65ff8eeba48c21349b687c1265c56f0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Rolice.System.RcSfxController
+  sfxMove: {fileID: 8300000, guid: e43b63b5d1bf30447919faea8aa2e590, type: 3}
+  sfxTileMatch: {fileID: 8300000, guid: ceca6b773142ad84eb2d9938525e1a06, type: 3}
+  sfxLevelClear: {fileID: 0}
+  sfxGameLose: {fileID: 8300000, guid: a8045f7ae7e39154e8c970be71c910ed, type: 3}
+  bgmLevelClear: {fileID: 8300000, guid: 91573454e9a1e0642a6d1209d5c094eb, type: 3}
+  _levelClearFadeOut: 0.5
+  _levelClearFadeIn: 3
+  _levelClearBgmVolume: 0.6
+  _loseBgmFadeOut: 2
+  sfxUiClick: {fileID: 8300000, guid: 6251b23b7df281a45831acdd5aae3fce, type: 3}
 --- !u!1 &7853399048436991406
 GameObject:
   m_ObjectHideFlags: 0

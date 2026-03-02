@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1d95b7218eea3d740a5f2ef9a861a51c, type: 3}
-  m_Name: ColorTileType
+  m_Name: TeleportTileType
   m_EditorClassIdentifier: Assembly-CSharp::RcTileTypeSO
-  Prefab: {fileID: 1480887570026557805, guid: 640ef1db7282e2542b28e5f4dddee33e, type: 3}
+  Prefab: {fileID: 1480887570026557805, guid: 9f20306c2172ce7448564efa2a920348, type: 3}
   Rules:
-  - {fileID: 11400000, guid: 908806de45c94424d87d8d58ffba7a89, type: 2}
-  RequiresClearTracking: 1
+  - {fileID: 11400000, guid: 9cb7d549e266da94c887351b7f1e8802, type: 2}
+  RequiresClearTracking: 0
   TileDataTemplate:
-    rid: 345118051908453090
+    rid: 345118051908453099
   references:
     version: 2
     RefIds:
-    - rid: 345118051908453090
-      type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
+    - rid: 345118051908453099
+      type: {class: RcTeleportTileData, ns: , asm: Assembly-CSharp}
       data:
         TileType: {fileID: 0}
         bCanEnter: 1
-        Color: {fileID: 0}
+        PairID: TP_01

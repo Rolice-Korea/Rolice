@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RcColorSO
   DisplayName: purple
   DiceMaterial: {fileID: 2100000, guid: 7bada31283bc1d64383d0fb0b4e42dc5, type: 2}
-  TileMaterial: {fileID: 2100000, guid: 7bada31283bc1d64383d0fb0b4e42dc5, type: 2}
+  TileMaterial: {fileID: 2100000, guid: e6ab13c4b97d5e94f9f1c0da87223bda, type: 2}
   EffectMaterial: {fileID: -876546973899608171, guid: 5484f6815180c7b4683540017ff41c42, type: 3}
+  MatchEffectPrefab: {fileID: 0}

@@ -1,13 +1,8 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/ArtAsset/Sound.meta
 guid: d47a95e652ac9f244a9d496c32fd5f2b
 folderAsset: yes
 DefaultImporter:
-========
-guid: 5ae75c92d12ee65479357bcab1705af9
-PrefabImporter:
->>>>>>>> feature_kmc:Assets/Resources/Core.prefab.meta
   externalObjects: {}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+  userData:
+  assetBundleName:
+  assetBundleVariant:
