@@ -22,6 +22,9 @@ public class RcTileData
         Runner = runner;
     }
 
+    /// 타일 오브젝트 생성 직후 1회 호출 — 서브클래스에서 비주얼 초기화
+    public virtual void InitializeVisual(GameObject tileObject) { }
+
     public bool CanEnter(RcDicePawn pawn)
     {
         return bCanEnter;

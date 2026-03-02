@@ -12,6 +12,13 @@ public class RcColorTileData : RcTileData
 
     [NonSerialized] public bool IsCleared;
 
+    public override void InitializeVisual(GameObject tileObject)
+    {
+        if (Color?.TileMaterial == null) return;
+        var rend = tileObject.GetComponentInChildren<Renderer>();
+        if (rend != null) rend.sharedMaterial = Color.TileMaterial;
+    }
+
     public override RcTileData Clone()
     {
         return new RcColorTileData

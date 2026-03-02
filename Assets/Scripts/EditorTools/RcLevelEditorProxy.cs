@@ -69,6 +69,7 @@ public class RcLevelEditorProxy : MonoBehaviour
         go.name      = $"Tile_{cell.x}_{cell.y}";
         go.hideFlags = HideFlags.DontSave;
         SpawnedTiles[cell] = go;
+        tileData.InitializeVisual(go);
     }
 
     void DestroyTileAt(Vector2Int cell)

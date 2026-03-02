@@ -90,6 +90,7 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
                 // Runner를 동적으로 부착하고 TileTypeSO의 Rules로 구성
                 RcTileRuleRunner runner = tileObj.AddComponent<RcTileRuleRunner>();
                 runtimeTile.Setup(tileObj, runner);
+                runtimeTile.InitializeVisual(tileObj);
                 runner.Initialize(sourceTile.TileType.Rules, sourceTile.TileType.RequiresClearTracking, runtimeTile);
 
                 tilesCreated++;

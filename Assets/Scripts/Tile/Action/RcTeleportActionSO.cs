@@ -4,10 +4,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TeleportAction", menuName = "Rolice/Tile/Action/Teleport")]
 public class RcTeleportActionSO : RcTileActionSO
 {
-    [Header("Teleport Settings")]
-    [Tooltip("같은 ID를 가진 다른 타일과 페어를 형성합니다")]
-    public string PairID = "TP_01";
-
     [Header("Visual & Audio")]
     [Tooltip("텔레포트 시작 시 재생할 이펙트")]
     public GameObject TeleportOutEffectPrefab;
@@ -24,18 +20,30 @@ public class RcTeleportActionSO : RcTileActionSO
     /// 타일 생성 시 텔레포트 페어 등록
     public override void Initialize(RcTileData tileData)
     {
+        if (tileData is not RcTeleportTileData teleportTile)
+        {
+            Debug.LogWarning("[TeleportAction] RcTeleportTileData가 아닌 타일에 적용되었습니다.");
+            return;
+        }
+
         Vector2Int pos = RcMapGenerator.WorldToGrid(tileData.TileObject.transform.position);
-        RcLevelManager.Instance.RegisterTeleportPair(PairID, pos);
+        RcLevelManager.Instance.RegisterTeleportPair(teleportTile.PairID, pos);
     }
 
     public override void Execute(RcDicePawn pawn, RcTileData tileData)
     {
-        Vector2Int tilePos = RcMapGenerator.WorldToGrid(tileData.TileObject.transform.position);
-        Vector2Int? targetPos = RcLevelManager.Instance.FindTeleportPair(PairID, tilePos);
+        if (tileData is not RcTeleportTileData teleportTile)
+        {
+            Debug.LogWarning("[TeleportAction] RcTeleportTileData가 아닌 타일에 적용되었습니다.");
+            return;
+        }
+
+        Vector2Int tilePos    = RcMapGenerator.WorldToGrid(tileData.TileObject.transform.position);
+        Vector2Int? targetPos = RcLevelManager.Instance.FindTeleportPair(teleportTile.PairID, tilePos);
 
         if (!targetPos.HasValue)
         {
-            Debug.LogWarning($"[TeleportAction] 페어 타일을 찾을 수 없습니다: {PairID}");
+            Debug.LogWarning($"[TeleportAction] 페어 타일을 찾을 수 없습니다: {teleportTile.PairID}");
             return;
         }
 
