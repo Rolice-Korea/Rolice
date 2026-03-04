@@ -2392,7 +2392,8 @@ GameObject:
   - component: {fileID: 8875245699148623436}
   - component: {fileID: 3107808395967329223}
   - component: {fileID: 951893877703828180}
-  - component: {fileID: 2188451532564544725}
+  - component: {fileID: 7400028286226845417}
+  - component: {fileID: 3167897071571481886}
   m_Layer: 0
   m_Name: close_btn
   m_TagString: Untagged
@@ -2459,7 +2460,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2188451532564544725
+--- !u!114 &7400028286226845417
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2468,41 +2469,65 @@ MonoBehaviour:
   m_GameObject: {fileID: 7191700730653321097}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d0950badda204b4fae13d13b1a0bcfa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 0}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 951893877703828180}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls: []
+  m_EditorClassIdentifier: Assembly-CSharp::Engine.UI.RcButton
+  tweenAnimator: {fileID: 3167897071571481886}
+  interactable: 1
+--- !u!114 &3167897071571481886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7191700730653321097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04bb4365cdb4fd541bd2d7bf3b5e0141, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RcTweenAnimator
+  sequences:
+  - name: OnPress
+    animations:
+    - rid: 345118085088280637
+    loop: 0
+    loopCount: -1
+    loopType: 0
+  - name: OnRelease
+    animations:
+    - rid: 345118085088280638
+    loop: 0
+    loopCount: -1
+    loopType: 0
+  playOnEnable: 0
+  onDisableBehaviorType: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 345118085088280637
+      type: {class: RcScaleConfig, ns: , asm: Assembly-CSharp}
+      data:
+        sequenceMode: 0
+        target: {fileID: 8875245699148623436}
+        duration: 0.2
+        ease: 6
+        delay: 0
+        targetScale: {x: 0.93, y: 0.93, z: 1}
+        fromCurrentScale: 1
+        startScale: {x: 1, y: 1, z: 1}
+        restoreToOriginal: 0
+    - rid: 345118085088280638
+      type: {class: RcScaleConfig, ns: , asm: Assembly-CSharp}
+      data:
+        sequenceMode: 0
+        target: {fileID: 0}
+        duration: 0.2
+        ease: 6
+        delay: 0
+        targetScale: {x: 1, y: 1, z: 1}
+        fromCurrentScale: 1
+        startScale: {x: 1, y: 1, z: 1}
+        restoreToOriginal: 0
 --- !u!1 &7340662471800013383
 GameObject:
   m_ObjectHideFlags: 0
@@ -2514,7 +2539,8 @@ GameObject:
   - component: {fileID: 4625435511590572657}
   - component: {fileID: 5204172625652293716}
   - component: {fileID: 6588689944663043422}
-  - component: {fileID: 2961369048847201154}
+  - component: {fileID: 4075805822904828978}
+  - component: {fileID: 277641006629574131}
   m_Layer: 0
   m_Name: start_btn
   m_TagString: Untagged
@@ -2581,7 +2607,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2961369048847201154
+--- !u!114 &4075805822904828978
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2590,41 +2616,65 @@ MonoBehaviour:
   m_GameObject: {fileID: 7340662471800013383}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d0950badda204b4fae13d13b1a0bcfa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 0}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 6588689944663043422}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls: []
+  m_EditorClassIdentifier: Assembly-CSharp::Engine.UI.RcButton
+  tweenAnimator: {fileID: 277641006629574131}
+  interactable: 1
+--- !u!114 &277641006629574131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7340662471800013383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04bb4365cdb4fd541bd2d7bf3b5e0141, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RcTweenAnimator
+  sequences:
+  - name: OnPress
+    animations:
+    - rid: 345118085088280637
+    loop: 0
+    loopCount: -1
+    loopType: 0
+  - name: OnRelease
+    animations:
+    - rid: 345118085088280638
+    loop: 0
+    loopCount: -1
+    loopType: 0
+  playOnEnable: 0
+  onDisableBehaviorType: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 345118085088280637
+      type: {class: RcScaleConfig, ns: , asm: Assembly-CSharp}
+      data:
+        sequenceMode: 0
+        target: {fileID: 4625435511590572657}
+        duration: 0.2
+        ease: 6
+        delay: 0
+        targetScale: {x: 0.93, y: 0.93, z: 1}
+        fromCurrentScale: 1
+        startScale: {x: 1, y: 1, z: 1}
+        restoreToOriginal: 0
+    - rid: 345118085088280638
+      type: {class: RcScaleConfig, ns: , asm: Assembly-CSharp}
+      data:
+        sequenceMode: 0
+        target: {fileID: 0}
+        duration: 0.2
+        ease: 6
+        delay: 0
+        targetScale: {x: 1, y: 1, z: 1}
+        fromCurrentScale: 1
+        startScale: {x: 1, y: 1, z: 1}
+        restoreToOriginal: 0
 --- !u!1 &7433826117385177757
 GameObject:
   m_ObjectHideFlags: 0
@@ -2885,8 +2935,8 @@ MonoBehaviour:
   - {fileID: 1493155878224655970}
   - {fileID: 7736977007481600597}
   - {fileID: 335513083629923419}
-  startButton: {fileID: 2961369048847201154}
-  cancelButton: {fileID: 2188451532564544725}
+  startButton: {fileID: 4075805822904828978}
+  cancelButton: {fileID: 7400028286226845417}
 --- !u!225 &5001542114923273769
 CanvasGroup:
   m_ObjectHideFlags: 0

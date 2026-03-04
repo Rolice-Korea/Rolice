@@ -1,7 +1,6 @@
 using Engine.UI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using Rolice.Particle;
 
@@ -20,9 +19,9 @@ namespace Rolice.UI
         [SerializeField] private float starPopDelay = 0.3f;
 
         [Header("Buttons")]
-        [SerializeField] private Button retryButton;
-        [SerializeField] private Button nextLevelButton;
-        [SerializeField] private Button lobbyButton;
+        [SerializeField] private RcButton retryButton;
+        [SerializeField] private RcButton nextLevelButton;
+        [SerializeField] private RcButton lobbyButton;
 
         private RcGameResultPresenter presenter;
         private RcParticleEffectFactory particleFactory;
@@ -93,8 +92,8 @@ namespace Rolice.UI
             nextLevelButton.gameObject.SetActive(visible);
         }
 
-        public Button RetryButton => retryButton;
-        public Button NextLevelButton => nextLevelButton;
-        public Button LobbyButton => lobbyButton;
+        public RcButton RetryButton => retryButton;
+        public RcButton NextLevelButton => nextLevelButton;
+        public RcButton LobbyButton => lobbyButton;
     }
 }

@@ -29,6 +29,13 @@ MonoBehaviour:
   - rid: 345118051908453330
   - rid: 345118051908453326
   - rid: 345118051908453325
+  InitialDiceFaces:
+  - {fileID: 11400000, guid: ed5a589d5f5778343b766a9411881f26, type: 2}
+  - {fileID: 11400000, guid: ed5a589d5f5778343b766a9411881f26, type: 2}
+  - {fileID: 11400000, guid: ed5a589d5f5778343b766a9411881f26, type: 2}
+  - {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
+  - {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
+  - {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
   Rules:
     HasTurnLimit: 1
     MaxTurns: 30

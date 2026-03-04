@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: ColorTileType
   m_EditorClassIdentifier: Assembly-CSharp::RcTileTypeSO
   Prefab: {fileID: 1480887570026557805, guid: 640ef1db7282e2542b28e5f4dddee33e, type: 3}
+  TileDataTemplate:
+    rid: 345118056672657468
   Rules:
   - {fileID: 11400000, guid: 908806de45c94424d87d8d58ffba7a89, type: 2}
   RequiresClearTracking: 1
-  TileDataTemplate:
-    rid: 345118051908453090
   references:
     version: 2
     RefIds:
-    - rid: 345118051908453090
+    - rid: 345118056672657468
       type: {class: RcColorTileData, ns: , asm: Assembly-CSharp}
       data:
         TileType: {fileID: 0}

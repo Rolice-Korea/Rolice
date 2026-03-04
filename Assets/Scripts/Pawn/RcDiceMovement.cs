@@ -18,6 +18,7 @@ public class RcDiceMovement : MonoBehaviour
 
     public event Action<Vector2Int> OnMoveStarted;
     public event Action<Vector2Int> OnMoveCompleted;
+    public event Action<Vector2Int, float> OnRollStarted;
 
     private RcLevelManager LevelManager => RcLevelManager.Instance;
 
@@ -115,6 +116,8 @@ public class RcDiceMovement : MonoBehaviour
 
         Quaternion endRot = Quaternion.AngleAxis(90f, axis) * startRot;
         Vector3 pivot = startPos + moveDir * 0.5f + Vector3.down * 0.5f;
+
+        OnRollStarted?.Invoke(dir, rollDuration);
 
         float t = 0f;
         while (t < 1f)

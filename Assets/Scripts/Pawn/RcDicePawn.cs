@@ -6,6 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(RcDiceTileInteractor))]
 public class RcDicePawn : MonoBehaviour
 {
+    public event System.Action<Vector2Int, float> OnRollStarted;
+
     private RcDiceFaceController faceController;
     private RcDiceMovement movement;
     private RcDiceTileInteractor tileInteractor;
@@ -27,6 +29,7 @@ public class RcDicePawn : MonoBehaviour
 
         movement.OnMoveStarted += OnMoveStarted;
         movement.OnMoveCompleted += OnMoveCompleted;
+        movement.OnRollStarted += (dir, dur) => OnRollStarted?.Invoke(dir, dur);
 
         RcGameEvents.Instance.Subscribe(RcGameEvent.GameLose, OnGameLose);
     }

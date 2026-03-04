@@ -402,7 +402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06ee140107d0f0445ac9edc0c7bfe300, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RcLevelEditorProxy
-  LevelData: {fileID: 11400000, guid: 0dba3a1c882f29c44a10f7fafa236193, type: 2}
+  LevelData: {fileID: 11400000, guid: 56cb3cf7807f5104b922dcc81054e91f, type: 2}
 --- !u!1 &998976110
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,7 +10,7 @@ namespace Rolice.UI
         protected override void OnInitialize()
         {
             RcGameEvents.Instance.Subscribe(RcGameEvent.TurnChanged, OnTurnChanged);
-            Panel.PauseButton.onClick.AddListener(OnPauseClicked);
+            Panel.PauseButton.OnClick += OnPauseClicked;
 
             InitializeDisplay();
         }
@@ -18,7 +18,7 @@ namespace Rolice.UI
         protected override void OnDispose()
         {
             RcGameEvents.Instance.Unsubscribe(RcGameEvent.TurnChanged, OnTurnChanged);
-            Panel.PauseButton.onClick.RemoveListener(OnPauseClicked);
+            Panel.PauseButton.OnClick -= OnPauseClicked;
         }
 
         private void InitializeDisplay()

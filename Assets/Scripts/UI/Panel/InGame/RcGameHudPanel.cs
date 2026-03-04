@@ -1,7 +1,6 @@
 using Engine.UI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Rolice.UI
 {
@@ -12,9 +11,9 @@ namespace Rolice.UI
         [SerializeField] private RcTweenAnimator animatorGameOver;
 
         [Header("Pause")]
-        [SerializeField] private Button pauseButton;
+        [SerializeField] private RcButton pauseButton;
 
-        public Button PauseButton => pauseButton;
+        public RcButton PauseButton => pauseButton;
 
         private RcGameHudPresenter presenter;
 

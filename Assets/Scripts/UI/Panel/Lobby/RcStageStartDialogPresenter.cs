@@ -6,15 +6,15 @@ namespace Rolice.UI
     {
         protected override void OnInitialize()
         {
-            Panel.StartButton.onClick.AddListener(HandleStart);
-            Panel.CancelButton.onClick.AddListener(HandleCancel);
+            Panel.StartButton.OnClick += HandleStart;
+            Panel.CancelButton.OnClick += HandleCancel;
             PopulateView(Panel.Data);
         }
 
         protected override void OnDispose()
         {
-            Panel.StartButton.onClick.RemoveListener(HandleStart);
-            Panel.CancelButton.onClick.RemoveListener(HandleCancel);
+            Panel.StartButton.OnClick -= HandleStart;
+            Panel.CancelButton.OnClick -= HandleCancel;
         }
 
         private void PopulateView(RcStageStartDialogData data)

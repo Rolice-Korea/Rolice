@@ -17,10 +17,13 @@ namespace Rolice.UI
     public class RcStageItemWidget : RcUIWidget
     {
         [Header("UI References")]
-        [SerializeField] private Button button;
+        [SerializeField] private RcButton button;
         [SerializeField] private TMP_Text stageNumberText;
         [SerializeField] private Image glowFrame;
         [SerializeField] private Image[] starImages;
+
+        [Header("State")]
+        [SerializeField] private RcUIStateMachine stateMachine;
 
         [Header("Text Alpha")]
         [SerializeField, Range(0f, 1f)] private float lockedTextAlpha = 0.25f;
@@ -49,7 +52,7 @@ namespace Rolice.UI
 
         public override void Initialize()
         {
-            button.onClick.AddListener(HandleClick);
+            button.OnClick += HandleClick;
             if (glowFrame != null)
             {
                 glowFrame.raycastTarget = false;
@@ -77,7 +80,7 @@ namespace Rolice.UI
         public override void Cleanup()
         {
             pulseTween?.Kill();
-            button.onClick.RemoveListener(HandleClick);
+            button.OnClick -= HandleClick;
             OnStageSelected = null;
         }
 
@@ -86,11 +89,13 @@ namespace Rolice.UI
             this.stageNumber = stageNumber;
             this.state = state;
             this.stars = Mathf.Clamp(stars, 0, 3);
+            stateMachine?.SetState(state.ToString());
             UpdateVisual();
         }
 
         public void SetSelected(bool selected)
         {
+            if (isSelected == selected) return;
             isSelected = selected;
             UpdateVisual();
         }
@@ -112,7 +117,7 @@ namespace Rolice.UI
             UpdateStageNumber();
             UpdateStars();
             UpdateGlow();
-            button.interactable = state != RcStageState.Locked;
+            button.Interactable = state != RcStageState.Locked;
         }
 
         private void UpdateStageNumber()

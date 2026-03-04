@@ -15,5 +15,5 @@ MonoBehaviour:
   DisplayName: lime
   DiceMaterial: {fileID: 2100000, guid: 3ae972448f1d64840bf1487ad890ab51, type: 2}
   TileMaterial: {fileID: 2100000, guid: 9c9cd06bac017584a8de6844d7e2531b, type: 2}
-  EffectMaterial: {fileID: -876546973899608171, guid: 5484f6815180c7b4683540017ff41c42, type: 3}
-  MatchEffectPrefab: {fileID: 0}
+  EffectMaterial: {fileID: 2100000, guid: 6cee72fed68d29a49b9e085f52ce40b4, type: 2}
+  MatchEffectPrefab: {fileID: 6946120282878016763, guid: 66ecdc9482e68d14393184f04a93bb8d, type: 3}

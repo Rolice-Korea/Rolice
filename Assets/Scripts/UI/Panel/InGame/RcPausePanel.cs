@@ -1,7 +1,6 @@
 using Engine.UI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Rolice.UI
 {
@@ -16,16 +15,16 @@ namespace Rolice.UI
         [SerializeField] private TMP_Text[] starThresholdTexts;
 
         [Header("Buttons")]
-        [SerializeField] private Button retryButton;
-        [SerializeField] private Button lobbyButton;
-        [SerializeField] private Button closeButton;
+        [SerializeField] private RcButton retryButton;
+        [SerializeField] private RcButton lobbyButton;
+        [SerializeField] private RcButton closeButton;
 
         private const float ActiveAlpha = 1.0f;
         private const float DimAlpha    = 0.4f;
 
-        public Button RetryButton => retryButton;
-        public Button LobbyButton => lobbyButton;
-        public Button CloseButton => closeButton;
+        public RcButton RetryButton => retryButton;
+        public RcButton LobbyButton => lobbyButton;
+        public RcButton CloseButton => closeButton;
 
         private RcPausePresenter presenter;
 

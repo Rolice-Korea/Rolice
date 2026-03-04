@@ -92,7 +92,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Rolice.UI.RcGameHudPanel
   turnText: {fileID: 5359883065570499321}
   animatorGameOver: {fileID: 1448597262149683689}
-  pauseButton: {fileID: 2552089314785163818}
+  pauseButton: {fileID: 7839887957881965777}
 --- !u!1 &3569056829485302403
 GameObject:
   m_ObjectHideFlags: 0
@@ -128,7 +128,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -110, y: -13}
   m_SizeDelta: {x: 300, y: 100}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &2329594954709831575
@@ -427,6 +427,8 @@ GameObject:
   - component: {fileID: 5485655814375851014}
   - component: {fileID: 8646418518267829123}
   - component: {fileID: 2552089314785163818}
+  - component: {fileID: 7839887957881965777}
+  - component: {fileID: 2270513170027510315}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -536,3 +538,71 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7839887957881965777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7767237393923485121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d0950badda204b4fae13d13b1a0bcfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Engine.UI.RcButton
+  tweenAnimator: {fileID: 2270513170027510315}
+  interactable: 1
+--- !u!114 &2270513170027510315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7767237393923485121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04bb4365cdb4fd541bd2d7bf3b5e0141, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RcTweenAnimator
+  sequences:
+  - name: OnPress
+    animations:
+    - rid: 345118085088280637
+    loop: 0
+    loopCount: -1
+    loopType: 0
+  - name: OnRelease
+    animations:
+    - rid: 345118085088280638
+    loop: 0
+    loopCount: -1
+    loopType: 0
+  playOnEnable: 0
+  onDisableBehaviorType: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 345118085088280637
+      type: {class: RcScaleConfig, ns: , asm: Assembly-CSharp}
+      data:
+        sequenceMode: 0
+        target: {fileID: 0}
+        duration: 0.2
+        ease: 6
+        delay: 0
+        targetScale: {x: 0.93, y: 0.93, z: 1}
+        fromCurrentScale: 1
+        startScale: {x: 1, y: 1, z: 1}
+        restoreToOriginal: 0
+    - rid: 345118085088280638
+      type: {class: RcScaleConfig, ns: , asm: Assembly-CSharp}
+      data:
+        sequenceMode: 0
+        target: {fileID: 0}
+        duration: 0.2
+        ease: 6
+        delay: 0
+        targetScale: {x: 1, y: 1, z: 1}
+        fromCurrentScale: 1
+        startScale: {x: 1, y: 1, z: 1}
+        restoreToOriginal: 0

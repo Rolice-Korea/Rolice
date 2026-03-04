@@ -13,19 +13,18 @@ namespace Rolice.UI
 
             InitializeDisplay();
 
-            Panel.RetryButton.onClick.AddListener(OnRetryClicked);
-            Panel.LobbyButton.onClick.AddListener(OnLobbyClicked);
-            Panel.CloseButton.onClick.AddListener(OnCloseClicked);
+            Panel.RetryButton.OnClick += OnRetryClicked;
+            Panel.LobbyButton.OnClick += OnLobbyClicked;
+            Panel.CloseButton.OnClick += OnCloseClicked;
         }
 
         protected override void OnDispose()
         {
-            Panel.RetryButton.onClick.RemoveListener(OnRetryClicked);
-            Panel.LobbyButton.onClick.RemoveListener(OnLobbyClicked);
-            Panel.CloseButton.onClick.RemoveListener(OnCloseClicked);
+            Panel.RetryButton.OnClick -= OnRetryClicked;
+            Panel.LobbyButton.OnClick -= OnLobbyClicked;
+            Panel.CloseButton.OnClick -= OnCloseClicked;
 
             RcPauseManager.Instance.Resume();
-            RcUIManager.Instance.Open<RcGameHudPanel>();
         }
 
         private void InitializeDisplay()
@@ -46,6 +45,10 @@ namespace Rolice.UI
 
         private void OnRetryClicked() => RcGameFlowManager.Instance.RetryStage();
         private void OnLobbyClicked() => RcGameFlowManager.Instance.GoToLobby();
-        private void OnCloseClicked() => RcUIManager.Instance.Close<RcPausePanel>();
+        private void OnCloseClicked()
+        {
+            RcUIManager.Instance.Close<RcPausePanel>();
+            RcUIManager.Instance.Open<RcGameHudPanel>();
+        }
     }
 }

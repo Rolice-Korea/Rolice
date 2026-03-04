@@ -8,16 +8,16 @@ namespace Rolice.UI
         {
             InitializeDisplay(Panel.Data);
 
-            Panel.RetryButton.onClick.AddListener(OnRetryClicked);
-            Panel.NextLevelButton.onClick.AddListener(OnNextLevelClicked);
-            Panel.LobbyButton.onClick.AddListener(OnLobbyClicked);
+            Panel.RetryButton.OnClick += OnRetryClicked;
+            Panel.NextLevelButton.OnClick += OnNextLevelClicked;
+            Panel.LobbyButton.OnClick += OnLobbyClicked;
         }
 
         protected override void OnDispose()
         {
-            Panel.RetryButton.onClick.RemoveListener(OnRetryClicked);
-            Panel.NextLevelButton.onClick.RemoveListener(OnNextLevelClicked);
-            Panel.LobbyButton.onClick.RemoveListener(OnLobbyClicked);
+            Panel.RetryButton.OnClick -= OnRetryClicked;
+            Panel.NextLevelButton.OnClick -= OnNextLevelClicked;
+            Panel.LobbyButton.OnClick -= OnLobbyClicked;
         }
 
         private void InitializeDisplay(RcGameResultData data)

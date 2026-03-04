@@ -1,14 +1,13 @@
 using System;
 using Engine.UI;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Rolice.UI
 {
     public class RcLobbySettingsPanel : RcUIPanel
     {
         [Header("UI References")]
-        [SerializeField] private Button backdropButton;
+        [SerializeField] private RcButton backdropButton;
 
         private RcLobbySettingsPresenter presenter;
 
@@ -19,7 +18,7 @@ namespace Rolice.UI
             base.Awake();
 
             if (backdropButton != null)
-                backdropButton.onClick.AddListener(() => OnCloseClicked?.Invoke());
+                backdropButton.OnClick += () => OnCloseClicked?.Invoke();
         }
 
         protected override void OnOpen()

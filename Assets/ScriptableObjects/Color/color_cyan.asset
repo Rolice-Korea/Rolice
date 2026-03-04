@@ -15,5 +15,5 @@ MonoBehaviour:
   DisplayName: cyan
   DiceMaterial: {fileID: 2100000, guid: ee32cda6f158a7241ada424afcdda4e3, type: 2}
   TileMaterial: {fileID: 2100000, guid: 6469e6d667efa3f47bab0703f1cc6004, type: 2}
-  EffectMaterial: {fileID: -876546973899608171, guid: 5484f6815180c7b4683540017ff41c42, type: 3}
-  MatchEffectPrefab: {fileID: 0}
+  EffectMaterial: {fileID: 2100000, guid: 2777451d1d8df0442a91080353d0cbd4, type: 2}
+  MatchEffectPrefab: {fileID: 6946120282878016763, guid: 52447422aaa2bdc4680f62534e5d8deb, type: 3}

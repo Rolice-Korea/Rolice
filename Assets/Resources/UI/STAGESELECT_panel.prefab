@@ -418,7 +418,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fbbc01e12bf664418759b7163467166, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rolice.UI.RcStageItemWidget
-  button: {fileID: 181725489713167703}
+  button: {fileID: 7404766062312842474}
   stageNumberText: {fileID: 168007110260681544}
   glowFrame: {fileID: 3968952138751095120}
   starImages:
@@ -497,6 +497,7 @@ MonoBehaviour:
         targetScale: {x: 1, y: 1, z: 1}
         fromCurrentScale: 0
         startScale: {x: 0.7, y: 0.7, z: 0.7}
+        restoreToOriginal: 0
 --- !u!1 &7001322030780132505
 GameObject:
   m_ObjectHideFlags: 0
@@ -888,7 +889,7 @@ GameObject:
   - component: {fileID: 8003075255371033242}
   - component: {fileID: 6653455620666166461}
   - component: {fileID: 4921571350985282104}
-  - component: {fileID: 181725489713167703}
+  - component: {fileID: 7404766062312842474}
   m_Layer: 5
   m_Name: select_btn
   m_TagString: Untagged
@@ -953,7 +954,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &181725489713167703
+--- !u!114 &7404766062312842474
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -962,38 +963,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 8960302916699416789}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d0950badda204b4fae13d13b1a0bcfa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 4921571350985282104}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls: []
+  m_EditorClassIdentifier: Assembly-CSharp::Engine.UI.RcButton
+  tweenAnimator: {fileID: 0}
+  interactable: 1

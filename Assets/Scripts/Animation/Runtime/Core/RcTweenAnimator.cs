@@ -104,6 +104,30 @@ public class RcTweenAnimator : MonoBehaviour
         currentSequence.Play();
     }
 
+    public void PlayInstant(string sequenceName = "Default")
+    {
+        var sequence = sequences.Find(s => s.name == sequenceName);
+        if (sequence == null || sequence.animations == null || sequence.animations.Count == 0)
+            return;
+
+        Stop();
+
+        var seq = DOTween.Sequence();
+        foreach (var animation in sequence.animations)
+        {
+            if (animation == null) continue;
+            var tween = animation.CreateTween(transform);
+            if (tween == null) continue;
+
+            if (animation.sequenceMode == RcTweenConfig.SequenceMode.Append)
+                seq.Append(tween);
+            else
+                seq.Join(tween);
+        }
+
+        seq.Complete();
+    }
+
     public void Evaluate(float t, string sequenceName = "Default")
     {
         var seq = GetOrBuildEvaluateSequence(sequenceName);
@@ -146,6 +170,8 @@ public class RcTweenAnimator : MonoBehaviour
         currentSequence != null && currentSequence.IsActive() && currentSequence.IsPlaying();
 
     public void PlayOnClick() => Play("OnClick");
+    public void PlayOnPress() => Play("OnPress");
+    public void PlayOnRelease() => Play("OnRelease");
     public void PlayOnEnter() => Play("OnEnter");
     public void PlayOnExit() => Play("OnExit");
     public void PlayOnOpen() => Play("OnOpen");

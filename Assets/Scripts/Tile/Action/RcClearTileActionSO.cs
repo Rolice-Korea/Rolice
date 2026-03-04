@@ -8,10 +8,6 @@ public class RcClearTileActionSO : RcTileActionSO
     [Tooltip("클리어된 타일에 적용할 Material (옵션)")]
     public Material ClearedMaterial;
 
-    [Header("클리어 이펙트")]
-    [Tooltip("클리어 시 재생할 파티클 프리팹 (옵션)")]
-    public GameObject ClearEffectPrefab;
-
     public override void Execute(RcDicePawn pawn, RcTileData tileData)
     {
         if (tileData is not RcColorTileData colorTile) return;
@@ -26,11 +22,12 @@ public class RcClearTileActionSO : RcTileActionSO
                 renderer.material = ClearedMaterial;
         }
 
-        // 이펙트 재생
-        if (ClearEffectPrefab != null)
+        // 이펙트 재생 (색상 SO의 MatchEffectPrefab 사용)
+        var effectPrefab = colorTile.Color?.MatchEffectPrefab;
+        if (effectPrefab != null)
         {
             GameObject effect = Object.Instantiate(
-                ClearEffectPrefab,
+                effectPrefab,
                 tileData.TileObject.transform.position + Vector3.up * 0.5f,
                 Quaternion.identity
             );

@@ -26,8 +26,8 @@ namespace Rolice.UI
         [SerializeField] private Image[] currentStarImages;
 
         [Header("Buttons")]
-        [SerializeField] private Button startButton;
-        [SerializeField] private Button cancelButton;
+        [SerializeField] private RcButton startButton;
+        [SerializeField] private RcButton cancelButton;
 
         private static readonly Color StarEarnedColor = Color.white;
         private static readonly Color StarDimColor = new Color(0.33f, 0.33f, 0.33f, 0.4f);
@@ -76,7 +76,7 @@ namespace Rolice.UI
             }
         }
 
-        public Button StartButton => startButton;
-        public Button CancelButton => cancelButton;
+        public RcButton StartButton => startButton;
+        public RcButton CancelButton => cancelButton;
     }
 }

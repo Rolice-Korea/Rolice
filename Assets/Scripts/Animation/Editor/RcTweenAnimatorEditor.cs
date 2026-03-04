@@ -271,6 +271,8 @@ public class RcTweenAnimatorEditor : Editor
         var menu = new GenericMenu();
 
         menu.AddItem(new GUIContent("UI/OnClick"), false, () => SetName(nameProp, "OnClick"));
+        menu.AddItem(new GUIContent("UI/OnPress"), false, () => SetName(nameProp, "OnPress"));
+        menu.AddItem(new GUIContent("UI/OnRelease"), false, () => SetName(nameProp, "OnRelease"));
         menu.AddItem(new GUIContent("UI/OnEnter"), false, () => SetName(nameProp, "OnEnter"));
         menu.AddItem(new GUIContent("UI/OnExit"), false, () => SetName(nameProp, "OnExit"));
         menu.AddItem(new GUIContent("UI/OnOpen"), false, () => SetName(nameProp, "OnOpen"));

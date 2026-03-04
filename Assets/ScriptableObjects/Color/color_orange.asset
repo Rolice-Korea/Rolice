@@ -15,5 +15,5 @@ MonoBehaviour:
   DisplayName: orange
   DiceMaterial: {fileID: 2100000, guid: 74371cfe276423745bcdc617e783bc30, type: 2}
   TileMaterial: {fileID: 2100000, guid: e74dc88759ff0a2498ddf6aeb8a921e7, type: 2}
-  EffectMaterial: {fileID: -876546973899608171, guid: 5484f6815180c7b4683540017ff41c42, type: 3}
-  MatchEffectPrefab: {fileID: 0}
+  EffectMaterial: {fileID: 2100000, guid: a2269c5fabaac9344b905db96680f483, type: 2}
+  MatchEffectPrefab: {fileID: 6946120282878016763, guid: 45bb622c063981a438a8cb8714938e4d, type: 3}
