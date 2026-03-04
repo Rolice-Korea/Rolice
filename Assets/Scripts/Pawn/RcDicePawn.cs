@@ -66,7 +66,10 @@ public class RcDicePawn : MonoBehaviour
         Vector2Int targetPos = movement.GetGridPos() + direction;
 
         if (!IsValidMove(targetPos))
+        {
+            movement.Lean(direction);
             return;
+        }
 
         movement.Move(direction);
         faceController.RotateFaces(direction);

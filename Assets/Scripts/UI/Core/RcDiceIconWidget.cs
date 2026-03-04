@@ -1,11 +1,7 @@
+using DG.Tweening;
 using UnityEngine;
 
-/// <summary>
-/// 다이스 아이콘 위젯.
-/// - iconRoot(dice_edge 프레임): 매 LateUpdate마다 실제 다이스 모델 rotation을 복사 → 완벽 동기화
-/// - bodyRenderer(Quad 면): 굴리는 동안 숨기고 도착 후 바닥면 색으로 표시
-/// 아이콘 오브젝트는 Overlay Camera 전용 레이어에 배치할 것.
-/// </summary>
+
 public class RcDiceIconWidget : MonoBehaviour
 {
     [SerializeField] private RcDicePawn dicePawn;
@@ -13,16 +9,23 @@ public class RcDiceIconWidget : MonoBehaviour
     [SerializeField] private Transform iconRoot;           // dice_edge: 회전 동기화 대상
     [SerializeField] private Renderer bodyRenderer;        // dice(Quad): 색상 표시 면
     [SerializeField] private Transform overlayCam;         // OverlayCam: 게임 카메라 rotation 동기화
+    [SerializeField] private Vector2 viewportAnchor = new Vector2(0.1f, 0.1f); // 뷰포트 기준 위치
+    [SerializeField] private float revealPulseMultiplier = 3f;  // 등장 시 이미션 배율
+    [SerializeField] private float revealPulseDuration   = 0.35f;
 
     private Material bodyMaterialInstance;
     private Quaternion initialModelRot;  // 게임 시작 시 dice model의 초기 rotation
     private Quaternion initialIconRot;   // 게임 시작 시 iconRoot의 초기 rotation
+    private Camera overlayCamComponent;
+    private float widgetDepth;
 
     private static readonly int ShaderGlowColor = Shader.PropertyToID("_GlowColor");
 
     private void Start()
     {
         bodyMaterialInstance = bodyRenderer.material;
+        overlayCamComponent = overlayCam.GetComponent<Camera>();
+        widgetDepth = Vector3.Distance(overlayCam.position, transform.position);
 
         // FaceController 초기화 이후 rotation을 기준점으로 저장
         initialModelRot = diceModelTransform != null ? diceModelTransform.rotation : Quaternion.identity;
@@ -40,6 +43,11 @@ public class RcDiceIconWidget : MonoBehaviour
         // OverlayCam을 Main Camera rotation에 동기화 (Q/E 카메라 회전 대응)
         if (overlayCam != null && Camera.main != null)
             overlayCam.rotation = Camera.main.transform.rotation;
+
+        // 뷰포트 좌표 기반으로 위젯 위치 이동 (해상도 무관)
+        if (overlayCamComponent != null)
+            transform.position = overlayCamComponent.ViewportToWorldPoint(
+                new Vector3(viewportAnchor.x, viewportAnchor.y, widgetDepth));
 
         // 초기 rotation 대비 delta만 추출 → iconRoot 초기 rotation에 합성
         if (diceModelTransform == null) return;
@@ -71,6 +79,19 @@ public class RcDiceIconWidget : MonoBehaviour
     {
         UpdateBottomColor();
         bodyRenderer.enabled = true;
+        PlayRevealPulse();
+    }
+
+    private void PlayRevealPulse()
+    {
+        Color baseColor = bodyMaterialInstance.GetColor(ShaderGlowColor);
+        bodyMaterialInstance.SetColor(ShaderGlowColor, baseColor * revealPulseMultiplier);
+        DOTween.To(
+            () => bodyMaterialInstance.GetColor(ShaderGlowColor),
+            c  => bodyMaterialInstance.SetColor(ShaderGlowColor, c),
+            baseColor,
+            revealPulseDuration
+        ).SetEase(Ease.OutCubic);
     }
 
     private void OnGameLose()
