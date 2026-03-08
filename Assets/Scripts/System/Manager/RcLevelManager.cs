@@ -93,7 +93,7 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
                     runtimeTile.Construct(sourceTile);
                     runtimeTiles[gridPos] = runtimeTile;
 
-                    if (!runtimeTile.IsClear() && (runtimeTile is RcColorTile || runtimeTile is RcStoneTile))
+                    if (!runtimeTile.IsClear() && (runtimeTile is RcNormalTile || runtimeTile is RcStoneTile))
                     {
                         colorTilesRemaining.Add(gridPos);
                     }

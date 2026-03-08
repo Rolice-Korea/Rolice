@@ -1,7 +1,7 @@
 using UnityEngine;
 using Rolice;
 
-public class RcColorTile : RcTileBase
+public class RcNormalTile : RcTileBase
 {
     private RcColorType color;
 

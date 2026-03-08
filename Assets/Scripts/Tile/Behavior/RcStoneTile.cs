@@ -24,7 +24,7 @@ public class RcStoneTile : RcTileBase
 
     private void ConvertToColorTile()
     {
-        var colorTile = gameObject.AddComponent<RcColorTile>();
+        var colorTile = gameObject.AddComponent<RcNormalTile>();
         var flatData = new RcTileData { Color = targetColor };
         colorTile.Construct(flatData);
         Destroy(this);
