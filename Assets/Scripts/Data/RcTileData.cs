@@ -10,8 +10,7 @@ public class RcTileData
 
     public RcColorType Color;
     public int StoneMaxHits = 1;
-    public string TeleportTileID;
-    public string TeleportTargetID;
+    public Vector2Int TeleportTargetGrid;
 
     public bool IsEmpty => TileType == null;
 }

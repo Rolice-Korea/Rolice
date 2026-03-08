@@ -21,131 +21,106 @@ MonoBehaviour:
   Height: 5
   Tiles:
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
+    Color: 1
     StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
+    TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
+    Color: 1
     StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
+    TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
+    Color: 1
     StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
+    TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
+    Color: 1
     StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 11400000, guid: 52f24b0cbada5f5428ad85fb7c1a36a9, type: 2}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 2}
+  - TileType: {fileID: 0}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 0}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 0}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 0}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 0}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 11400000, guid: 52f24b0cbada5f5428ad85fb7c1a36a9, type: 2}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 4, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
+    Color: 1
     StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
+    TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
+    Color: 1
     StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
+    TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
+    Color: 1
     StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 11400000, guid: 52f24b0cbada5f5428ad85fb7c1a36a9, type: 2}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 4}
+  - TileType: {fileID: 0}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 0}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 0}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 0}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 0}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 11400000, guid: 52f24b0cbada5f5428ad85fb7c1a36a9, type: 2}
+    Color: 0
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 4, y: 2}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
+    Color: 1
     StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
+    TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
+    Color: 1
     StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
+    TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
+    Color: 1
     StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
+    TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
+    Color: 1
     StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    Color: 3
-    StoneMaxHits: 1
-    TeleportTileID: 
-    TeleportTargetID: 
-  InitialDiceFaces: 010000000200000003000000040000000500000006000000
+    TeleportTargetGrid: {x: 0, y: 0}
+  InitialDiceFaces: 010000000100000001000000010000000100000001000000
   Rules:
     HasTurnLimit: 1
     MaxTurns: 30

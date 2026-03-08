@@ -473,8 +473,7 @@ public class RcLevelEditorProxyEditor : Editor
                 EditorGUILayout.PropertyField(cellProp.FindPropertyRelative("StoneMaxHits"));
             if (tileData.TileType.bHasTeleport)
             {
-                EditorGUILayout.PropertyField(cellProp.FindPropertyRelative("TeleportTileID"));
-                EditorGUILayout.PropertyField(cellProp.FindPropertyRelative("TeleportTargetID"));
+                EditorGUILayout.PropertyField(cellProp.FindPropertyRelative("TeleportTargetGrid"));
             }
         }
 

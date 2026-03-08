@@ -9,7 +9,6 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
     private RcLevelDataSO currentLevelData;
     private Dictionary<Vector2Int, RcTileBase> runtimeTiles;
     private HashSet<Vector2Int> colorTilesRemaining;
-    private RcTeleportPairManager teleportManager;
 
     public bool IsInitialized { get; private set; }
 
@@ -53,7 +52,6 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
 
         runtimeTiles?.Clear();
         colorTilesRemaining?.Clear();
-        teleportManager?.Clear();
 
         currentLevelData = null;
         IsInitialized = false;
@@ -63,7 +61,6 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
     {
         runtimeTiles = new Dictionary<Vector2Int, RcTileBase>();
         colorTilesRemaining = new HashSet<Vector2Int>();
-        teleportManager = new RcTeleportPairManager();
     }
 
     private int GenerateMap(Transform tilesParent)
@@ -154,16 +151,6 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
     private void HandleLevelComplete()
     {
         RcGameEvents.Instance.Publish(RcGameEvent.LevelCompleted);
-    }
-
-    public void RegisterTeleport(string tileID, Vector2Int position)
-    {
-        teleportManager?.Register(tileID, position);
-    }
-
-    public Vector2Int? FindTeleportTarget(string targetID)
-    {
-        return teleportManager?.FindTarget(targetID);
     }
 
     public int GetRemainingColorTiles()
