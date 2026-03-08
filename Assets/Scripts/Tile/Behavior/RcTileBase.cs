@@ -7,6 +7,7 @@ public abstract class RcTileBase : MonoBehaviour
     public virtual void OnDiceEnter(RcDicePawn pawn) { }
     public virtual void OnDiceLeave(RcDicePawn pawn) { }
 
+    public bool IsClearable() { return bClearable; }
     public bool IsClear() { return bClear; }
     public void Clear()
     {
@@ -16,5 +17,6 @@ public abstract class RcTileBase : MonoBehaviour
         RcLevelManager.Instance?.ClearColorTile(pos);
     }
 
-    [SerializeField] protected bool bClear = true;
+    [SerializeField] protected bool bClearable = true;
+    [SerializeField] protected bool bClear = false;
 }

@@ -8,6 +8,8 @@ public class RcTeleportTile : RcTileBase
 
     public override void Construct(RcTileData tileData)
     {
+        bClearable = false;
+
         myTeleportID = tileData.TeleportTileID;
         targetTeleportID = tileData.TeleportTargetID;
         
