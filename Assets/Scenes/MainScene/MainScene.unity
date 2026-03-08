@@ -1021,13 +1021,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   diceRenderer: {fileID: 1085149298}
   faceToSlot: 010000000300000005000000040000000200000000000000
-  initialFaces:
-  - {fileID: 11400000, guid: 86c6e2b2c9038424b9b3865eaf6f9ce7, type: 2}
-  - {fileID: 11400000, guid: 80b5a57182cbfce47a42f9d5a4f87169, type: 2}
-  - {fileID: 11400000, guid: ed5a589d5f5778343b766a9411881f26, type: 2}
-  - {fileID: 11400000, guid: 6d3c4fd1a4475314197e081d1c62789a, type: 2}
-  - {fileID: 11400000, guid: 173576493ce7e9d448d5ba2d0cdf9fe1, type: 2}
-  - {fileID: 11400000, guid: a1a07241612e7f2468f922b3cab4edc3, type: 2}
+  initialFaces: 000000000000000000000000000000000000000000000000
   grayFadeDuration: 1
   flashIntensity: 3
   flashDuration: 0.5

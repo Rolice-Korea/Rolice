@@ -9,6 +9,7 @@ public class RcTileData
     public RcTileTypeSO TileType;
 
     public RcColorType Color;
+    public int StoneMaxHits = 1;
     public string TeleportTileID;
     public string TeleportTargetID;
 

@@ -7,9 +7,11 @@ public class RcStoneTile : RcTileBase
     private int currentHits = 0;
     private int maxHits = 1;
 
-    public override void Construct(RcTileData tileData)
+    public override void Construct(RcTileData tileData, Vector2Int pos)
     {
+        base.Construct(tileData, pos);
         targetColor = tileData.Color;
+        maxHits = tileData.StoneMaxHits;
         bClear = false;
     }
 
@@ -26,7 +28,8 @@ public class RcStoneTile : RcTileBase
     {
         var colorTile = gameObject.AddComponent<RcNormalTile>();
         var flatData = new RcTileData { Color = targetColor };
-        colorTile.Construct(flatData);
+        colorTile.Construct(flatData, gridPos);
+        RcLevelManager.Instance?.UpdateTile(gridPos, colorTile);
         Destroy(this);
     }
 }

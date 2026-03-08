@@ -30,6 +30,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 6650510152926458488}
   - {fileID: 6525690304127557972}
   - {fileID: 3751269422150211102}
   - {fileID: 6378613409147503811}
@@ -99,6 +100,52 @@ MonoBehaviour:
   zoomDuration: 0.5
   defeatPauseDelay: 0.5
   resultDelay: 0.15
+--- !u!1 &4774361319047239809
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6650510152926458488}
+  - component: {fileID: 4990481259826459002}
+  m_Layer: 0
+  m_Name: FaceDataManger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6650510152926458488
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4774361319047239809}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2, y: 0.24900001, z: 2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4573002009885458275}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4990481259826459002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4774361319047239809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb96ba8fd7d0eff4e989282f36c16af7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RcDataTableManager
+  faceDataTableRef: {fileID: 11400000, guid: 5757ec2c2b36a894e971b59579f77784, type: 2}
+  edgeDataTableRef: {fileID: 0}
 --- !u!1 &5123981453975841652
 GameObject:
   m_ObjectHideFlags: 0
@@ -194,6 +241,7 @@ MonoBehaviour:
   _masterVolumeParameterName: MasterVolume
   _bgmVolumeParameterName: BGMVolume
   _sfxVolumeParameterName: SFXVolume
+  _defaultBGM: {fileID: 0}
   _fadeDuration: 1
   _maxSfxPlayers: 10
 --- !u!114 &1249084260282151078
@@ -212,11 +260,6 @@ MonoBehaviour:
   sfxTileMatch: {fileID: 8300000, guid: ceca6b773142ad84eb2d9938525e1a06, type: 3}
   sfxLevelClear: {fileID: 0}
   sfxGameLose: {fileID: 8300000, guid: a8045f7ae7e39154e8c970be71c910ed, type: 3}
-  bgmLevelClear: {fileID: 8300000, guid: 91573454e9a1e0642a6d1209d5c094eb, type: 3}
-  _levelClearFadeOut: 0.5
-  _levelClearFadeIn: 3
-  _levelClearBgmVolume: 0.6
-  _loseBgmFadeOut: 2
   sfxUiClick: {fileID: 8300000, guid: 6251b23b7df281a45831acdd5aae3fce, type: 3}
 --- !u!1 &7853399048436991406
 GameObject:

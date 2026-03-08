@@ -89,6 +89,9 @@ public class RcGameBootstrap : MonoBehaviour
                 return;
             }
         }
+
+        // 프리팹 기본값 사용 시에도 비주얼은 갱신
+        dicePawn.RefreshVisuals();
     }
 
     private void InitializeGameRules(RcLevelDataSO levelData)

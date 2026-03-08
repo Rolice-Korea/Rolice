@@ -6,15 +6,15 @@ public class RcTeleportTile : RcTileBase
     private string myTeleportID;
     private string targetTeleportID;
 
-    public override void Construct(RcTileData tileData)
+    public override void Construct(RcTileData tileData, Vector2Int pos)
     {
+        base.Construct(tileData, pos);
         bClearable = false;
 
         myTeleportID = tileData.TeleportTileID;
         targetTeleportID = tileData.TeleportTargetID;
-        
-        var pos = new Vector2Int(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.z));
-        RcLevelManager.Instance?.RegisterTeleport(myTeleportID, pos);
+
+        RcLevelManager.Instance?.RegisterTeleport(myTeleportID, gridPos);
     }
 
     public override void OnDiceEnter(RcDicePawn pawn)

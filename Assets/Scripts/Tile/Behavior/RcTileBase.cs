@@ -3,20 +3,22 @@ using Rolice;
 
 public abstract class RcTileBase : MonoBehaviour
 {
-    public virtual void Construct(RcTileData tileData) { }
+    public virtual void Construct(RcTileData tileData, Vector2Int pos) { gridPos = pos; }
     public virtual void OnDiceEnter(RcDicePawn pawn) { }
     public virtual void OnDiceLeave(RcDicePawn pawn) { }
+    public virtual bool CanEnter() { return true; }
+    public virtual void OnCleared() { }
 
     public bool IsClearable() { return bClearable; }
     public bool IsClear() { return bClear; }
     public void Clear()
     {
         bClear = true;
-
-        var pos = new Vector2Int(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.z));
-        RcLevelManager.Instance?.ClearColorTile(pos);
+        OnCleared();
+        RcLevelManager.Instance?.ClearColorTile(gridPos);
     }
 
+    protected Vector2Int gridPos;
     [SerializeField] protected bool bClearable = true;
     [SerializeField] protected bool bClear = false;
 }

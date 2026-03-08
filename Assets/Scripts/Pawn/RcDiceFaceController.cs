@@ -28,7 +28,8 @@ public class RcDiceFaceController : MonoBehaviour
     public void Initialize()
     {
         faceData = new RcDiceFaceData(initialFaces);
-        UpdateVisuals();
+        // faces가 주입되기 전 상태이므로 UpdateVisuals 호출하지 않음
+        // 실제 비주얼은 Bootstrap이 InitializeFaces()를 호출할 때 갱신됨
     }
 
     public void Initialize(RcColorType[] faces)
@@ -69,8 +70,8 @@ public class RcDiceFaceController : MonoBehaviour
 
             // 현재 주사위 면의 색상 정보를 가져옴 (this.faceData 사용)
             RcColorType faceColor = faceData.GetFaceColor(i);
+            if (faceColor == RcColorType.None) continue;
 
-            // 해당 색상에 매칭되는 머티리얼을 데이터 테이블(skinData)에서 검색
             Material skinMat = skinData.GetFaceMaterial(faceColor);
             if (skinMat != null)
             {

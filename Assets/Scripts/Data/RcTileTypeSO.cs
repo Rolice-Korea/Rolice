@@ -10,4 +10,5 @@ public class RcTileTypeSO : ScriptableObject
     [Header("Property Flags (에디터용)")]
     public bool bHasColor;
     public bool bHasTeleport;
+    public bool bHasStone;
 }

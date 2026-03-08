@@ -90,7 +90,7 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
                 RcTileBase runtimeTile = tileObj.GetComponent<RcTileBase>();
                 if (runtimeTile != null)
                 {
-                    runtimeTile.Construct(sourceTile);
+                    runtimeTile.Construct(sourceTile, gridPos);
                     runtimeTiles[gridPos] = runtimeTile;
 
                     if (runtimeTile.IsClearable() && !runtimeTile.IsClear())
@@ -118,6 +118,11 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
         GameObject tileObj = Object.Instantiate(tileType.Prefab, worldPos, Quaternion.identity, parent);
         tileObj.name = $"Tile_{gridPos.x}_{gridPos.y}_{tileType.name}";
         return tileObj;
+    }
+
+    public void UpdateTile(Vector2Int pos, RcTileBase newTile)
+    {
+        runtimeTiles[pos] = newTile;
     }
 
     public RcTileBase GetTile(Vector2Int pos)

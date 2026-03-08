@@ -87,6 +87,11 @@ public class RcDicePawn : MonoBehaviour
         faceController.Initialize(faces);
     }
 
+    public void RefreshVisuals()
+    {
+        faceController.UpdateVisuals();
+    }
+
     public RcColorType GetBottomColor()
     {
         return faceController.GetBottomColor();

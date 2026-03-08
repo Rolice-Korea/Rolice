@@ -31,6 +31,6 @@ public class RcDiceTileInteractor : MonoBehaviour
         RcTileBase tile = LevelManager.GetTile(pos);
         if (tile == null) return false;
 
-        return tile.IsClear();
+        return tile.CanEnter();
     }
 }

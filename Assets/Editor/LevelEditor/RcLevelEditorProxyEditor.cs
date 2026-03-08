@@ -469,6 +469,8 @@ public class RcLevelEditorProxyEditor : Editor
         {
             if (tileData.TileType.bHasColor)
                 EditorGUILayout.PropertyField(cellProp.FindPropertyRelative("Color"));
+            if (tileData.TileType.bHasStone)
+                EditorGUILayout.PropertyField(cellProp.FindPropertyRelative("StoneMaxHits"));
             if (tileData.TileType.bHasTeleport)
             {
                 EditorGUILayout.PropertyField(cellProp.FindPropertyRelative("TeleportTileID"));

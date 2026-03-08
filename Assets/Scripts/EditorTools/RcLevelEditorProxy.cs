@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Rolice;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -69,12 +70,34 @@ public class RcLevelEditorProxy : MonoBehaviour
         go.name      = $"Tile_{cell.x}_{cell.y}";
         go.hideFlags = HideFlags.DontSave;
         SpawnedTiles[cell] = go;
-        
+
         var tileBase = go.GetComponent<RcTileBase>();
         if (tileBase != null)
+            tileBase.Construct(tileData, cell);
+
+        if (tileData.TileType.bHasColor)
+            ApplyEditorTileColor(go, tileData.Color);
+    }
+
+    static RcFaceDataTable _cachedFaceDataTable;
+
+    static void ApplyEditorTileColor(GameObject go, RcColorType color)
+    {
+        if (_cachedFaceDataTable == null)
         {
-            tileBase.Construct(tileData);
+            var guids = AssetDatabase.FindAssets("t:RcFaceDataTable");
+            if (guids.Length > 0)
+                _cachedFaceDataTable = AssetDatabase.LoadAssetAtPath<RcFaceDataTable>(
+                    AssetDatabase.GUIDToAssetPath(guids[0]));
         }
+        if (_cachedFaceDataTable == null) return;
+
+        var mat = _cachedFaceDataTable.GetFaceData(RcFaceSkinType.Default).GetTileMaterial(color);
+        if (mat == null) return;
+
+        var renderer = go.GetComponentInChildren<Renderer>();
+        if (renderer != null)
+            renderer.sharedMaterial = mat;
     }
 
     void DestroyTileAt(Vector2Int cell)

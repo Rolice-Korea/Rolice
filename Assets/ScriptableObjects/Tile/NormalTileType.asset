@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d95b7218eea3d740a5f2ef9a861a51c, type: 3}
   m_Name: NormalTileType
   m_EditorClassIdentifier: Assembly-CSharp::RcTileTypeSO
-  Prefab: {fileID: 1480887570026557805, guid: f8784335a104d364d85a63d188425166, type: 3}
-  Rules: []
-  RequiresClearTracking: 0
+  Prefab: {fileID: 1480887570026557805, guid: 640ef1db7282e2542b28e5f4dddee33e, type: 3}
+  bHasColor: 1
+  bHasTeleport: 0
