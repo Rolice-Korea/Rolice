@@ -1,31 +1,33 @@
+using System;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Rolice;
 
-/// RcLevelEditorProxy 선택 시 Inspector에 레벨 에디터 UI를 그린다.
-/// OnSceneGUI로 씬뷰 그리드 오버레이와 클릭 인터랙션을 처리한다.
 [CustomEditor(typeof(RcLevelEditorProxy))]
 public class RcLevelEditorProxyEditor : Editor
 {
-    // ── 브러시 상태 (SessionState로 선택 해제 후에도 유지) ─────────────────────
     private RcTileTypeSO brushTileType;
-    private RcColorSO    brushColor;
+    private RcColorType brushColor = RcColorType.None;
 
-    // ── 에셋 캐시 ──────────────────────────────────────────────────────────────
     private RcTileTypeSO[] allTileTypes = {};
-    private RcColorSO[]    allColors    = {};
+    private readonly RcColorType[] allColors = { 
+        RcColorType.White, 
+        RcColorType.Magenta, 
+        RcColorType.Yellow, 
+        RcColorType.Green, 
+        RcColorType.Cyan, 
+        RcColorType.Grey 
+    };
 
     private Vector2Int hoveredCell   = new(-1, -1);
-    private Vector2Int lastPainted   = new(-1, -1); // 드래그 중 중복 배치 방지
-    private Vector2Int selectedCell  = new(-1, -1); // Edit 탭에서 선택된 셀
-    private int        activeTab     = 0;            // 0 = Paint, 1 = Edit
+    private Vector2Int lastPainted   = new(-1, -1); 
+    private Vector2Int selectedCell  = new(-1, -1); 
+    private int        activeTab     = 0;            
     private RcLevelEditorProxy proxy;
-    private RcLevelDataSO lastLevelData;
     private SerializedObject levelDataSO;
-
-    // ── Lifecycle ──────────────────────────────────────────────────────────────
 
     void OnEnable()
     {
@@ -37,7 +39,6 @@ public class RcLevelEditorProxyEditor : Editor
         activeTab = SessionState.GetInt("RcLevelEditor.ActiveTab", 0);
         UpdateLevelDataSO();
 
-        lastLevelData = proxy.LevelData;
         proxy.RebuildScene();
     }
 
@@ -45,8 +46,6 @@ public class RcLevelEditorProxyEditor : Editor
     {
         SaveBrushState();
     }
-
-    // ── Inspector UI ───────────────────────────────────────────────────────────
 
     public override void OnInspectorGUI()
     {
@@ -95,13 +94,11 @@ public class RcLevelEditorProxyEditor : Editor
         EditorGUILayout.LabelField("Level Asset", EditorStyles.boldLabel);
 
         EditorGUI.BeginChangeCheck();
-        var picked = (RcLevelDataSO)EditorGUILayout.ObjectField(
-            proxy.LevelData, typeof(RcLevelDataSO), false);
+        var picked = (RcLevelDataSO)EditorGUILayout.ObjectField(proxy.LevelData, typeof(RcLevelDataSO), false);
         if (EditorGUI.EndChangeCheck())
         {
             Undo.RecordObject(proxy, "Change Level");
             proxy.LevelData  = picked;
-            lastLevelData    = picked;
             selectedCell     = new(-1, -1);
             UpdateLevelDataSO();
             EditorUtility.SetDirty(proxy);
@@ -168,7 +165,7 @@ public class RcLevelEditorProxyEditor : Editor
     {
         var ld = proxy.LevelData;
         if (ld.InitialDiceFaces == null || ld.InitialDiceFaces.Length != 6)
-            ld.InitialDiceFaces = new RcColorSO[6];
+            ld.InitialDiceFaces = new RcColorType[6];
 
         EditorGUILayout.LabelField("Dice Setup", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox("전부 비워두면 프리팹 기본값 사용", MessageType.None);
@@ -180,26 +177,23 @@ public class RcLevelEditorProxyEditor : Editor
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(FaceNames[i], GUILayout.Width(58));
 
-            // None 버튼
-            GUI.backgroundColor = ld.InitialDiceFaces[i] == null ? Color.yellow : new Color(0.6f, 0.6f, 0.6f);
+            GUI.backgroundColor = ld.InitialDiceFaces[i] == RcColorType.None ? Color.yellow : new Color(0.6f, 0.6f, 0.6f);
             if (GUILayout.Button("None", GUILayout.Height(22), GUILayout.Width(46)))
             {
                 Undo.RecordObject(ld, "Dice Face None");
-                ld.InitialDiceFaces[i] = null;
+                ld.InitialDiceFaces[i] = RcColorType.None;
                 EditorUtility.SetDirty(ld);
             }
 
-            // 색상 스와치 버튼
             foreach (var color in allColors)
             {
-                if (color == null) continue;
                 bool selected    = ld.InitialDiceFaces[i] == color;
                 var  swatchColor = GetSwatchColor(color);
                 GUI.backgroundColor = selected
                     ? Color.Lerp(swatchColor, Color.yellow, 0.45f)
                     : swatchColor;
 
-                string label = selected ? $"● {color.DisplayName}" : color.DisplayName;
+                string label = selected ? $"● {color}" : color.ToString();
                 if (GUILayout.Button(label, GUILayout.Height(22)))
                 {
                     Undo.RecordObject(ld, "Dice Face Color");
@@ -217,7 +211,7 @@ public class RcLevelEditorProxyEditor : Editor
         if (GUILayout.Button("Clear All (프리팹 기본값)", GUILayout.Height(20)))
         {
             Undo.RecordObject(ld, "Dice Faces Clear");
-            ld.InitialDiceFaces = new RcColorSO[6];
+            ld.InitialDiceFaces = new RcColorType[6];
             EditorUtility.SetDirty(ld);
         }
         GUI.backgroundColor = prevBg;
@@ -229,24 +223,21 @@ public class RcLevelEditorProxyEditor : Editor
 
         var prevBg = GUI.backgroundColor;
 
-        // Erase 버튼
         GUI.backgroundColor = brushTileType == null ? Color.yellow : Color.gray;
         if (GUILayout.Button("Erase", GUILayout.Height(24)))
-            SelectBrush(null, null);
+            SelectBrush(null, RcColorType.None);
         GUI.backgroundColor = prevBg;
 
         EditorGUILayout.Space(2);
 
-        // 타일 타입별 버튼 행
         foreach (var tileType in allTileTypes)
         {
             if (tileType == null) continue;
 
             EditorGUILayout.LabelField(tileType.name, EditorStyles.miniLabel);
 
-            if (NeedsColor(tileType))
+            if (tileType.bHasColor)
             {
-                // 색상 스와치 버튼
                 EditorGUILayout.BeginHorizontal();
                 foreach (var color in allColors)
                 {
@@ -257,7 +248,7 @@ public class RcLevelEditorProxyEditor : Editor
                         ? Color.Lerp(swatchColor, Color.yellow, 0.5f)
                         : swatchColor;
 
-                    string label = selected ? $"● {color.DisplayName}" : color.DisplayName;
+                    string label = selected ? $"● {color}" : color.ToString();
                     if (GUILayout.Button(label, GUILayout.Height(26)))
                         SelectBrush(tileType, color);
                 }
@@ -265,10 +256,10 @@ public class RcLevelEditorProxyEditor : Editor
             }
             else
             {
-                bool selected = brushTileType == tileType && brushColor == null;
+                bool selected = brushTileType == tileType && brushColor == RcColorType.None;
                 GUI.backgroundColor = selected ? Color.yellow : prevBg;
                 if (GUILayout.Button(tileType.name, GUILayout.Height(26)))
-                    SelectBrush(tileType, null);
+                    SelectBrush(tileType, RcColorType.None);
             }
 
             GUI.backgroundColor = prevBg;
@@ -278,7 +269,7 @@ public class RcLevelEditorProxyEditor : Editor
         EditorGUILayout.HelpBox("좌클릭·드래그: 배치   우클릭: 씬뷰에서 바로 선택 후 배치", MessageType.None);
     }
 
-    void SelectBrush(RcTileTypeSO tileType, RcColorSO color)
+    void SelectBrush(RcTileTypeSO tileType, RcColorType color)
     {
         brushTileType = tileType;
         brushColor    = color;
@@ -300,8 +291,6 @@ public class RcLevelEditorProxyEditor : Editor
         GUI.backgroundColor = prev;
     }
 
-    // ── Scene GUI ──────────────────────────────────────────────────────────────
-
     void OnSceneGUI()
     {
         if (proxy == null || proxy.LevelData == null) return;
@@ -310,7 +299,6 @@ public class RcLevelEditorProxyEditor : Editor
         DrawOverlay();
         HandleInput();
 
-        // 마우스 이동 시 씬뷰 갱신 (호버 하이라이트용)
         if (Event.current.type == EventType.MouseMove)
             SceneView.RepaintAll();
     }
@@ -326,18 +314,12 @@ public class RcLevelEditorProxyEditor : Editor
         var ld = proxy.LevelData;
         const float Y = 0.02f;
 
-        // 그리드 선
         Handles.color = new Color(1f, 1f, 1f, 0.18f);
         for (int x = 0; x <= ld.Width; x++)
-            Handles.DrawLine(
-                new Vector3(x - 0.5f, Y, -0.5f),
-                new Vector3(x - 0.5f, Y, ld.Height - 0.5f));
+            Handles.DrawLine(new Vector3(x - 0.5f, Y, -0.5f), new Vector3(x - 0.5f, Y, ld.Height - 0.5f));
         for (int z = 0; z <= ld.Height; z++)
-            Handles.DrawLine(
-                new Vector3(-0.5f, Y, z - 0.5f),
-                new Vector3(ld.Width - 0.5f, Y, z - 0.5f));
+            Handles.DrawLine(new Vector3(-0.5f, Y, z - 0.5f), new Vector3(ld.Width - 0.5f, Y, z - 0.5f));
 
-        // 빈 칸 어두운 채우기
         Handles.color = new Color(0f, 0f, 0f, 0.35f);
         for (int y = 0; y < ld.Height; y++)
         for (int x = 0; x < ld.Width;  x++)
@@ -347,14 +329,12 @@ public class RcLevelEditorProxyEditor : Editor
                 DrawCellQuad(new Vector2Int(x, y), Y);
         }
 
-        // 호버 하이라이트
         if (IsValidCell(hoveredCell))
         {
             Handles.color = new Color(1f, 1f, 0f, 0.28f);
             DrawCellQuad(hoveredCell, Y);
         }
 
-        // 선택 셀 하이라이트 (Edit 탭)
         if (activeTab == 1 && IsValidCell(selectedCell))
         {
             Handles.color = new Color(0f, 0.8f, 1f, 0.45f);
@@ -380,7 +360,6 @@ public class RcLevelEditorProxyEditor : Editor
 
     void HandlePaintInput(Event e)
     {
-        // 좌클릭 & 좌드래그 — 브러시 페인팅
         if (e.button == 0 && (e.type == EventType.MouseDown || e.type == EventType.MouseDrag))
         {
             if (IsValidCell(hoveredCell) && hoveredCell != lastPainted)
@@ -391,14 +370,12 @@ public class RcLevelEditorProxyEditor : Editor
             e.Use();
         }
 
-        // 마우스 버튼 놓으면 중복 방지 셀 초기화
         if (e.button == 0 && e.type == EventType.MouseUp)
         {
             lastPainted = new(-1, -1);
             e.Use();
         }
 
-        // 우클릭 — 컨텍스트 메뉴
         if (e.button == 1 && e.type == EventType.MouseDown && IsValidCell(hoveredCell))
         {
             ShowContextMenu(hoveredCell);
@@ -408,7 +385,6 @@ public class RcLevelEditorProxyEditor : Editor
 
     void HandleEditInput(Event e)
     {
-        // 좌클릭 — 셀 선택
         if (e.button == 0 && e.type == EventType.MouseDown && IsValidCell(hoveredCell))
         {
             selectedCell = hoveredCell;
@@ -417,16 +393,14 @@ public class RcLevelEditorProxyEditor : Editor
         }
     }
 
-    // ── Context Menu ───────────────────────────────────────────────────────────
-
     void ShowContextMenu(Vector2Int cell)
     {
         var menu = new GenericMenu();
 
         menu.AddItem(new GUIContent("Erase"), false, () =>
         {
-            SelectBrush(null, null);
-            PlaceTile(cell, null, null);
+            SelectBrush(null, RcColorType.None);
+            PlaceTile(cell, null, RcColorType.None);
         });
         menu.AddSeparator("");
 
@@ -435,32 +409,26 @@ public class RcLevelEditorProxyEditor : Editor
             if (tileType == null) continue;
             var capturedType = tileType;
 
-            if (NeedsColor(tileType))
+            if (tileType.bHasColor)
             {
                 foreach (var color in allColors)
                 {
-                    var  capturedColor = color;
+                    var capturedColor = color;
                     bool isActive = brushTileType == capturedType && brushColor == capturedColor;
-                    menu.AddItem(
-                        new GUIContent($"{tileType.name}/{color.DisplayName}"),
-                        isActive,
-                        () =>
-                        {
-                            SelectBrush(capturedType, capturedColor);
-                            PlaceTile(cell, capturedType, capturedColor);
-                        });
+                    menu.AddItem(new GUIContent($"{tileType.name}/{color}"), isActive, () =>
+                    {
+                        SelectBrush(capturedType, capturedColor);
+                        PlaceTile(cell, capturedType, capturedColor);
+                    });
                 }
             }
             else
             {
-                bool isActive = brushTileType == capturedType && brushColor == null;
-                menu.AddItem(
-                    new GUIContent(tileType.name),
-                    isActive,
-                    () =>
+                bool isActive = brushTileType == capturedType && brushColor == RcColorType.None;
+                menu.AddItem(new GUIContent(tileType.name), isActive, () =>
                     {
-                        SelectBrush(capturedType, null);
-                        PlaceTile(cell, capturedType, null);
+                        SelectBrush(capturedType, RcColorType.None);
+                        PlaceTile(cell, capturedType, RcColorType.None);
                     });
             }
         }
@@ -495,7 +463,19 @@ public class RcLevelEditorProxyEditor : Editor
         var cellProp = levelDataSO.FindProperty("Tiles").GetArrayElementAtIndex(index);
 
         EditorGUI.BeginChangeCheck();
-        EditorGUILayout.PropertyField(cellProp, true);
+        
+        EditorGUILayout.PropertyField(cellProp.FindPropertyRelative("TileType"));
+        if (tileData.TileType != null)
+        {
+            if (tileData.TileType.bHasColor)
+                EditorGUILayout.PropertyField(cellProp.FindPropertyRelative("Color"));
+            if (tileData.TileType.bHasTeleport)
+            {
+                EditorGUILayout.PropertyField(cellProp.FindPropertyRelative("TeleportTileID"));
+                EditorGUILayout.PropertyField(cellProp.FindPropertyRelative("TeleportTargetID"));
+            }
+        }
+
         if (EditorGUI.EndChangeCheck())
         {
             levelDataSO.ApplyModifiedProperties();
@@ -504,9 +484,7 @@ public class RcLevelEditorProxyEditor : Editor
         }
     }
 
-    // ── Tile Operations ────────────────────────────────────────────────────────
-
-    void PlaceTile(Vector2Int cell, RcTileTypeSO tileType, RcColorSO color)
+    void PlaceTile(Vector2Int cell, RcTileTypeSO tileType, RcColorType color)
     {
         var ld = proxy.LevelData;
         Undo.RecordObject(ld, "Paint Tile");
@@ -520,28 +498,20 @@ public class RcLevelEditorProxyEditor : Editor
         Repaint();
     }
 
-    static RcTileData BuildTileData(RcTileTypeSO tileType, RcColorSO color)
+    static RcTileData BuildTileData(RcTileTypeSO tileType, RcColorType color)
     {
         if (tileType == null) return null;
 
-        RcTileData data = tileType.TileDataTemplate != null
-            ? tileType.TileDataTemplate.Clone()
-            : new RcTileData();
-
-        data.TileType = tileType;
-
-        if (data is RcColorTileData colorData)
-            colorData.Color = color;
+        var data = new RcTileData { TileType = tileType };
+        if (tileType.bHasColor)
+            data.Color = color;
 
         return data;
     }
 
-    // ── Helpers ────────────────────────────────────────────────────────────────
-
     void RefreshAssetCache()
     {
         allTileTypes = LoadAllAssets<RcTileTypeSO>();
-        allColors    = LoadAllAssets<RcColorSO>();
     }
 
     static T[] LoadAllAssets<T>() where T : ScriptableObject
@@ -558,15 +528,10 @@ public class RcLevelEditorProxyEditor : Editor
             levelDataSO = proxy.LevelData != null ? new SerializedObject(proxy.LevelData) : null;
     }
 
-    static bool NeedsColor(RcTileTypeSO tileType)
-        => tileType.TileDataTemplate is RcColorTileData;
-
     bool IsValidCell(Vector2Int cell)
     {
         var ld = proxy.LevelData;
-        return ld != null
-            && cell.x >= 0 && cell.x < ld.Width
-            && cell.y >= 0 && cell.y < ld.Height;
+        return ld != null && cell.x >= 0 && cell.x < ld.Width && cell.y >= 0 && cell.y < ld.Height;
     }
 
     static Vector2Int ScreenToGrid(Vector2 mousePos)
@@ -614,34 +579,24 @@ public class RcLevelEditorProxyEditor : Editor
         Debug.Log($"[LevelEditor] '{proxy.LevelData.name}' 저장 완료.");
     }
 
-    string BuildBrushLabel()
+    static Color GetSwatchColor(RcColorType color)
     {
-        if (brushTileType == null) return "Erase";
-        if (brushColor    != null) return $"{brushTileType.name}  /  {brushColor.DisplayName}";
-        return brushTileType.name;
+        return color switch
+        {
+            RcColorType.White => Color.white,
+            RcColorType.Magenta => Color.magenta,
+            RcColorType.Yellow => Color.yellow,
+            RcColorType.Green => Color.green,
+            RcColorType.Cyan => Color.cyan,
+            RcColorType.Grey => Color.gray,
+            _ => Color.white
+        };
     }
-
-    // 커스텀 셰이더 대응 — _Color 외에 일반적인 컬러 프로퍼티 이름 순서대로 시도
-    static readonly string[] ColorPropCandidates = {"_Color", "_BaseColor", "_EmissionColor", "_TintColor", "_MainColor"};
-
-    static Color GetSwatchColor(RcColorSO colorSO)
-    {
-        var mat = colorSO?.TileMaterial ?? colorSO?.DiceMaterial;
-        if (mat == null) return Color.white;
-
-        foreach (var prop in ColorPropCandidates)
-            if (mat.HasProperty(prop))
-                return mat.GetColor(prop);
-
-        return Color.white;
-    }
-
-    // ── 브러시 상태 영속화 (SessionState) ─────────────────────────────────────
 
     void SaveBrushState()
     {
         SessionState.SetString("RcLevelEditor.BrushType",  brushTileType?.name ?? "");
-        SessionState.SetString("RcLevelEditor.BrushColor", brushColor?.DisplayName ?? "");
+        SessionState.SetString("RcLevelEditor.BrushColor", brushColor.ToString());
     }
 
     void RestoreBrushState()
@@ -650,11 +605,10 @@ public class RcLevelEditorProxyEditor : Editor
         string colorName = SessionState.GetString("RcLevelEditor.BrushColor", "");
 
         brushTileType = allTileTypes.FirstOrDefault(t => t.name == typeName);
-        brushColor    = allColors.FirstOrDefault(c => c.DisplayName == colorName);
+        brushColor = Enum.TryParse<RcColorType>(colorName, out var c) ? c : RcColorType.None;
     }
 }
 
-/// 레벨 에디터 씬 열릴 때 RcLevelEditorProxy를 자동 선택한다.
 [InitializeOnLoad]
 static class RcLevelEditorAutoSelect
 {
@@ -665,7 +619,7 @@ static class RcLevelEditorAutoSelect
 
     static void OnSceneOpened(Scene scene, OpenSceneMode mode)
     {
-        var proxy = Object.FindFirstObjectByType<RcLevelEditorProxy>();
+        var proxy = UnityEngine.Object.FindFirstObjectByType<RcLevelEditorProxy>();
         if (proxy != null)
             Selection.activeGameObject = proxy.gameObject;
     }

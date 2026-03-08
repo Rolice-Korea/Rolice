@@ -80,10 +80,10 @@ public class RcGameBootstrap : MonoBehaviour
         var faces = levelData.InitialDiceFaces;
         if (faces == null || faces.Length != 6) return;
 
-        // 전부 null이면 레벨에서 다이스 면을 지정하지 않은 것 → 프리팹 기본값 유지
+        // 전부 None이면 레벨에서 다이스 면을 지정하지 않은 것 → 프리팹 기본값 유지
         foreach (var face in faces)
         {
-            if (face != null)
+            if (face != Rolice.RcColorType.None)
             {
                 dicePawn.InitializeFaces(faces);
                 return;

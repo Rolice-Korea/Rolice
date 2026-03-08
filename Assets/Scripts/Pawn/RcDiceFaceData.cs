@@ -1,4 +1,5 @@
 using UnityEngine;
+using Rolice;
 
 public struct RcDiceFaceData
 {
@@ -11,18 +12,18 @@ public struct RcDiceFaceData
         new[] { RIGHT, LEFT, FRONT, BACK, TOP, BOTTOM }     // LEFT
     };
 
-    public RcColorSO[] faces;
+    public RcColorType[] faces;
 
-    public RcDiceFaceData(RcColorSO[] initialFaces)
+    public RcDiceFaceData(RcColorType[] initialFaces)
     {
         if (initialFaces == null || initialFaces.Length != 6)
         {
             Debug.LogError("[DiceFaceData] 면 배열은 6개여야 합니다!");
-            faces = new RcColorSO[6];
+            faces = new RcColorType[6];
         }
         else
         {
-            faces = (RcColorSO[])initialFaces.Clone();
+            faces = (RcColorType[])initialFaces.Clone();
         }
     }
 
@@ -31,7 +32,7 @@ public struct RcDiceFaceData
         int mapIndex = GetMapIndex(direction);
         int[] map = RollMaps[mapIndex];
 
-        RcColorSO[] newFaces = new RcColorSO[6];
+        RcColorType[] newFaces = new RcColorType[6];
         for (int i = 0; i < 6; i++)
         {
             newFaces[i] = faces[map[i]];
@@ -40,15 +41,15 @@ public struct RcDiceFaceData
         return new RcDiceFaceData(newFaces);
     }
 
-    public RcColorSO GetFaceColor(int faceIndex)
+    public RcColorType GetFaceColor(int faceIndex)
     {
         if (faceIndex >= 0 && faceIndex < 6)
             return faces[faceIndex];
 
-        return null;
+        return RcColorType.None;
     }
 
-    public RcColorSO GetBottomColor() => faces[BOTTOM];
+    public RcColorType GetBottomColor() => faces[BOTTOM];
 
     private static int GetMapIndex(Vector2Int direction)
     {

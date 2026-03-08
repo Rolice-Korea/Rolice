@@ -12,22 +12,25 @@ public class RcDiceTileInteractor : MonoBehaviour
 
     public void OnEnterTile(Vector2Int pos)
     {
-        RcTileData tile = LevelManager.GetRuntimeTile(pos);
+        RcTileBase tile = LevelManager.GetTile(pos);
         if (tile == null) return;
 
-        tile.Runner?.OnDiceEnter(pawn, tile);
+        tile.OnDiceEnter(pawn);
     }
 
     public void OnExitTile(Vector2Int pos)
     {
-        // 현재 OnExit 동작을 사용하는 Rule이 없음
+        RcTileBase tile = LevelManager.GetTile(pos);
+        if (tile == null) return;
+
+        tile.OnDiceLeave(pawn);
     }
 
     public bool CanEnterTile(Vector2Int pos)
     {
-        RcTileData tile = LevelManager.GetRuntimeTile(pos);
+        RcTileBase tile = LevelManager.GetTile(pos);
         if (tile == null) return false;
 
-        return tile.CanEnter(pawn);
+        return tile.IsClear();
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using Rolice;
 
 [DefaultExecutionOrder(-10)]
 [RequireComponent(typeof(RcDiceFaceController))]
@@ -81,12 +82,12 @@ public class RcDicePawn : MonoBehaviour
     }
 
     /// <summary>레벨 로드 시 GameBootstrap에서 호출. 프리팹 기본값 대신 레벨 지정 면 색을 적용한다.</summary>
-    public void InitializeFaces(RcColorSO[] faces)
+    public void InitializeFaces(RcColorType[] faces)
     {
         faceController.Initialize(faces);
     }
 
-    public RcColorSO GetBottomColor()
+    public RcColorType GetBottomColor()
     {
         return faceController.GetBottomColor();
     }
@@ -96,20 +97,15 @@ public class RcDicePawn : MonoBehaviour
         return movement.GetGridPos();
     }
 
-    public RcColorSO GetFaceColor(int faceIndex)
+    public RcColorType GetFaceColor(int faceIndex)
     {
         return faceController.GetFaceColor(faceIndex);
     }
 
     private bool IsValidMove(Vector2Int targetPos)
     {
-        RcTileData targetTile = RcLevelManager.Instance.GetRuntimeTile(targetPos);
-
-        if (targetTile == null || targetTile.IsEmpty)
-            return false;
-
-        if (!targetTile.bCanEnter)
-            return false;
+        var tile = RcLevelManager.Instance.GetTile(targetPos);
+        if (tile == null) return false;
 
         if (!tileInteractor.CanEnterTile(targetPos))
             return false;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using Rolice;
 
 public class RcDiceMovement : MonoBehaviour
 {
@@ -73,8 +74,8 @@ public class RcDiceMovement : MonoBehaviour
 
     private bool IsValidTeleportTarget(Vector2Int targetPos)
     {
-        RcTileData targetTile = LevelManager.GetRuntimeTile(targetPos);
-        return targetTile != null && !targetTile.IsEmpty;
+        var targetTile = LevelManager.GetTile(targetPos);
+        return targetTile != null;
     }
 
     private IEnumerator RollCo(Vector2Int dir, Vector2Int targetPos)

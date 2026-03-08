@@ -7,7 +7,7 @@ using Object = UnityEngine.Object;
 public class RcLevelManager : RcSingleton<RcLevelManager>
 {
     private RcLevelDataSO currentLevelData;
-    private Dictionary<Vector2Int, RcTileData> runtimeTiles;
+    private Dictionary<Vector2Int, RcTileBase> runtimeTiles;
     private HashSet<Vector2Int> colorTilesRemaining;
     private RcTeleportPairManager teleportManager;
 
@@ -44,8 +44,11 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
     {
         if (runtimeTiles != null)
         {
-            foreach (var tileData in runtimeTiles.Values)
-                Object.Destroy(tileData.TileObject);
+            foreach (var tile in runtimeTiles.Values)
+            {
+                if (tile != null)
+                    Object.Destroy(tile.gameObject);
+            }
         }
 
         runtimeTiles?.Clear();
@@ -58,7 +61,7 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
 
     private void InitializeCollections()
     {
-        runtimeTiles = new Dictionary<Vector2Int, RcTileData>();
+        runtimeTiles = new Dictionary<Vector2Int, RcTileBase>();
         colorTilesRemaining = new HashSet<Vector2Int>();
         teleportManager = new RcTeleportPairManager();
     }
@@ -77,9 +80,6 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
                 if (sourceTile == null || sourceTile.IsEmpty)
                     continue;
 
-                RcTileData runtimeTile = sourceTile.Clone();
-                runtimeTiles[gridPos] = runtimeTile;
-
                 GameObject tileObj = SpawnTile(sourceTile.TileType, gridPos, tilesParent);
                 if (tileObj == null)
                 {
@@ -87,16 +87,19 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
                     continue;
                 }
 
-                // Runner를 동적으로 부착하고 TileTypeSO의 Rules로 구성
-                RcTileRuleRunner runner = tileObj.AddComponent<RcTileRuleRunner>();
-                runtimeTile.Setup(tileObj, runner);
-                runtimeTile.InitializeVisual(tileObj);
-                runner.Initialize(sourceTile.TileType.Rules, sourceTile.TileType.RequiresClearTracking, runtimeTile);
+                RcTileBase runtimeTile = tileObj.GetComponent<RcTileBase>();
+                if (runtimeTile != null)
+                {
+                    runtimeTile.Construct(sourceTile);
+                    runtimeTiles[gridPos] = runtimeTile;
+
+                    if (!runtimeTile.IsClear() && (runtimeTile is RcColorTile || runtimeTile is RcStoneTile))
+                    {
+                        colorTilesRemaining.Add(gridPos);
+                    }
+                }
 
                 tilesCreated++;
-
-                if (runner.RequiresClearTracking)
-                    colorTilesRemaining.Add(gridPos);
             }
         }
 
@@ -117,7 +120,7 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
         return tileObj;
     }
 
-    public RcTileData GetRuntimeTile(Vector2Int pos)
+    public RcTileBase GetTile(Vector2Int pos)
     {
         return runtimeTiles != null && runtimeTiles.TryGetValue(pos, out var tile) ? tile : null;
     }
@@ -148,14 +151,14 @@ public class RcLevelManager : RcSingleton<RcLevelManager>
         RcGameEvents.Instance.Publish(RcGameEvent.LevelCompleted);
     }
 
-    public void RegisterTeleportPair(string pairID, Vector2Int position)
+    public void RegisterTeleport(string tileID, Vector2Int position)
     {
-        teleportManager?.Register(pairID, position);
+        teleportManager?.Register(tileID, position);
     }
 
-    public Vector2Int? FindTeleportPair(string pairID, Vector2Int myPosition)
+    public Vector2Int? FindTeleportTarget(string targetID)
     {
-        return teleportManager?.FindPair(pairID, myPosition);
+        return teleportManager?.FindTarget(targetID);
     }
 
     public int GetRemainingColorTiles()

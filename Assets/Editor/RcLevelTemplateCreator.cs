@@ -136,7 +136,7 @@ RcLevelDataSO CreateEmptyLevel()
     {
         return CreateLevel(5, 5, (x, y) =>
         {
-            return new RcTileData { TileType = defaultTileType, bCanEnter = true };
+            return new RcTileData { TileType = defaultTileType };
         });
     }
 
@@ -144,7 +144,7 @@ RcLevelDataSO CreateEmptyLevel()
     {
         return CreateLevel(7, 7, (x, y) =>
         {
-            return new RcTileData { TileType = defaultTileType, bCanEnter = true };
+            return new RcTileData { TileType = defaultTileType };
         });
     }
 
@@ -152,7 +152,7 @@ RcLevelDataSO CreateEmptyLevel()
     {
         return CreateLevel(10, 10, (x, y) =>
         {
-            return new RcTileData { TileType = defaultTileType, bCanEnter = true };
+            return new RcTileData { TileType = defaultTileType };
         });
     }
 
@@ -165,7 +165,7 @@ RcLevelDataSO CreateEmptyLevel()
             int centerY = 3;
 
             if (x == centerX || y == centerY)
-                return new RcTileData { TileType = defaultTileType, bCanEnter = true };
+                return new RcTileData { TileType = defaultTileType };
 
             return null;
         });
@@ -177,7 +177,7 @@ RcLevelDataSO CreateEmptyLevel()
         {
             // L자 모양 (왼쪽 열 + 아래 행)
             if (x == 0 || y == 0)
-                return new RcTileData { TileType = defaultTileType, bCanEnter = true };
+                return new RcTileData { TileType = defaultTileType };
 
             return null;
         });
@@ -187,7 +187,7 @@ RcLevelDataSO CreateEmptyLevel()
     {
         return CreateLevel(3, 3, (x, y) =>
         {
-            return new RcTileData { TileType = defaultTileType, bCanEnter = true };
+            return new RcTileData { TileType = defaultTileType };
         });
     }
     

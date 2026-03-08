@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using Rolice;
 
 
 public class RcDiceIconWidget : MonoBehaviour
@@ -105,9 +106,15 @@ public class RcDiceIconWidget : MonoBehaviour
         if (bodyMaterialInstance == null) return;
 
         var bottomColor = dicePawn.GetBottomColor();
-        if (bottomColor == null || bottomColor.DiceMaterial == null) return;
+        if (bottomColor == RcColorType.None) return;
 
-        Color glowColor = bottomColor.DiceMaterial.GetColor(ShaderGlowColor);
+        var table = RcDataTableManager.FaceDataTable;
+        if (table == null) return;
+        var skin = table.GetFaceData(RcFaceSkinType.Default);
+        var material = skin.GetFaceMaterial(bottomColor);
+        if (material == null) return;
+
+        Color glowColor = material.GetColor(ShaderGlowColor);
         bodyMaterialInstance.SetColor(ShaderGlowColor, glowColor);
     }
 }

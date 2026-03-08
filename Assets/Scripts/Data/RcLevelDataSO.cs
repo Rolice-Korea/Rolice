@@ -1,5 +1,6 @@
 using Rolice.Data;
 using UnityEngine;
+using Rolice;
 
 [CreateAssetMenu(fileName = "NewLevel", menuName = "Rolice/Level")]
 public class RcLevelDataSO : ScriptableObject
@@ -11,12 +12,10 @@ public class RcLevelDataSO : ScriptableObject
     public int Width;
     public int Height;
 
-    [SerializeReference, RcPolymorphicReference(typeof(RcTileData))]
     public RcTileData[] Tiles;
 
     [Header("Dice Setup")]
-    [Tooltip("레벨 시작 시 다이스 6면 초기 색상. null = 색 없는 면. 비워두면 프리팹 기본값 사용")]
-    public RcColorSO[] InitialDiceFaces = new RcColorSO[6];
+    public RcColorType[] InitialDiceFaces = new RcColorType[6];
 
     [Header("Game Rules")]
     public RcLevelRules Rules = new RcLevelRules();
@@ -32,9 +31,7 @@ public class RcLevelDataSO : ScriptableObject
         if (Tiles != null)
         {
             for (int i = 0; i < Mathf.Min(Tiles.Length, newTiles.Length); i++)
-            {
-                newTiles[i] = Tiles[i]; // null = 빈 타일 (SerializeReference에서 유효)
-            }
+                newTiles[i] = Tiles[i];
         }
 
         Tiles = newTiles;
@@ -42,16 +39,13 @@ public class RcLevelDataSO : ScriptableObject
         if (InitialDiceFaces == null || InitialDiceFaces.Length != 6)
         {
             var prev = InitialDiceFaces;
-            InitialDiceFaces = new RcColorSO[6];
+            InitialDiceFaces = new RcColorType[6];
             if (prev != null)
-            {
                 for (int i = 0; i < Mathf.Min(prev.Length, 6); i++)
                     InitialDiceFaces[i] = prev[i];
-            }
         }
 
         Rules?.Validate();
-
         StageInfo ??= new RcStageInfo();
         StageInfo.Validate();
     }

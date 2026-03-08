@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using Rolice;
 
 public class RcDiceFaceController : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class RcDiceFaceController : MonoBehaviour
     [SerializeField] private int[] faceToSlot = { 0, 1, 2, 3, 4, 5 };
 
     [Header("Initial Face Colors")]
-    [SerializeField] private RcColorSO[] initialFaces = new RcColorSO[6];
+    [SerializeField] private RcColorType[] initialFaces = new RcColorType[6];
 
     [Header("Defeat Effect")]
     [SerializeField] private float grayFadeDuration = 0.6f;
@@ -30,7 +31,7 @@ public class RcDiceFaceController : MonoBehaviour
         UpdateVisuals();
     }
 
-    public void Initialize(RcColorSO[] faces)
+    public void Initialize(RcColorType[] faces)
     {
         faceData = new RcDiceFaceData(faces);
         UpdateVisuals();
@@ -41,12 +42,12 @@ public class RcDiceFaceController : MonoBehaviour
         faceData = faceData.Rotate(direction);
     }
 
-    public RcColorSO GetBottomColor()
+    public RcColorType GetBottomColor()
     {
         return faceData.GetBottomColor();
     }
 
-    public RcColorSO GetFaceColor(int faceIndex)
+    public RcColorType GetFaceColor(int faceIndex)
     {
         return faceData.GetFaceColor(faceIndex);
     }
@@ -56,17 +57,24 @@ public class RcDiceFaceController : MonoBehaviour
         if (diceRenderer == null) return;
 
         var mats = diceRenderer.materials;
+        var table = RcDataTableManager.FaceDataTable;
+        if (table == null) return;
+
+        var skinData = table.GetFaceData(RcFaceSkinType.Default);
 
         for (int i = 0; i < 6; i++)
         {
             int slot = faceToSlot[i];
             if (slot < 0 || slot >= mats.Length) continue;
 
-            RcColorSO faceColor = faceData.GetFaceColor(i);
+            // 현재 주사위 면의 색상 정보를 가져옴 (this.faceData 사용)
+            RcColorType faceColor = faceData.GetFaceColor(i);
 
-            if (faceColor != null && faceColor.DiceMaterial != null)
+            // 해당 색상에 매칭되는 머티리얼을 데이터 테이블(skinData)에서 검색
+            Material skinMat = skinData.GetFaceMaterial(faceColor);
+            if (skinMat != null)
             {
-                mats[slot] = faceColor.DiceMaterial;
+                mats[slot] = skinMat;
             }
         }
 
@@ -145,7 +153,7 @@ public class RcDiceFaceController : MonoBehaviour
     {
         if (initialFaces == null || initialFaces.Length != 6)
         {
-            initialFaces = new RcColorSO[6];
+            initialFaces = new RcColorType[6];
         }
 
         if (faceToSlot == null || faceToSlot.Length != 6)
