@@ -8,7 +8,7 @@ public class RcTileData
     [Header("Tile Type")]
     public RcTileTypeSO TileType;
 
-    public RcColorType Color;
+    public RcColorType colorType;
     public int StoneMaxHits = 1;
     public Vector2Int TeleportTargetGrid;
 

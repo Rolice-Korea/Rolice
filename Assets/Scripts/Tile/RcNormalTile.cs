@@ -11,7 +11,7 @@ public class RcNormalTile : RcTileBase
     public override void Construct(RcTileData tileData, Vector2Int pos)
     {
         base.Construct(tileData, pos);
-        color = tileData.Color;
+        color = tileData.colorType;
         bClear = false;
         ApplyColorMaterial();
     }
@@ -30,11 +30,11 @@ public class RcNormalTile : RcTileBase
             tileRenderer.material = clearedMaterial;
     }
 
-    public override void OnDiceEnter(RcDicePawn pawn)
+    public override void OnDiceEnter(RcDicePawn dice)
     {
         if (bClear) return;
 
-        if (pawn.GetBottomColor() == color)
+        if (dice.GetBottomColor() == color)
         {
             Clear();
 

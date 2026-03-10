@@ -76,7 +76,7 @@ public class RcLevelEditorProxy : MonoBehaviour
             tileBase.Construct(tileData, cell);
 
         if (tileData.TileType.bHasColor)
-            ApplyEditorTileColor(go, tileData.Color);
+            ApplyEditorTileColor(go, tileData.colorType);
     }
 
     static RcFaceDataTable _cachedFaceDataTable;

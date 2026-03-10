@@ -13,8 +13,8 @@ public class RcTeleportTile : RcTileBase
         targetGrid = tileData.TeleportTargetGrid;
     }
 
-    public override void OnDiceEnter(RcDicePawn pawn)
+    public override void OnDiceEnter(RcDicePawn dice)
     {
-        pawn.Teleport(targetGrid);
+        dice.Teleport(targetGrid);
     }
 }

@@ -41,6 +41,26 @@ public struct RcDiceFaceData
         return new RcDiceFaceData(newFaces);
     }
 
+    public RcDiceFaceData ChangeColor(RcColorType targetColorType, RcColorType newColorType)
+    {
+        if (targetColorType == newColorType) return this;
+
+        RcColorType[] newFaces = new RcColorType[6];
+        for (int i = 0; i < 6; i++)
+        {
+            if (faces[i] == targetColorType)
+            {
+                newFaces[i] = newColorType;
+            }
+            else
+            {
+                newFaces[i] = faces[i];
+            }
+        }
+
+        return new RcDiceFaceData(newFaces);
+    }
+
     public RcColorType GetFaceColor(int faceIndex)
     {
         if (faceIndex >= 0 && faceIndex < 6)

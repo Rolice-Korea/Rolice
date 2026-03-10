@@ -505,7 +505,7 @@ public class RcLevelEditorProxyEditor : Editor
 
         var data = new RcTileData { TileType = tileType };
         if (tileType.bHasColor)
-            data.Color = color;
+            data.colorType = color;
 
         return data;
     }

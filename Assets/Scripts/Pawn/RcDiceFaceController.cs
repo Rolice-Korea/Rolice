@@ -43,6 +43,12 @@ public class RcDiceFaceController : MonoBehaviour
         faceData = faceData.Rotate(direction);
     }
 
+    public void ChangeFaceColor(RcColorType targetColorType, RcColorType newColorType)
+    {
+        faceData = faceData.ChangeColor(targetColorType, newColorType);
+        UpdateVisuals();
+    }
+
     public RcColorType GetBottomColor()
     {
         return faceData.GetBottomColor();
