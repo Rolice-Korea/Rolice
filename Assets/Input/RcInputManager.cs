@@ -98,8 +98,8 @@ public class RcInputManager
     private void OnMoveLeftStarted(InputAction.CallbackContext _)  => OnMoveInput?.Invoke(Vector2Int.left);
     private void OnMoveRightStarted(InputAction.CallbackContext _) => OnMoveInput?.Invoke(Vector2Int.right);
 
-    private void OnCameraLeftStarted(InputAction.CallbackContext _)  => OnCameraRotateInput?.Invoke(-1);
-    private void OnCameraRightStarted(InputAction.CallbackContext _) => OnCameraRotateInput?.Invoke(1);
+    private void OnCameraLeftStarted(InputAction.CallbackContext _)  => OnCameraRotateInput?.Invoke(1);
+    private void OnCameraRightStarted(InputAction.CallbackContext _) => OnCameraRotateInput?.Invoke(-1);
 
     private void OnPointerPressStarted(InputAction.CallbackContext _)
     {

@@ -20,15 +20,25 @@ public class RcDiceCamera : MonoBehaviour
 
     [Header("Angles")]
     [SerializeField] private float pitch = 35f;  // 내려다보는 각도
-    [SerializeField] private float targetYaw = 45f; // 목표 수평 각도
+    [SerializeField] private float yaw = 45f;    // 목표 수평 각도
     private float currentYaw = 45f;
 
-    public bool IsRotating => Mathf.Abs(Mathf.DeltaAngle(currentYaw, targetYaw)) > 0.1f;
+    public bool IsRotating => Mathf.Abs(Mathf.DeltaAngle(currentYaw, yaw)) > 0.1f;
 
     private void Awake()
     {
         if (_instance == null) _instance = this;
-        currentYaw = targetYaw;
+        currentYaw = yaw;
+    }
+
+    // 인스펙터에서 값을 수정할 때 에디터 화면에 즉시 반영
+    private void OnValidate()
+    {
+        currentYaw = yaw;
+        if (target != null)
+        {
+            ApplyCameraTransform();
+        }
     }
 
     private void Start()
@@ -44,7 +54,7 @@ public class RcDiceCamera : MonoBehaviour
         if (target == null) return;
 
         // 1. 수평 각도(Yaw)만 부드럽게 보간
-        currentYaw = Mathf.LerpAngle(currentYaw, targetYaw, Time.deltaTime * rotationSmoothSpeed);
+        currentYaw = Mathf.LerpAngle(currentYaw, yaw, Time.deltaTime * rotationSmoothSpeed);
 
         // 2. 매 프레임 현재 각도에 따른 위치/회전 즉시 갱신 (직선 보간 X)
         ApplyCameraTransform();
@@ -68,17 +78,15 @@ public class RcDiceCamera : MonoBehaviour
 
     public void Rotate(int direction)
     {
-        targetYaw += direction * 90f;
+        yaw += direction * 90f;
     }
 
     public Vector2Int GetAdjustedDirection(Vector2Int inputDir)
     {
         if (inputDir == Vector2Int.zero) return Vector2Int.zero;
 
-        // 쿼터뷰(45도) 기준 조작을 위해 입력 벡터를 카메라 회전에 맞춰 회전시킵니다.
-        // 초기 45도 각도에서 W가 월드 Z축(0, 1)이 되도록 -45도 오프셋을 적용합니다.
-        float angle = targetYaw + 45f;
-        float rad = -angle * Mathf.Deg2Rad;
+        // 카메라의 현재 yaw 각도만큼 입력을 회전시킵니다.
+        float rad = -yaw * Mathf.Deg2Rad;
 
         float cos = Mathf.Cos(rad);
         float sin = Mathf.Sin(rad);
