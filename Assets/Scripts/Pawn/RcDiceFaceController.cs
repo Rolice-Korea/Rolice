@@ -78,7 +78,7 @@ public class RcDiceFaceController : MonoBehaviour
             RcColorType faceColor = faceData.GetFaceColor(i);
             if (faceColor == RcColorType.None) continue;
 
-            Material skinMat = skinData.GetFaceMaterial(faceColor);
+            Material skinMat = skinData?.GetFaceMaterial(faceColor);
             if (skinMat != null)
             {
                 mats[slot] = skinMat;

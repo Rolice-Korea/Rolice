@@ -12,9 +12,11 @@ public class RcColorTile : RcTileBase
         meshRenderer = GetComponentInChildren<MeshRenderer>();
     }
 
-    public override void Construct(RcTileData tileData)
+    public override void Construct(RcTileData tileData, Vector2Int pos)
     {
-        bClearable = false; // 클리어 대상이 아님
+        base.Construct(tileData, pos);
+
+        bClearable = false;
         bClear = false;
 
         ChangeColor(tileData.colorType);
@@ -40,10 +42,10 @@ public class RcColorTile : RcTileBase
         if (RcDataTableManager.FaceDataTable == null) return;
 
         // 현재 사용 중인 스킨 데이터를 가져옴
-        var skinData = RcDataTableManager.FaceDataTable.GetFaceData(RcFaceSkinType.Default);
-        if (skinData == null) return;
+        var faceData = RcDataTableManager.FaceDataTable.GetFaceData(RcFaceSkinType.Default);
+        if (faceData == null) return;
 
-        Material skinMat = skinData.GetFaceMaterial(colorType);
+        Material skinMat = faceData?.GetFaceMaterial(colorType);
         if (skinMat != null)
         {
             var mats = meshRenderer.materials;

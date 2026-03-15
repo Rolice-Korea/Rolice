@@ -111,7 +111,7 @@ public class RcDiceIconWidget : MonoBehaviour
         var table = RcDataTableManager.FaceDataTable;
         if (table == null) return;
         var skin = table.GetFaceData(RcFaceSkinType.Default);
-        var material = skin.GetFaceMaterial(bottomColor);
+        var material = skin?.GetFaceMaterial(bottomColor);
         if (material == null) return;
 
         Color glowColor = material.GetColor(ShaderGlowColor);

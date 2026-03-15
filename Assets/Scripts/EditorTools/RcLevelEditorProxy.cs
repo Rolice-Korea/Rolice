@@ -92,7 +92,7 @@ public class RcLevelEditorProxy : MonoBehaviour
         }
         if (_cachedFaceDataTable == null) return;
 
-        var mat = _cachedFaceDataTable.GetFaceData(RcFaceSkinType.Default).GetTileMaterial(color);
+        var mat = _cachedFaceDataTable.GetFaceData(RcFaceSkinType.Default)?.GetTileMaterial(color);
         if (mat == null) return;
 
         var renderer = go.GetComponentInChildren<Renderer>();
