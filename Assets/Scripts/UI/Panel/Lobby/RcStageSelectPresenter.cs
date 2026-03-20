@@ -1,19 +1,23 @@
 using Engine.UI;
+using Rolice.System;
 using UnityEngine;
 
 namespace Rolice.UI
 {
     public class RcStageSelectPresenter : RcUIPresenter<RcStageSelectPanel>
     {
+
         protected override void OnInitialize()
         {
             Panel.OnStageSelected += HandleStageSelected;
+            RcPlayerState.Instance.OnProgressChanged += RefreshStageList;
             RefreshStageList();
         }
 
         protected override void OnDispose()
         {
             Panel.OnStageSelected -= HandleStageSelected;
+            RcPlayerState.Instance.OnProgressChanged -= RefreshStageList;
         }
 
         public void RefreshStageList()

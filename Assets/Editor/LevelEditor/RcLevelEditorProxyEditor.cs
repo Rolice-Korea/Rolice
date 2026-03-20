@@ -23,11 +23,16 @@ public class RcLevelEditorProxyEditor : Editor
     };
 
     private Vector2Int hoveredCell   = new(-1, -1);
-    private Vector2Int lastPainted   = new(-1, -1); 
-    private Vector2Int selectedCell  = new(-1, -1); 
-    private int        activeTab     = 0;            
+    private Vector2Int lastPainted   = new(-1, -1);
+    private Vector2Int selectedCell  = new(-1, -1);
+    private int        activeTab     = 0;
     private RcLevelEditorProxy proxy;
     private SerializedObject levelDataSO;
+
+    // Auto Generate 탭 상태
+    private RcLevelAutoGenerator.GenParams genParams = new();
+    private int  lastUsedSeed = -1;
+    private bool genParamsLoaded = false;
 
     void OnEnable()
     {
@@ -67,7 +72,7 @@ public class RcLevelEditorProxyEditor : Editor
             DrawDiceSetupSection();
             EditorGUILayout.Space(6);
 
-            int newTab = GUILayout.Toolbar(activeTab, new[] { "Paint", "Edit" }, GUILayout.Height(26));
+            int newTab = GUILayout.Toolbar(activeTab, new[] { "Paint", "Edit", "Generate" }, GUILayout.Height(26));
             if (newTab != activeTab)
             {
                 activeTab    = newTab;
@@ -79,8 +84,10 @@ public class RcLevelEditorProxyEditor : Editor
 
             if (activeTab == 0)
                 DrawBrushSection();
-            else
+            else if (activeTab == 1)
                 DrawEditSection();
+            else
+                DrawGenerateSection();
 
             EditorGUILayout.Space(8);
             DrawActionsSection();
@@ -275,6 +282,89 @@ public class RcLevelEditorProxyEditor : Editor
         brushColor    = color;
         SaveBrushState();
         Repaint();
+    }
+
+    void DrawGenerateSection()
+    {
+        if (!genParamsLoaded)
+        {
+            RestoreGenParams();
+            genParamsLoaded = true;
+        }
+
+        EditorGUILayout.LabelField("Auto Generate", EditorStyles.boldLabel);
+
+        EditorGUI.BeginChangeCheck();
+
+        genParams.Preset = (RcLevelAutoGenerator.Preset)EditorGUILayout.EnumPopup("Preset", genParams.Preset);
+
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Size", GUILayout.Width(60));
+        genParams.Width  = Mathf.Clamp(EditorGUILayout.IntField(genParams.Width,  GUILayout.Width(40)), 3, 12);
+        EditorGUILayout.LabelField("×", GUILayout.Width(14));
+        genParams.Height = Mathf.Clamp(EditorGUILayout.IntField(genParams.Height, GUILayout.Width(40)), 3, 12);
+        EditorGUILayout.EndHorizontal();
+
+        genParams.ColorCount     = EditorGUILayout.IntSlider("Colors",      genParams.ColorCount,     2, 6);
+        genParams.FillRatio      = EditorGUILayout.Slider("Fill Ratio",     genParams.FillRatio,      0.3f, 1f);
+        genParams.TurnMultiplier = EditorGUILayout.Slider("Turn Mult",      genParams.TurnMultiplier, 1f, 3f);
+
+        EditorGUILayout.BeginHorizontal();
+        genParams.Seed = EditorGUILayout.IntField("Seed (-1=random)", genParams.Seed);
+        if (GUILayout.Button("🎲", GUILayout.Width(28)))
+            genParams.Seed = -1;
+        EditorGUILayout.EndHorizontal();
+
+        if (EditorGUI.EndChangeCheck())
+            SaveGenParams();
+
+        if (lastUsedSeed >= 0)
+            EditorGUILayout.HelpBox($"Last seed: {lastUsedSeed}", MessageType.None);
+
+        EditorGUILayout.Space(4);
+
+        // ColorTile 타입 자동 탐색 (bHasColor && !bHasTeleport && !bHasStone)
+        var colorTileType = allTileTypes.FirstOrDefault(t => t != null && t.bHasColor && !t.bHasTeleport && !t.bHasStone);
+        if (colorTileType == null)
+        {
+            EditorGUILayout.HelpBox("Color TileType SO를 찾을 수 없습니다. (bHasColor=true 인 TileTypeSO 필요)", MessageType.Error);
+            return;
+        }
+
+        var prev = GUI.backgroundColor;
+        GUI.backgroundColor = new Color(0.4f, 0.9f, 0.5f);
+        if (GUILayout.Button("Generate", GUILayout.Height(32)))
+        {
+            var ld = proxy.LevelData;
+            Undo.RecordObject(ld, "Auto Generate Level");
+            lastUsedSeed = RcLevelAutoGenerator.Generate(ld, genParams, colorTileType);
+            EditorUtility.SetDirty(ld);
+            proxy.RebuildScene();
+            Repaint();
+        }
+        GUI.backgroundColor = prev;
+    }
+
+    void SaveGenParams()
+    {
+        SessionState.SetInt   ("RcGen.Preset",       (int)genParams.Preset);
+        SessionState.SetInt   ("RcGen.Width",         genParams.Width);
+        SessionState.SetInt   ("RcGen.Height",        genParams.Height);
+        SessionState.SetInt   ("RcGen.ColorCount",    genParams.ColorCount);
+        SessionState.SetFloat ("RcGen.FillRatio",     genParams.FillRatio);
+        SessionState.SetFloat ("RcGen.TurnMult",      genParams.TurnMultiplier);
+        SessionState.SetInt   ("RcGen.Seed",          genParams.Seed);
+    }
+
+    void RestoreGenParams()
+    {
+        genParams.Preset         = (RcLevelAutoGenerator.Preset)SessionState.GetInt  ("RcGen.Preset",    0);
+        genParams.Width          = SessionState.GetInt  ("RcGen.Width",       6);
+        genParams.Height         = SessionState.GetInt  ("RcGen.Height",      6);
+        genParams.ColorCount     = SessionState.GetInt  ("RcGen.ColorCount",  4);
+        genParams.FillRatio      = SessionState.GetFloat("RcGen.FillRatio",   0.7f);
+        genParams.TurnMultiplier = SessionState.GetFloat("RcGen.TurnMult",    1.6f);
+        genParams.Seed           = SessionState.GetInt  ("RcGen.Seed",       -1);
     }
 
     void DrawActionsSection()
