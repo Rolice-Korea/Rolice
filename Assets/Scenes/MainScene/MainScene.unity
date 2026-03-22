@@ -630,7 +630,7 @@ Transform:
   m_GameObject: {fileID: 415295202}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: -0, z: -0, w: 0.8660254}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 11.465584, z: -6.3157897}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -872,7 +872,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RcGameBootstrap
   tilesParent: {fileID: 688716421}
   dicePawn: {fileID: 893243768}
-  fallbackLevel: {fileID: 11400000, guid: 56cb3cf7807f5104b922dcc81054e91f, type: 2}
+  fallbackLevel: {fileID: 11400000, guid: 9d8f331d7f77c85498e37fe9473ae15c, type: 2}
 --- !u!1 &843895468
 GameObject:
   m_ObjectHideFlags: 0

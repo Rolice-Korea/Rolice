@@ -7,24 +7,16 @@ public class RcInputManager
     public event Action<Vector2Int> OnMoveInput;
     public event Action<int> OnCameraRotateInput;
 
-    private readonly float minSwipeDistance;
-
     private InputAction moveUpAction;
     private InputAction moveDownAction;
     private InputAction moveLeftAction;
     private InputAction moveRightAction;
 
-    private InputAction pointerPressAction;
-    private InputAction pointerPositionAction;
-
     private InputAction cameraLeftAction;
     private InputAction cameraRightAction;
 
-    private Vector2 pointerStartPos;
-
     public RcInputManager(float minSwipeDistance = 50f)
     {
-        this.minSwipeDistance = minSwipeDistance;
         BuildActions();
     }
 
@@ -35,9 +27,6 @@ public class RcInputManager
         moveLeftAction.started  += OnMoveLeftStarted;
         moveRightAction.started += OnMoveRightStarted;
 
-        pointerPressAction.started  += OnPointerPressStarted;
-        pointerPressAction.canceled += OnPointerPressCanceled;
-
         cameraLeftAction.started  += OnCameraLeftStarted;
         cameraRightAction.started += OnCameraRightStarted;
 
@@ -45,8 +34,6 @@ public class RcInputManager
         moveDownAction.Enable();
         moveLeftAction.Enable();
         moveRightAction.Enable();
-        pointerPressAction.Enable();
-        pointerPositionAction.Enable();
         cameraLeftAction.Enable();
         cameraRightAction.Enable();
     }
@@ -58,9 +45,6 @@ public class RcInputManager
         moveLeftAction.started  -= OnMoveLeftStarted;
         moveRightAction.started -= OnMoveRightStarted;
 
-        pointerPressAction.started  -= OnPointerPressStarted;
-        pointerPressAction.canceled -= OnPointerPressCanceled;
-
         cameraLeftAction.started  -= OnCameraLeftStarted;
         cameraRightAction.started -= OnCameraRightStarted;
 
@@ -68,8 +52,6 @@ public class RcInputManager
         moveDownAction.Dispose();
         moveLeftAction.Dispose();
         moveRightAction.Dispose();
-        pointerPressAction.Dispose();
-        pointerPositionAction.Dispose();
         cameraLeftAction.Dispose();
         cameraRightAction.Dispose();
     }
@@ -81,14 +63,6 @@ public class RcInputManager
         moveLeftAction  = BuildButton("MoveLeft",  "<Keyboard>/a", "<Keyboard>/leftArrow");
         moveRightAction = BuildButton("MoveRight", "<Keyboard>/d", "<Keyboard>/rightArrow");
 
-        pointerPressAction = BuildButton("PointerPress",
-            "<Mouse>/leftButton",
-            "<Touchscreen>/primaryTouch/press");
-
-        pointerPositionAction = new InputAction("PointerPosition", InputActionType.Value, expectedControlType: "Vector2");
-        pointerPositionAction.AddBinding("<Mouse>/position");
-        pointerPositionAction.AddBinding("<Touchscreen>/primaryTouch/position");
-
         cameraLeftAction  = BuildButton("CameraLeft",  "<Keyboard>/q");
         cameraRightAction = BuildButton("CameraRight", "<Keyboard>/e");
     }
@@ -98,27 +72,11 @@ public class RcInputManager
     private void OnMoveLeftStarted(InputAction.CallbackContext _)  => OnMoveInput?.Invoke(Vector2Int.left);
     private void OnMoveRightStarted(InputAction.CallbackContext _) => OnMoveInput?.Invoke(Vector2Int.right);
 
-    private void OnCameraLeftStarted(InputAction.CallbackContext _)  => OnCameraRotateInput?.Invoke(1);
-    private void OnCameraRightStarted(InputAction.CallbackContext _) => OnCameraRotateInput?.Invoke(-1);
+    private void OnCameraLeftStarted(InputAction.CallbackContext _)  => TriggerRotate(1);
+    private void OnCameraRightStarted(InputAction.CallbackContext _) => TriggerRotate(-1);
 
-    private void OnPointerPressStarted(InputAction.CallbackContext _)
-    {
-        pointerStartPos = pointerPositionAction.ReadValue<Vector2>();
-    }
-
-    private void OnPointerPressCanceled(InputAction.CallbackContext _)
-    {
-        Vector2 delta = pointerPositionAction.ReadValue<Vector2>() - pointerStartPos;
-
-        if (delta.magnitude < minSwipeDistance)
-            return;
-
-        Vector2Int dir = Mathf.Abs(delta.x) > Mathf.Abs(delta.y)
-            ? (delta.x > 0 ? Vector2Int.right : Vector2Int.left)
-            : (delta.y > 0 ? Vector2Int.up    : Vector2Int.down);
-
-        OnMoveInput?.Invoke(dir);
-    }
+    public void TriggerMove(Vector2Int dir) => OnMoveInput?.Invoke(dir);
+    public void TriggerRotate(int dir) => OnCameraRotateInput?.Invoke(dir);
 
     private static InputAction BuildButton(string name, params string[] paths)
     {

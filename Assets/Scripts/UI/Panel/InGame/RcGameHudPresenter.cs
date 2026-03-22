@@ -11,6 +11,8 @@ namespace Rolice.UI
         {
             RcGameEvents.Instance.Subscribe(RcGameEvent.TurnChanged, OnTurnChanged);
             Panel.PauseButton.OnClick += OnPauseClicked;
+            Panel.RotateLeftButton.OnClick += OnRotateLeftClicked;
+            Panel.RotateRightButton.OnClick += OnRotateRightClicked;
 
             InitializeDisplay();
         }
@@ -19,6 +21,8 @@ namespace Rolice.UI
         {
             RcGameEvents.Instance.Unsubscribe(RcGameEvent.TurnChanged, OnTurnChanged);
             Panel.PauseButton.OnClick -= OnPauseClicked;
+            Panel.RotateLeftButton.OnClick -= OnRotateLeftClicked;
+            Panel.RotateRightButton.OnClick -= OnRotateRightClicked;
         }
 
         private void InitializeDisplay()
@@ -32,6 +36,9 @@ namespace Rolice.UI
         }
 
         private void OnPauseClicked() => RcUIManager.Instance.Open<RcPausePanel>();
+
+        private void OnRotateLeftClicked() => RcInputController.Instance?.TriggerRotate(1);
+        private void OnRotateRightClicked() => RcInputController.Instance?.TriggerRotate(-1);
 
         private void OnTurnChanged(int currentTurn)
         {

@@ -15,6 +15,15 @@ namespace Rolice.UI
 
         public RcButton PauseButton => pauseButton;
 
+        [Header("Controls")]
+        [SerializeField] private RcSwipeArea swipeArea;
+        [SerializeField] private RcButton rotateLeftButton;
+        [SerializeField] private RcButton rotateRightButton;
+
+        public RcSwipeArea SwipeArea => swipeArea;
+        public RcButton RotateLeftButton => rotateLeftButton;
+        public RcButton RotateRightButton => rotateRightButton;
+
         private RcGameHudPresenter presenter;
 
         protected override void OnOpen()
