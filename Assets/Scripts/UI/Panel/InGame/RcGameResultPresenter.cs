@@ -23,10 +23,10 @@ namespace Rolice.UI
         private void InitializeDisplay(RcGameResultData data)
         {
             Panel.SetResultTitle(data.IsVictory);
-            Panel.SetMoveCount(data.TurnUsed);
+            Panel.SetMoveCount(data.MoveCount);
             Panel.SetStars(data.StarCount);
-            Panel.SetRetryButtonVisible(!data.IsVictory);
-            Panel.SetNextButtonVisible(data.IsVictory && data.HasNextStage);
+            Panel.SetRetryButtonVisible(false);
+            Panel.SetNextButtonVisible(data.HasNextStage);
         }
 
         private void OnRetryClicked()

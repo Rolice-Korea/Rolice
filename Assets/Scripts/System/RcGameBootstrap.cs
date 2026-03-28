@@ -51,7 +51,18 @@ public class RcGameBootstrap : MonoBehaviour
     private void GameLoad(RcLevelDataSO levelData)
     {
         LoadLevel(levelData);
+        PlaceDice(levelData);
         InitializeDiceFaces(levelData);
+    }
+
+    private void PlaceDice(RcLevelDataSO levelData)
+    {
+        if (dicePawn == null) return;
+
+        var spawn = levelData.SpawnGridPosition;
+        if (spawn.x < 0 || spawn.y < 0) return;
+
+        dicePawn.SetSpawnPosition(spawn);
     }
 
     private void Start()

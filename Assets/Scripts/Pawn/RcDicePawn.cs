@@ -81,6 +81,12 @@ public class RcDicePawn : MonoBehaviour
         movement.Teleport(targetPos, onComplete);
     }
 
+    /// <summary>레벨 로드 시 GameBootstrap에서 호출. 레벨 데이터에 지정된 위치로 다이스를 이동한다.</summary>
+    public void SetSpawnPosition(Vector2Int pos)
+    {
+        movement.SetPosition(pos);
+    }
+
     /// <summary>레벨 로드 시 GameBootstrap에서 호출. 프리팹 기본값 대신 레벨 지정 면 색을 적용한다.</summary>
     public void InitializeFaces(RcColorType[] faces)
     {

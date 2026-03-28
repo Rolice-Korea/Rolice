@@ -15,9 +15,9 @@ public class RcGameResultManager : RcSingletonMono<RcGameResultManager>
 
     [Header("Camera Zoom")]
     [SerializeField] private float zoomOutAmount = 0.5f;
-    [SerializeField] private float zoomDuration = 0.8f;
+    [SerializeField] private float zoomDuration  = 0.8f;
 
-    private int currentStageNumber;
+    private int   currentStageNumber;
     private float originalCameraSize;
     private Tween cameraZoomTween;
 
@@ -47,13 +47,11 @@ public class RcGameResultManager : RcSingletonMono<RcGameResultManager>
     private void SubscribeEvents()
     {
         RcGameEvents.Instance.Subscribe(RcGameEvent.GameWin, OnGameWin);
-        RcGameEvents.Instance.Subscribe(RcGameEvent.GameLose, OnGameLose);
     }
 
     private void UnsubscribeEvents()
     {
         RcGameEvents.Instance.Unsubscribe(RcGameEvent.GameWin, OnGameWin);
-        RcGameEvents.Instance.Unsubscribe(RcGameEvent.GameLose, OnGameLose);
     }
 
     private void OnGameWin()
@@ -66,7 +64,7 @@ public class RcGameResultManager : RcSingletonMono<RcGameResultManager>
         yield return new WaitForSeconds(0.3f);
 
         bool flashDone = false;
-        var dice = FindAnyObjectByType<RcDicePawn>();
+        var  dice      = FindAnyObjectByType<RcDicePawn>();
 
         if (dice != null)
             dice.FlashEmission(() => flashDone = true);
@@ -77,7 +75,7 @@ public class RcGameResultManager : RcSingletonMono<RcGameResultManager>
 
         if (victoryEffectPrefab != null && dice != null)
         {
-            var pos = dice.transform.position + Vector3.up * effectYOffset;
+            var pos    = dice.transform.position + Vector3.up * effectYOffset;
             var effect = Instantiate(victoryEffectPrefab, pos, Quaternion.identity);
             effect.OnCompleted += () =>
             {
@@ -94,47 +92,23 @@ public class RcGameResultManager : RcSingletonMono<RcGameResultManager>
 
     private void ShowVictoryResult()
     {
-        int turnUsed = RcGameRuleManager.Instance.CurrentTurn;
+        int   moveCount   = RcGameRuleManager.Instance.CurrentTurn;
+        float elapsedTime = RcGameRuleManager.Instance.ElapsedTime;
 
         if (currentStageNumber > 0)
-            RcProgressManager.Instance.RecordStageClear(currentStageNumber, turnUsed);
+            RcProgressManager.Instance.RecordStageClear(currentStageNumber, moveCount, elapsedTime);
 
         int stars = 0;
         if (currentStageNumber > 0)
         {
             var levelData = RcProgressManager.Instance.StageDatabase.GetStage(currentStageNumber);
-            stars = levelData.StageInfo.CalculateStars(turnUsed);
+            stars = levelData.StageInfo.CalculateStars(moveCount, elapsedTime);
         }
 
         bool hasNext = currentStageNumber > 0
             && currentStageNumber < RcProgressManager.Instance.TotalStageCount;
 
-        ShowResultPanel(true, turnUsed, stars, hasNext);
-    }
-
-    private void OnGameLose() { }
-
-    [Header("Game Over")]
-    [SerializeField] private float defeatPauseDelay = 0.5f;
-    [SerializeField] private float resultDelay = 0.15f;
-
-    public void ShowGameOverResult()
-    {
-        StartCoroutine(DefeatSequence());
-    }
-
-    private IEnumerator DefeatSequence()
-    {
-        yield return new WaitForSeconds(defeatPauseDelay);
-        PlayCameraZoomOut(() => StartCoroutine(DelayedGameLose()));
-    }
-
-    private IEnumerator DelayedGameLose()
-    {
-        yield return new WaitForSeconds(resultDelay);
-
-        int turnUsed = RcGameRuleManager.Instance.CurrentTurn;
-        ShowResultPanel(false, turnUsed, 0, false);
+        ShowResultPanel(moveCount, elapsedTime, stars, hasNext);
     }
 
     private void PlayCameraZoomOut(System.Action onComplete = null)
@@ -164,13 +138,14 @@ public class RcGameResultManager : RcSingletonMono<RcGameResultManager>
             cam.orthographicSize = originalCameraSize;
     }
 
-    private void ShowResultPanel(bool isVictory, int turnUsed, int starCount, bool hasNextStage)
+    private void ShowResultPanel(int moveCount, float elapsedTime, int starCount, bool hasNextStage)
     {
         var data = new RcGameResultData
         {
-            IsVictory = isVictory,
-            TurnUsed = turnUsed,
-            StarCount = starCount,
+            IsVictory    = true,
+            MoveCount    = moveCount,
+            ElapsedTime  = elapsedTime,
+            StarCount    = starCount,
             HasNextStage = hasNextStage
         };
 

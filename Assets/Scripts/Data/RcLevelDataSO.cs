@@ -14,6 +14,9 @@ public class RcLevelDataSO : ScriptableObject
 
     public RcTileData[] Tiles;
 
+    [Header("Dice Spawn")]
+    public Vector2Int SpawnGridPosition = new Vector2Int(-1, -1);  // (-1,-1) = 미지정 (씬 기본값 사용)
+
     [Header("Dice Setup")]
     public RcColorType[] InitialDiceFaces = new RcColorType[6];
 
