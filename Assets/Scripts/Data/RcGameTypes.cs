@@ -28,4 +28,10 @@ namespace Rolice
         Gold,
         Max
     }
+
+    public enum RcScreenMode
+    {
+        Landscape = 0,
+        Portrait  = 1,
+    }
 }

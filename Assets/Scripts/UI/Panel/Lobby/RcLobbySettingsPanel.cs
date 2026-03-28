@@ -9,9 +9,14 @@ namespace Rolice.UI
         [Header("UI References")]
         [SerializeField] private RcButton backdropButton;
 
+        [Header("Screen Mode")]
+        [SerializeField] private RcButton landscapeButton;
+        [SerializeField] private RcButton portraitButton;
+
         private RcLobbySettingsPresenter presenter;
 
         public event Action OnCloseClicked;
+        public event Action<RcScreenMode> OnScreenModeChanged;
 
         protected override void Awake()
         {
@@ -19,6 +24,12 @@ namespace Rolice.UI
 
             if (backdropButton != null)
                 backdropButton.OnClick += () => OnCloseClicked?.Invoke();
+
+            if (landscapeButton != null)
+                landscapeButton.OnClick += () => OnScreenModeChanged?.Invoke(RcScreenMode.Landscape);
+
+            if (portraitButton != null)
+                portraitButton.OnClick += () => OnScreenModeChanged?.Invoke(RcScreenMode.Portrait);
         }
 
         protected override void OnOpen()

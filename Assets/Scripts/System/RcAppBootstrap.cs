@@ -15,6 +15,7 @@ public static class RcAppBootstrap
         RcBackendServices.Register(new RcUgsProvider()); // UGS 제거 시 이 줄만 제거
         RcPlayerState.Instance.Initialize();
         InitializeProgressManager();
+        RcScreenOrientationApplier.Apply(RcGameSettingsData.Current.GetScreenMode());
     }
 
     private static void LoadCorePrefab()

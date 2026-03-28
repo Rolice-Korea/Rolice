@@ -1,4 +1,6 @@
 using Engine.UI;
+using Rolice.Data;
+using Rolice.System;
 
 namespace Rolice.UI
 {
@@ -9,6 +11,7 @@ namespace Rolice.UI
         protected override void OnInitialize()
         {
             Panel.OnCloseClicked += HandleCloseClicked;
+            Panel.OnScreenModeChanged += HandleScreenModeChanged;
 
             stageSelectWasOpen = RcUIManager.Instance.IsOpen<RcStageSelectPanel>();
             if (stageSelectWasOpen)
@@ -18,6 +21,7 @@ namespace Rolice.UI
         protected override void OnDispose()
         {
             Panel.OnCloseClicked -= HandleCloseClicked;
+            Panel.OnScreenModeChanged -= HandleScreenModeChanged;
         }
 
         private void HandleCloseClicked()
@@ -26,6 +30,15 @@ namespace Rolice.UI
                 RcUIManager.Instance.Open<RcStageSelectPanel>();
 
             Panel.Close();
+        }
+
+        private void HandleScreenModeChanged(RcScreenMode mode)
+        {
+            // 설정 저장
+            RcGameSettingsData.Current.SetScreenMode(mode);
+
+            // 화면 방향 적용
+            RcScreenOrientationApplier.Apply(mode);
         }
     }
 }
