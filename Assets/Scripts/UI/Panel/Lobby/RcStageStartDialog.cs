@@ -48,11 +48,11 @@ namespace Rolice.UI
 
         public void SetTitle(string title) => titleText.text = title;
 
-        public void SetConditionRow(int index, int starCount, int turnThreshold)
+        public void SetConditionRow(int index, int starCount, string conditionText)
         {
             if (index >= conditionRows.Length) return;
             var row = conditionRows[index];
-            row.turnText.text = $"{turnThreshold} TURNS";
+            row.turnText.text = conditionText;
             for (int i = 0; i < row.starImages.Length; i++)
                 row.starImages[i].color = i < starCount ? StarEarnedColor : StarDimColor;
         }

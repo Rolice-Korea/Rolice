@@ -6,7 +6,6 @@ namespace Rolice.UI
 {
     public class RcStageSelectPresenter : RcUIPresenter<RcStageSelectPanel>
     {
-
         protected override void OnInitialize()
         {
             Panel.OnStageSelected += HandleStageSelected;
@@ -29,18 +28,28 @@ namespace Rolice.UI
             }
 
             int totalStages = RcProgressManager.Instance.TotalStageCount;
-            Panel.CreateItems(totalStages);
 
-            for (int i = 0; i < totalStages; i++)
+            // 스테이지 수가 같으면 pool 재생성 없이 visible 위젯 데이터만 갱신
+            if (totalStages == Panel.ItemCount)
             {
-                int stageNumber = i + 1;
-                var state = GetStageState(stageNumber);
-                int stars = RcProgressManager.Instance.GetStageStars(stageNumber);
-                Panel.SetItemData(i, stageNumber, state, stars);
+                Panel.RefreshVisibleData();
+                return;
             }
 
+            Panel.SetupVirtualCarousel(totalStages, GetStageItemData);
             Panel.FocusIndex(GetInitialFocusIndex());
             Panel.PlayEntryAnimation();
+        }
+
+        private RcStageSelectPanel.StageItemData GetStageItemData(int index)
+        {
+            int stageNumber = index + 1;
+            return new RcStageSelectPanel.StageItemData
+            {
+                StageNumber = stageNumber,
+                State       = GetStageState(stageNumber),
+                Stars       = RcProgressManager.Instance.GetStageStars(stageNumber),
+            };
         }
 
         private int GetInitialFocusIndex()
@@ -51,7 +60,7 @@ namespace Rolice.UI
                 if (GetStageState(i + 1) != RcStageState.Cleared)
                     return i;
             }
-            return total - 1; // 전부 클리어 → 마지막 스테이지
+            return total - 1;
         }
 
         private RcStageState GetStageState(int stageNumber)
@@ -74,15 +83,16 @@ namespace Rolice.UI
                 return;
             }
 
-            var stageInfo = levelData.StageInfo;
+            var stageInfo    = levelData.StageInfo;
             int currentStars = RcProgressManager.Instance.GetStageStars(stageNumber);
 
             RcUIManager.Instance.Open<RcStageStartDialog, RcStageStartDialogData>(new RcStageStartDialogData
             {
-                StageNumber = stageNumber,
-                StageName = stageInfo.GetDisplayName(),
-                StarThresholds = stageInfo.StarThresholds,
-                CurrentStars = currentStars,
+                StageNumber        = stageNumber,
+                StageName          = stageInfo.GetDisplayName(),
+                MoveCountThreshold = stageInfo.MoveCountThreshold,
+                TimeThreshold      = stageInfo.TimeThreshold,
+                CurrentStars       = currentStars,
             });
         }
     }

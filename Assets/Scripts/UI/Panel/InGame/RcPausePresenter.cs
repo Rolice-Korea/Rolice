@@ -4,7 +4,8 @@ namespace Rolice.UI
 {
     public class RcPausePresenter : RcUIPresenter<RcPausePanel>
     {
-        private int[] starThresholds;
+        private int   moveCountThreshold;
+        private float timeThreshold;
 
         protected override void OnInitialize()
         {
@@ -29,8 +30,10 @@ namespace Rolice.UI
 
         private void InitializeDisplay()
         {
-            int currentTurn = RcGameRuleManager.Instance.CurrentTurn;
-            Panel.SetCurrentTurn(currentTurn);
+            int   currentMove = RcGameRuleManager.Instance.CurrentTurn;
+            float elapsed     = RcGameRuleManager.Instance.ElapsedTime;
+
+            Panel.SetCurrentMove(currentMove);
 
             int stageNumber = RcGameContext.SelectedStageNumber;
             if (stageNumber <= 0) return;
@@ -38,9 +41,11 @@ namespace Rolice.UI
             var levelData = RcProgressManager.Instance.StageDatabase.GetStage(stageNumber);
             if (levelData == null) return;
 
-            starThresholds = levelData.StageInfo.StarThresholds;
-            Panel.SetStarConditions(starThresholds);
-            Panel.RefreshStarHighlights(currentTurn, starThresholds);
+            moveCountThreshold = levelData.StageInfo.MoveCountThreshold;
+            timeThreshold      = levelData.StageInfo.TimeThreshold;
+
+            Panel.SetStarConditions(moveCountThreshold, timeThreshold);
+            Panel.RefreshStarHighlights(currentMove, elapsed, moveCountThreshold, timeThreshold);
         }
 
         private void OnRetryClicked() => RcGameFlowManager.Instance.RetryStage();

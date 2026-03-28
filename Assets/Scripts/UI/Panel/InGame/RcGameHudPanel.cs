@@ -6,9 +6,8 @@ namespace Rolice.UI
 {
     public class RcGameHudPanel : RcUIPanel
     {
-        [Header("Turn")]
-        [SerializeField] private TMP_Text turnText;
-        [SerializeField] private RcTweenAnimator animatorGameOver;
+        [Header("Move Count")]
+        [SerializeField] private TMP_Text moveCountText;
 
         [Header("Pause")]
         [SerializeField] private RcButton pauseButton;
@@ -20,9 +19,9 @@ namespace Rolice.UI
         [SerializeField] private RcButton rotateLeftButton;
         [SerializeField] private RcButton rotateRightButton;
 
-        public RcSwipeArea SwipeArea => swipeArea;
-        public RcButton RotateLeftButton => rotateLeftButton;
-        public RcButton RotateRightButton => rotateRightButton;
+        public RcSwipeArea SwipeArea        => swipeArea;
+        public RcButton    RotateLeftButton  => rotateLeftButton;
+        public RcButton    RotateRightButton => rotateRightButton;
 
         private RcGameHudPresenter presenter;
 
@@ -38,25 +37,10 @@ namespace Rolice.UI
             presenter = null;
         }
 
-        public void SetRemainingTurns(int remaining)
+        public void SetMoveCount(int count)
         {
-            if (turnText == null) return;
-
-            turnText.text = $"{remaining}";
-        }
-
-        public void PlayGameOverAnimation()
-        {
-            if (animatorGameOver != null && !animatorGameOver.IsPlaying())
-            {
-                animatorGameOver.OnComplete = OnGameOverAnimationComplete;
-                animatorGameOver.Play("GameOver");
-            }
-        }
-
-        private void OnGameOverAnimationComplete()
-        {
-            RcGameResultManager.Instance.ShowGameOverResult();
+            if (moveCountText != null)
+                moveCountText.text = $"{count}";
         }
     }
 }
