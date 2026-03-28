@@ -11,19 +11,34 @@ public static class RcLevelAutoGenerator
         Full,       // 전체 격자 — 밀도로 랜덤 제거
         Path,       // 랜덤 워크 — 연결된 경로
         Cluster,    // 여러 클러스터 — 섬처럼 모여있음
+        Hybrid,     // 역방향 핵심 구간 + 랜덤 혼합
+    }
+
+    public enum ShapePreset
+    {
+        Rectangle,  // 기본 (전체 격자)
+        Diamond,    // 마름모
+        Cross,      // 십자형
+        Frame,      // 테두리
     }
 
     [Serializable]
     public class GenParams
     {
-        public Preset Preset         = Preset.Full;
-        public int    Width          = 6;
-        public int    Height         = 6;
-        public int    ColorCount     = 4;
+        public Preset      Preset          = Preset.Full;
+        public ShapePreset Shape           = ShapePreset.Rectangle;
+        public int         Width           = 6;
+        public int         Height          = 6;
+        public int         ColorCount      = 4;
         [Range(0.3f, 1f)]
-        public float  FillRatio      = 0.7f;
-        public float  TurnMultiplier = 1.6f;
-        public int    Seed           = -1;  // -1 = 매번 랜덤
+        public float       FillRatio       = 0.7f;
+        public float       TurnMultiplier  = 1.6f;
+        public int         Seed            = -1;  // -1 = 매번 랜덤
+
+        // Hybrid 전용
+        public int    CriticalSegmentCount  = 1;
+        [Range(3, 8)]
+        public int    CriticalSegmentLength = 5;
     }
 
     // 실제 적용된 시드를 반환
@@ -41,7 +56,21 @@ public static class RcLevelAutoGenerator
         for (int i = 0; i < active.Length; i++)
             if (active[i]) actives.Add(i);
 
-        AssignColors(levelData, actives, p.ColorCount, colorTileType, rng);
+        // 스폰 위치: 활성 타일 중 랜덤 선택
+        if (actives.Count > 0)
+        {
+            int spawnIdx = actives[rng.Next(actives.Count)];
+            levelData.SpawnGridPosition = new Vector2Int(spawnIdx % levelData.Width, spawnIdx / levelData.Width);
+        }
+
+        // Hybrid: 핵심 구간 먼저 역방향 설계
+        var criticalSet = new HashSet<int>();
+        if (p.Preset == Preset.Hybrid)
+            ApplyCriticalSegments(levelData, actives, criticalSet, colorTileType, p, rng);
+
+        // 나머지 타일 랜덤 배색
+        var nonCritical = actives.Where(i => !criticalSet.Contains(i)).ToList();
+        AssignColors(levelData, nonCritical, p.ColorCount, colorTileType, rng);
 
         int tileCount = actives.Count;
         int maxTurns  = Mathf.Max(tileCount + 2, Mathf.RoundToInt(tileCount * p.TurnMultiplier));
@@ -56,46 +85,90 @@ public static class RcLevelAutoGenerator
         int star1 = Mathf.Max(star2 + 1, maxTurns - 1);
         levelData.StageInfo.StarThresholds = new[] { star3, star2, star1 };
 
-        // 다이스 초기 면 — 6색 순서대로 할당 (None이면 매칭 불가)
+        // 다이스 초기 면 — ColorCount 내에서만 순환 할당
         if (levelData.InitialDiceFaces == null || levelData.InitialDiceFaces.Length != 6)
             levelData.InitialDiceFaces = new RcColorType[6];
+        int clampedColorCount = Mathf.Clamp(p.ColorCount, 1, AllColors.Length);
         for (int i = 0; i < 6; i++)
-            levelData.InitialDiceFaces[i] = AllColors[i % AllColors.Length];
+            levelData.InitialDiceFaces[i] = AllColors[i % clampedColorCount];
 
         return seed;
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Shape Generation
+
     private static bool[] GenerateShape(GenParams p, System.Random rng, int w, int h)
     {
-        int targetCount = Mathf.RoundToInt(w * h * Mathf.Clamp(p.FillRatio, 0.1f, 1f));
-        targetCount = Mathf.Clamp(targetCount, p.ColorCount, w * h);
+        bool[]    mask       = GetShapeMask(p.Shape, w, h);
+        List<int> maskCells  = Enumerable.Range(0, w * h).Where(i => mask[i]).ToList();
+
+        int targetCount = Mathf.RoundToInt(maskCells.Count * Mathf.Clamp(p.FillRatio, 0.1f, 1f));
+        targetCount = Mathf.Clamp(targetCount, p.ColorCount, maskCells.Count);
 
         return p.Preset switch
         {
-            Preset.Full    => GenerateFull(rng, w, h, targetCount),
-            Preset.Path    => GeneratePath(rng, w, h, targetCount),
-            Preset.Cluster => GenerateCluster(rng, w, h, targetCount, p.ColorCount),
-            _              => GenerateFull(rng, w, h, targetCount),
+            Preset.Full    => GenerateFull(rng, w, h, targetCount, maskCells),
+            Preset.Path    => GeneratePath(rng, w, h, targetCount, mask),
+            Preset.Cluster => GenerateCluster(rng, w, h, targetCount, p.ColorCount, mask),
+            Preset.Hybrid  => GeneratePath(rng, w, h, targetCount, mask),
+            _              => GenerateFull(rng, w, h, targetCount, maskCells),
         };
     }
 
-    private static bool[] GenerateFull(System.Random rng, int w, int h, int target)
+    // ─────────────────────────────────────────────────────────────────────────
+    // Shape Masks
+
+    private static bool[] GetShapeMask(ShapePreset shape, int w, int h)
     {
-        bool[] active = new bool[w * h];
-        for (int i = 0; i < active.Length; i++) active[i] = true;
+        bool[] mask = new bool[w * h];
+        for (int y = 0; y < h; y++)
+        for (int x = 0; x < w; x++)
+            mask[y * w + x] = shape switch
+            {
+                ShapePreset.Diamond => IsDiamond(x, y, w, h),
+                ShapePreset.Cross   => IsCross(x, y, w, h),
+                ShapePreset.Frame   => IsFrame(x, y, w, h),
+                _                   => true,
+            };
+        return mask;
+    }
 
-        var indices = Enumerable.Range(0, active.Length).ToList();
-        Shuffle(indices, rng);
-        int remove = active.Length - target;
-        for (int i = 0; i < remove; i++) active[indices[i]] = false;
+    private static bool IsDiamond(int x, int y, int w, int h)
+    {
+        float cx = (w - 1) / 2f, cy = (h - 1) / 2f;
+        return (Math.Abs(x - cx) / (w / 2f) + Math.Abs(y - cy) / (h / 2f)) <= 1f;
+    }
 
+    private static bool IsCross(int x, int y, int w, int h)
+    {
+        int midX1 = (w - 1) / 2, midX2 = w / 2;
+        int midY1 = (h - 1) / 2, midY2 = h / 2;
+        return (x >= midX1 && x <= midX2) || (y >= midY1 && y <= midY2);
+    }
+
+    private static bool IsFrame(int x, int y, int w, int h) =>
+        x == 0 || x == w - 1 || y == 0 || y == h - 1;
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private static bool[] GenerateFull(System.Random rng, int w, int h, int target, List<int> candidates)
+    {
+        bool[] active   = new bool[w * h];
+        var    shuffled = candidates.ToList();
+        Shuffle(shuffled, rng);
+        int keep = Math.Min(target, shuffled.Count);
+        for (int i = 0; i < keep; i++) active[shuffled[i]] = true;
         return active;
     }
 
-    private static bool[] GeneratePath(System.Random rng, int w, int h, int target)
+    private static bool[] GeneratePath(System.Random rng, int w, int h, int target, bool[] mask)
     {
-        bool[] active  = new bool[w * h];
-        int    cur     = (h / 2) * w + (w / 2);
+        bool[] active   = new bool[w * h];
+        var    maskList = Enumerable.Range(0, w * h).Where(i => mask[i]).ToList();
+        if (maskList.Count == 0) return active;
+
+        int    cur     = maskList[rng.Next(maskList.Count)];
         active[cur]    = true;
         int placed     = 1;
         int maxIter    = w * h * 20;
@@ -106,9 +179,8 @@ public static class RcLevelAutoGenerator
             int dir  = dirs[rng.Next(dirs.Length)];
             int next = cur + dir;
             if (next < 0 || next >= w * h) continue;
-
-            // 좌우 이동 시 행 경계 넘기 방지
             if (Math.Abs((next % w) - (cur % w)) > 1) continue;
+            if (!mask[next]) continue;
 
             cur = next;
             if (!active[cur]) { active[cur] = true; placed++; }
@@ -117,18 +189,21 @@ public static class RcLevelAutoGenerator
         return active;
     }
 
-    private static bool[] GenerateCluster(System.Random rng, int w, int h, int target, int colorCount)
+    private static bool[] GenerateCluster(System.Random rng, int w, int h, int target, int colorCount, bool[] mask)
     {
         bool[] active   = new bool[w * h];
-        var    frontier = new List<int>();
-        int    clusters = Mathf.Max(2, Mathf.Min(colorCount, target / 3 + 1));
+        var    maskList = Enumerable.Range(0, w * h).Where(i => mask[i]).ToList();
+        if (maskList.Count == 0) return active;
+
+        var frontier = new List<int>();
+        int clusters = Mathf.Max(2, Mathf.Min(colorCount, target / 3 + 1));
 
         var usedSeeds = new HashSet<int>();
         for (int i = 0; i < clusters; i++)
         {
             for (int attempt = 0; attempt < 30; attempt++)
             {
-                int idx = rng.Next(w * h);
+                int idx = maskList[rng.Next(maskList.Count)];
                 if (!usedSeeds.Contains(idx))
                 {
                     usedSeeds.Add(idx);
@@ -149,10 +224,10 @@ public static class RcLevelAutoGenerator
             int cy   = cell / w;
 
             var neighbors = new List<int>();
-            if (cx > 0     && !active[cell - 1]) neighbors.Add(cell - 1);
-            if (cx < w - 1 && !active[cell + 1]) neighbors.Add(cell + 1);
-            if (cy > 0     && !active[cell - w]) neighbors.Add(cell - w);
-            if (cy < h - 1 && !active[cell + w]) neighbors.Add(cell + w);
+            if (cx > 0     && !active[cell - 1] && mask[cell - 1]) neighbors.Add(cell - 1);
+            if (cx < w - 1 && !active[cell + 1] && mask[cell + 1]) neighbors.Add(cell + 1);
+            if (cy > 0     && !active[cell - w] && mask[cell - w]) neighbors.Add(cell - w);
+            if (cy < h - 1 && !active[cell + w] && mask[cell + w]) neighbors.Add(cell + w);
 
             if (neighbors.Count == 0) { frontier.RemoveAt(pick); continue; }
 
@@ -164,6 +239,123 @@ public static class RcLevelAutoGenerator
 
         return active;
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Hybrid: 역방향 핵심 구간
+
+    private static void ApplyCriticalSegments(
+        RcLevelDataSO  levelData,
+        List<int>      actives,
+        HashSet<int>   criticalSet,
+        RcTileTypeSO   tileType,
+        GenParams      p,
+        System.Random  rng)
+    {
+        int tileCount = Mathf.RoundToInt(levelData.Width * levelData.Height * Mathf.Clamp(p.FillRatio, 0.1f, 1f));
+        int maxSegCount = Mathf.Max(1, tileCount / (Mathf.Clamp(p.CriticalSegmentLength, 3, 8) * 2));
+        int segCount = Mathf.Clamp(p.CriticalSegmentCount, 1, maxSegCount);
+        int segLen   = Mathf.Clamp(p.CriticalSegmentLength, 3, 8);
+
+        for (int s = 0; s < segCount; s++)
+        {
+            // 이미 지정된 타일 제외하고 탐색
+            var available = actives.Where(i => !criticalSet.Contains(i)).ToList();
+            var segment   = FindSimplePath(levelData, available, segLen, rng);
+            if (segment == null) continue;
+
+            ApplyCriticalSegment(levelData, segment, tileType, rng);
+            foreach (var idx in segment) criticalSet.Add(idx);
+        }
+    }
+
+    // DFS로 length 길이의 단순 경로 탐색
+    private static List<int> FindSimplePath(
+        RcLevelDataSO  ld,
+        List<int>      available,
+        int            length,
+        System.Random  rng)
+    {
+        if (available.Count < length) return null;
+
+        var activeSet = new HashSet<int>(available);
+
+        for (int attempt = 0; attempt < 60; attempt++)
+        {
+            int start   = available[rng.Next(available.Count)];
+            var path    = new List<int> { start };
+            var visited = new HashSet<int> { start };
+
+            if (DFSSimplePath(ld, start, length - 1, visited, path, activeSet, rng))
+                return path;
+        }
+
+        return null;
+    }
+
+    private static bool DFSSimplePath(
+        RcLevelDataSO  ld,
+        int            cur,
+        int            remaining,
+        HashSet<int>   visited,
+        List<int>      path,
+        HashSet<int>   activeSet,
+        System.Random  rng)
+    {
+        if (remaining == 0) return true;
+
+        var neighbors = ShuffledNeighbors(ld, cur, activeSet, rng);
+        foreach (var n in neighbors)
+        {
+            if (visited.Contains(n)) continue;
+            visited.Add(n);
+            path.Add(n);
+            if (DFSSimplePath(ld, n, remaining - 1, visited, path, activeSet, rng))
+                return true;
+            visited.Remove(n);
+            path.RemoveAt(path.Count - 1);
+        }
+        return false;
+    }
+
+    // 핵심 구간에 다이스 역산으로 타일 색 배정
+    private static void ApplyCriticalSegment(
+        RcLevelDataSO  ld,
+        List<int>      segment,
+        RcTileTypeSO   tileType,
+        System.Random  rng)
+    {
+        // 랜덤 회전으로 진입 다이스 상태 생성 (중간 경유 시뮬레이션)
+        var dice    = new RcDiceFaceData(ld.InitialDiceFaces);
+        var allDirs = new[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+        int rotations = rng.Next(3, 10);
+        for (int i = 0; i < rotations; i++)
+            dice = dice.Rotate(allDirs[rng.Next(4)]);
+
+        // 첫 타일: 진입 시 바닥면 색
+        ld.Tiles[segment[0]] = new RcTileData
+        {
+            TileType  = tileType,
+            colorType = dice.GetBottomColor(),
+        };
+
+        // 이후 타일: 경로 방향으로 굴리며 바닥면 역산
+        for (int i = 1; i < segment.Count; i++)
+        {
+            var dir = new Vector2Int(
+                segment[i] % ld.Width  - segment[i - 1] % ld.Width,
+                segment[i] / ld.Width  - segment[i - 1] / ld.Width
+            );
+            dice = dice.Rotate(dir);
+            ld.Tiles[segment[i]] = new RcTileData
+            {
+                TileType  = tileType,
+                colorType = dice.GetBottomColor(),
+            };
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Color Assignment
 
     private static readonly RcColorType[] AllColors =
     {
@@ -183,6 +375,28 @@ public static class RcLevelAutoGenerator
 
         for (int i = 0; i < shuffled.Count; i++)
             ld.Tiles[shuffled[i]] = new RcTileData { TileType = tileType, colorType = usedColors[i % colorCount] };
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Helpers
+
+    private static List<int> ShuffledNeighbors(
+        RcLevelDataSO ld, int idx, HashSet<int> activeSet, System.Random rng)
+    {
+        int cx = idx % ld.Width, cy = idx / ld.Width;
+        var result = new List<int>(4);
+        int[] dx = {  0, 0, 1, -1 };
+        int[] dy = {  1, -1, 0, 0 };
+
+        for (int d = 0; d < 4; d++)
+        {
+            int nx = cx + dx[d], ny = cy + dy[d];
+            if (nx < 0 || nx >= ld.Width || ny < 0 || ny >= ld.Height) continue;
+            int ni = ny * ld.Width + nx;
+            if (activeSet.Contains(ni)) result.Add(ni);
+        }
+        Shuffle(result, rng);
+        return result;
     }
 
     private static void Shuffle<T>(List<T> list, System.Random rng)

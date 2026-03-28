@@ -22,10 +22,11 @@ public class RcLevelEditorProxyEditor : Editor
         RcColorType.Grey 
     };
 
-    private Vector2Int hoveredCell   = new(-1, -1);
-    private Vector2Int lastPainted   = new(-1, -1);
-    private Vector2Int selectedCell  = new(-1, -1);
-    private int        activeTab     = 0;
+    private Vector2Int hoveredCell    = new(-1, -1);
+    private Vector2Int lastPainted    = new(-1, -1);
+    private Vector2Int selectedCell   = new(-1, -1);
+    private bool       _pickingSpawn  = false;
+    private int        activeTab      = 0;
     private RcLevelEditorProxy proxy;
     private SerializedObject levelDataSO;
 
@@ -33,6 +34,11 @@ public class RcLevelEditorProxyEditor : Editor
     private RcLevelAutoGenerator.GenParams genParams = new();
     private int  lastUsedSeed = -1;
     private bool genParamsLoaded = false;
+
+    // Validation 캐시
+    private RcLevelValidator.Result _validation;
+    private RcLevelDataSO           _validationTarget;
+    private bool                    _validationDirty = true;
 
     void OnEnable()
     {
@@ -65,11 +71,15 @@ public class RcLevelEditorProxyEditor : Editor
             EditorGUILayout.Space(6);
             DrawMapSection();
             EditorGUILayout.Space(6);
+            DrawSpawnSection();
+            EditorGUILayout.Space(6);
             DrawRulesSection();
             EditorGUILayout.Space(6);
             DrawStarsSection();
             EditorGUILayout.Space(6);
             DrawDiceSetupSection();
+            EditorGUILayout.Space(6);
+            DrawStatsSection();
             EditorGUILayout.Space(6);
 
             int newTab = GUILayout.Toolbar(activeTab, new[] { "Paint", "Edit", "Generate" }, GUILayout.Height(26));
@@ -110,6 +120,7 @@ public class RcLevelEditorProxyEditor : Editor
             UpdateLevelDataSO();
             EditorUtility.SetDirty(proxy);
             proxy.RebuildScene();
+            _validationDirty = true;
         }
     }
 
@@ -130,6 +141,44 @@ public class RcLevelEditorProxyEditor : Editor
             EditorUtility.SetDirty(ld);
             proxy.RebuildScene();
         }
+    }
+
+    void DrawSpawnSection()
+    {
+        var ld    = proxy.LevelData;
+        var spawn = ld.SpawnGridPosition;
+
+        EditorGUILayout.LabelField("Dice Spawn", EditorStyles.boldLabel);
+
+        EditorGUILayout.BeginHorizontal();
+
+        string posLabel = spawn.x >= 0 ? $"({spawn.x}, {spawn.y})" : "미지정";
+        EditorGUILayout.LabelField($"위치:  {posLabel}", GUILayout.ExpandWidth(true));
+
+        var prevBg = GUI.backgroundColor;
+        GUI.backgroundColor = _pickingSpawn ? new Color(1f, 0.7f, 0.2f) : new Color(0.6f, 0.6f, 0.6f);
+        if (GUILayout.Button(_pickingSpawn ? "클릭해서 지정..." : "Pick", GUILayout.Width(110)))
+        {
+            _pickingSpawn = !_pickingSpawn;
+            SceneView.RepaintAll();
+        }
+        GUI.backgroundColor = prevBg;
+
+        GUI.backgroundColor = new Color(0.7f, 0.4f, 0.4f);
+        if (GUILayout.Button("Clear", GUILayout.Width(50)))
+        {
+            Undo.RecordObject(ld, "Clear Spawn Position");
+            ld.SpawnGridPosition = new Vector2Int(-1, -1);
+            _pickingSpawn = false;
+            EditorUtility.SetDirty(ld);
+            SceneView.RepaintAll();
+        }
+        GUI.backgroundColor = prevBg;
+
+        EditorGUILayout.EndHorizontal();
+
+        if (_pickingSpawn)
+            EditorGUILayout.HelpBox("씬뷰에서 타일을 클릭해 스폰 위치를 지정하세요.", MessageType.Info);
     }
 
     void DrawRulesSection()
@@ -189,6 +238,7 @@ public class RcLevelEditorProxyEditor : Editor
             {
                 Undo.RecordObject(ld, "Dice Face None");
                 ld.InitialDiceFaces[i] = RcColorType.None;
+                _validationDirty = true;
                 EditorUtility.SetDirty(ld);
             }
 
@@ -205,6 +255,7 @@ public class RcLevelEditorProxyEditor : Editor
                 {
                     Undo.RecordObject(ld, "Dice Face Color");
                     ld.InitialDiceFaces[i] = color;
+                    _validationDirty = true;
                     EditorUtility.SetDirty(ld);
                 }
             }
@@ -297,6 +348,7 @@ public class RcLevelEditorProxyEditor : Editor
         EditorGUI.BeginChangeCheck();
 
         genParams.Preset = (RcLevelAutoGenerator.Preset)EditorGUILayout.EnumPopup("Preset", genParams.Preset);
+        genParams.Shape  = (RcLevelAutoGenerator.ShapePreset)EditorGUILayout.EnumPopup("Shape",  genParams.Shape);
 
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("Size", GUILayout.Width(60));
@@ -308,6 +360,18 @@ public class RcLevelEditorProxyEditor : Editor
         genParams.ColorCount     = EditorGUILayout.IntSlider("Colors",      genParams.ColorCount,     2, 6);
         genParams.FillRatio      = EditorGUILayout.Slider("Fill Ratio",     genParams.FillRatio,      0.3f, 1f);
         genParams.TurnMultiplier = EditorGUILayout.Slider("Turn Mult",      genParams.TurnMultiplier, 1f, 3f);
+
+        if (genParams.Preset == RcLevelAutoGenerator.Preset.Hybrid)
+        {
+            EditorGUILayout.Space(4);
+            EditorGUILayout.LabelField("Hybrid Settings", EditorStyles.miniLabel);
+            genParams.CriticalSegmentLength = EditorGUILayout.IntSlider("Segment Length", genParams.CriticalSegmentLength, 3, 8);
+
+            int tiles      = Mathf.RoundToInt(genParams.Width * genParams.Height * genParams.FillRatio);
+            int maxSegment = Mathf.Max(1, tiles / (genParams.CriticalSegmentLength * 2));
+            genParams.CriticalSegmentCount = EditorGUILayout.IntSlider(
+                $"Critical Segments (max {maxSegment})", genParams.CriticalSegmentCount, 1, maxSegment);
+        }
 
         EditorGUILayout.BeginHorizontal();
         genParams.Seed = EditorGUILayout.IntField("Seed (-1=random)", genParams.Seed);
@@ -337,7 +401,8 @@ public class RcLevelEditorProxyEditor : Editor
         {
             var ld = proxy.LevelData;
             Undo.RecordObject(ld, "Auto Generate Level");
-            lastUsedSeed = RcLevelAutoGenerator.Generate(ld, genParams, colorTileType);
+            lastUsedSeed     = RcLevelAutoGenerator.Generate(ld, genParams, colorTileType);
+            _validationDirty = true;
             EditorUtility.SetDirty(ld);
             proxy.RebuildScene();
             Repaint();
@@ -348,23 +413,29 @@ public class RcLevelEditorProxyEditor : Editor
     void SaveGenParams()
     {
         SessionState.SetInt   ("RcGen.Preset",       (int)genParams.Preset);
+        SessionState.SetInt   ("RcGen.Shape",        (int)genParams.Shape);
         SessionState.SetInt   ("RcGen.Width",         genParams.Width);
         SessionState.SetInt   ("RcGen.Height",        genParams.Height);
         SessionState.SetInt   ("RcGen.ColorCount",    genParams.ColorCount);
         SessionState.SetFloat ("RcGen.FillRatio",     genParams.FillRatio);
         SessionState.SetFloat ("RcGen.TurnMult",      genParams.TurnMultiplier);
         SessionState.SetInt   ("RcGen.Seed",          genParams.Seed);
+        SessionState.SetInt   ("RcGen.CritSegCount",  genParams.CriticalSegmentCount);
+        SessionState.SetInt   ("RcGen.CritSegLen",    genParams.CriticalSegmentLength);
     }
 
     void RestoreGenParams()
     {
-        genParams.Preset         = (RcLevelAutoGenerator.Preset)SessionState.GetInt  ("RcGen.Preset",    0);
-        genParams.Width          = SessionState.GetInt  ("RcGen.Width",       6);
-        genParams.Height         = SessionState.GetInt  ("RcGen.Height",      6);
-        genParams.ColorCount     = SessionState.GetInt  ("RcGen.ColorCount",  4);
-        genParams.FillRatio      = SessionState.GetFloat("RcGen.FillRatio",   0.7f);
-        genParams.TurnMultiplier = SessionState.GetFloat("RcGen.TurnMult",    1.6f);
-        genParams.Seed           = SessionState.GetInt  ("RcGen.Seed",       -1);
+        genParams.Preset                = (RcLevelAutoGenerator.Preset)SessionState.GetInt      ("RcGen.Preset",    0);
+        genParams.Shape                 = (RcLevelAutoGenerator.ShapePreset)SessionState.GetInt("RcGen.Shape",     0);
+        genParams.Width                 = SessionState.GetInt  ("RcGen.Width",       6);
+        genParams.Height                = SessionState.GetInt  ("RcGen.Height",      6);
+        genParams.ColorCount            = SessionState.GetInt  ("RcGen.ColorCount",  4);
+        genParams.FillRatio             = SessionState.GetFloat("RcGen.FillRatio",   0.7f);
+        genParams.TurnMultiplier        = SessionState.GetFloat("RcGen.TurnMult",    1.6f);
+        genParams.Seed                  = SessionState.GetInt  ("RcGen.Seed",       -1);
+        genParams.CriticalSegmentCount  = SessionState.GetInt  ("RcGen.CritSegCount", 1);
+        genParams.CriticalSegmentLength = SessionState.GetInt  ("RcGen.CritSegLen",   5);
     }
 
     void DrawActionsSection()
@@ -419,9 +490,21 @@ public class RcLevelEditorProxyEditor : Editor
                 DrawCellQuad(new Vector2Int(x, y), Y);
         }
 
+        // 스폰 마커
+        var spawn = ld.SpawnGridPosition;
+        if (spawn.x >= 0 && spawn.y >= 0 && IsValidCell(spawn))
+        {
+            Handles.color = new Color(1f, 0.65f, 0f, 0.7f);
+            DrawCellQuad(spawn, Y + 0.01f);
+            Handles.Label(new Vector3(spawn.x - 0.15f, Y + 0.1f, spawn.y), "S",
+                new GUIStyle { normal = { textColor = Color.yellow }, fontSize = 14, fontStyle = FontStyle.Bold });
+        }
+
         if (IsValidCell(hoveredCell))
         {
-            Handles.color = new Color(1f, 1f, 0f, 0.28f);
+            Handles.color = _pickingSpawn
+                ? new Color(1f, 0.65f, 0f, 0.45f)
+                : new Color(1f, 1f, 0f, 0.28f);
             DrawCellQuad(hoveredCell, Y);
         }
 
@@ -442,10 +525,31 @@ public class RcLevelEditorProxyEditor : Editor
 
         if (e.alt) return;
 
+        if (_pickingSpawn)
+        {
+            HandleSpawnPickInput(e);
+            return;
+        }
+
         if (activeTab == 0)
             HandlePaintInput(e);
         else
             HandleEditInput(e);
+    }
+
+    void HandleSpawnPickInput(Event e)
+    {
+        if (e.button == 0 && e.type == EventType.MouseDown && IsValidCell(hoveredCell))
+        {
+            var ld = proxy.LevelData;
+            Undo.RecordObject(ld, "Set Spawn Position");
+            ld.SpawnGridPosition = hoveredCell;
+            _pickingSpawn = false;
+            EditorUtility.SetDirty(ld);
+            SceneView.RepaintAll();
+            Repaint();
+            e.Use();
+        }
     }
 
     void HandlePaintInput(Event e)
@@ -584,6 +688,7 @@ public class RcLevelEditorProxyEditor : Editor
         int index = cell.y * ld.Width + cell.x;
         ld.Tiles[index] = BuildTileData(tileType, color);
 
+        _validationDirty = true;
         EditorUtility.SetDirty(ld);
         proxy.RefreshTileAt(cell);
         Repaint();
@@ -668,6 +773,96 @@ public class RcLevelEditorProxyEditor : Editor
         EditorUtility.SetDirty(proxy.LevelData);
         AssetDatabase.SaveAssets();
         Debug.Log($"[LevelEditor] '{proxy.LevelData.name}' 저장 완료.");
+    }
+
+    RcLevelValidator.Result GetValidation()
+    {
+        if (_validationDirty || _validationTarget != proxy.LevelData)
+        {
+            _validation       = RcLevelValidator.Validate(proxy.LevelData);
+            _validationTarget = proxy.LevelData;
+            _validationDirty  = false;
+        }
+        return _validation;
+    }
+
+    void DrawStatsSection()
+    {
+        var r = GetValidation();
+
+        EditorGUILayout.LabelField("Stats & Validation", EditorStyles.boldLabel);
+
+        // 타일 / 색상 타일 수
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField($"전체 타일: {r.TotalTiles}", GUILayout.Width(100));
+        EditorGUILayout.LabelField($"색상 타일: {r.TotalColorTiles}");
+        EditorGUILayout.EndHorizontal();
+
+        // 타일 색상별 개수
+        if (r.TileColorCounts != null && r.TileColorCounts.Count > 0)
+        {
+            var prevBg = GUI.backgroundColor;
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Tiles", GUILayout.Width(38));
+            foreach (var kvp in r.TileColorCounts)
+            {
+                GUI.backgroundColor = GetSwatchColor(kvp.Key);
+                GUILayout.Label($"{kvp.Key.ToString()[0]}: {kvp.Value}",
+                    EditorStyles.helpBox, GUILayout.ExpandWidth(false), GUILayout.Height(18));
+            }
+            GUI.backgroundColor = prevBg;
+            EditorGUILayout.EndHorizontal();
+        }
+
+        // 다이스 색상별 개수
+        if (r.DiceColorCounts != null && r.DiceColorCounts.Count > 0)
+        {
+            var prevBg = GUI.backgroundColor;
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Dice", GUILayout.Width(38));
+            foreach (var kvp in r.DiceColorCounts)
+            {
+                GUI.backgroundColor = GetSwatchColor(kvp.Key);
+                GUILayout.Label($"{kvp.Key.ToString()[0]}: {kvp.Value}",
+                    EditorStyles.helpBox, GUILayout.ExpandWidth(false), GUILayout.Height(18));
+            }
+            GUI.backgroundColor = prevBg;
+            EditorGUILayout.EndHorizontal();
+        }
+
+        EditorGUILayout.Space(2);
+
+        // 에러 / 정보
+        if (r.Errors != null)
+            foreach (var e in r.Errors)
+                EditorGUILayout.HelpBox(e, MessageType.Error);
+
+        if (r.Infos != null)
+            foreach (var info in r.Infos)
+                EditorGUILayout.HelpBox(info, MessageType.Info);
+
+        // 시뮬레이션 결과
+        if (r.SolveRate >= 0)
+        {
+            string msg;
+            MessageType mt;
+            if (r.SolveRate == 100)
+            {
+                msg = $"Solve {r.SolveRate}%  ✓";
+                mt  = MessageType.Info;
+            }
+            else if (r.SolveRate > 0)
+            {
+                msg = $"Solve {r.SolveRate}%  (Best {r.BestClearRate}%)";
+                mt  = r.SolveRate >= 30 ? MessageType.Info : MessageType.Warning;
+            }
+            else
+            {
+                msg = $"Solve 0%  —  Best {r.BestClearRate}%";
+                mt  = MessageType.Error;
+            }
+            EditorGUILayout.HelpBox(msg, mt);
+        }
     }
 
     static Color GetSwatchColor(RcColorType color)
