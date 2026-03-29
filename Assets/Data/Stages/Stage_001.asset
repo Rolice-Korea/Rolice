@@ -21,15 +21,7 @@ MonoBehaviour:
   Height: 3
   Tiles:
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 2
-    StoneMaxHits: 1
-    TeleportTargetGrid: {x: 0, y: 0}
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 1
-    StoneMaxHits: 1
-    TeleportTargetGrid: {x: 0, y: 0}
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 1
+    colorType: 6
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
@@ -37,7 +29,7 @@ MonoBehaviour:
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 1
+    colorType: 6
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
@@ -45,19 +37,27 @@ MonoBehaviour:
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 1
+    colorType: 6
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 1
+    colorType: 6
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
     colorType: 2
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
-  SpawnGridPosition: {x: 1, y: 0}
-  InitialDiceFaces: 010000000200000001000000020000000100000002000000
+  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+    colorType: 2
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+    colorType: 6
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  SpawnGridPosition: {x: 0, y: 1}
+  InitialDiceFaces: 060000000200000006000000020000000600000002000000
   Rules:
     HasTurnLimit: 1
-    MaxTurns: 14
+    MaxTurns: 18

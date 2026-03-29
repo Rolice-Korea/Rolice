@@ -592,8 +592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29969eb81c46cf64a90db2f6c62ca452, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rolice.UI.RcGameHudPanel
-  turnText: {fileID: 5359883065570499321}
-  animatorGameOver: {fileID: 1448597262149683689}
+  moveCountText: {fileID: 5359883065570499321}
   pauseButton: {fileID: 7839887957881965777}
   swipeArea: {fileID: 501242692094759072}
   rotateLeftButton: {fileID: 5756798796354642103}
