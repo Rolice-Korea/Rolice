@@ -32,7 +32,7 @@ namespace Rolice.UI
         private void PopulateConditions(int moveCountThreshold, float timeThreshold)
         {
             // Row 0 (★★★): 시간 조건
-            string timeText = timeThreshold > 0f ? $"{timeThreshold:0}SEC" : "-";
+            string timeText = timeThreshold > 0f ? $"{timeThreshold:0} SEC" : "-";
             Panel.SetConditionRow(0, 3, timeText);
 
             // Row 1 (★★☆): 횟수 조건
