@@ -9,6 +9,9 @@ namespace Rolice.UI
         [Header("Move Count")]
         [SerializeField] private TMP_Text moveCountText;
 
+        [Header("Timer")]
+        [SerializeField] private TMP_Text timerText;
+
         [Header("Pause")]
         [SerializeField] private RcButton pauseButton;
 
@@ -35,6 +38,18 @@ namespace Rolice.UI
         {
             presenter?.Unbind();
             presenter = null;
+        }
+
+        private void Update()
+        {
+            if (timerText == null) return;
+            var mgr = RcGameRuleManager.Instance;
+            if (mgr == null || !mgr.IsInitialized) return;
+
+            float t = mgr.ElapsedTime;
+            int minutes = (int)(t / 60f);
+            int seconds = (int)(t % 60f);
+            timerText.text = $"{minutes:D2}:{seconds:D2}";
         }
 
         public void SetMoveCount(int count)

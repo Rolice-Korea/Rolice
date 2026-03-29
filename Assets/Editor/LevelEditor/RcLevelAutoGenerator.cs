@@ -95,8 +95,8 @@ public static class RcLevelAutoGenerator
         levelData.Rules.MaxTurns     = maxTurns;
 
         levelData.StageInfo ??= new Rolice.Data.RcStageInfo();
-        int star2 = Mathf.Max(tileCount + 2, Mathf.RoundToInt(tileCount * 1.25f) + 1);
-        levelData.StageInfo.MoveCountThreshold = star2;
+        levelData.StageInfo.MoveCountThreshold = tileCount * 3;          // ★2: 타일수 × 3회 이하
+        levelData.StageInfo.TimeThreshold      = tileCount * 5f;         // ★3: 타일수 × 5초 이하
 
         // ① 실제 타일에 사용된 색 기반으로 다이스 면 최종 확정
         var tileColors = levelData.Tiles
