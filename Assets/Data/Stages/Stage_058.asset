@@ -15,8 +15,8 @@ MonoBehaviour:
   StageInfo:
     StageNumber: 58
     DisplayName: STAGE 58
-    MoveCountThreshold: 36
-    TimeThreshold: 60
+    MoveCountThreshold: 48
+    TimeThreshold: 72
   Width: 4
   Height: 4
   Tiles:
@@ -25,11 +25,11 @@ MonoBehaviour:
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 6
+    colorType: 5
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 5
+    colorType: 1
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 0}
@@ -37,7 +37,11 @@ MonoBehaviour:
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 4
+    colorType: 6
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+    colorType: 5
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
@@ -45,7 +49,15 @@ MonoBehaviour:
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 1
+    colorType: 3
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+    colorType: 2
+    StoneMaxHits: 1
+    TeleportTargetGrid: {x: 0, y: 0}
+  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
+    colorType: 3
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
@@ -54,18 +66,6 @@ MonoBehaviour:
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
     colorType: 1
-    StoneMaxHits: 1
-    TeleportTargetGrid: {x: 0, y: 0}
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 4
-    StoneMaxHits: 1
-    TeleportTargetGrid: {x: 0, y: 0}
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 1
-    StoneMaxHits: 1
-    TeleportTargetGrid: {x: 0, y: 0}
-  - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 2
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 0}
@@ -77,7 +77,7 @@ MonoBehaviour:
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 11400000, guid: 401b3205fb0842f49b2f8f10d6f991b0, type: 2}
-    colorType: 5
+    colorType: 1
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   - TileType: {fileID: 0}
@@ -85,7 +85,7 @@ MonoBehaviour:
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   SpawnGridPosition: {x: 1, y: 0}
-  InitialDiceFaces: 060000000500000004000000020000000100000006000000
+  InitialDiceFaces: 050000000100000006000000020000000300000005000000
   Rules:
     HasTurnLimit: 1
     MaxTurns: 19
