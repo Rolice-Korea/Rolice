@@ -77,13 +77,9 @@ public static class RcLevelAutoGenerator
         levelData.Rules.HasTurnLimit = true;
         levelData.Rules.MaxTurns     = maxTurns;
 
-        // 반드시 오름차순 — CalculateStars가 순서 의존
         levelData.StageInfo ??= new Rolice.Data.RcStageInfo();
-        levelData.StageInfo.MaxStars = 3;
-        int star3 = tileCount + 1;
-        int star2 = Mathf.Max(star3 + 1, Mathf.RoundToInt(tileCount * 1.25f) + 1);
-        int star1 = Mathf.Max(star2 + 1, maxTurns - 1);
-        levelData.StageInfo.StarThresholds = new[] { star3, star2, star1 };
+        int star2 = Mathf.Max(tileCount + 2, Mathf.RoundToInt(tileCount * 1.25f) + 1);
+        levelData.StageInfo.MoveCountThreshold = star2;
 
         // 다이스 초기 면 — ColorCount 내에서만 순환 할당
         if (levelData.InitialDiceFaces == null || levelData.InitialDiceFaces.Length != 6)

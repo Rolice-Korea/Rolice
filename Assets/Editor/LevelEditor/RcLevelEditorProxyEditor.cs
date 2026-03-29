@@ -203,14 +203,13 @@ public class RcLevelEditorProxyEditor : Editor
     void DrawStarsSection()
     {
         var info = proxy.LevelData.StageInfo;
-        if (info?.StarThresholds == null || info.StarThresholds.Length == 0) return;
+        if (info == null) return;
 
-        EditorGUILayout.LabelField("Stars (턴 이하면 획득)", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Stars", EditorStyles.boldLabel);
 
         EditorGUI.BeginChangeCheck();
-        string[] labels = { "★★★  ≤", "★★  ≤", "★  ≤" };
-        for (int i = 0; i < Mathf.Min(info.StarThresholds.Length, labels.Length); i++)
-            info.StarThresholds[i] = EditorGUILayout.IntField(labels[i], info.StarThresholds[i]);
+        info.MoveCountThreshold = EditorGUILayout.IntField("★★  이동 ≤ (0=비활성)", info.MoveCountThreshold);
+        info.TimeThreshold      = EditorGUILayout.FloatField("★★★  시간 ≤ (0=비활성)", info.TimeThreshold);
         if (EditorGUI.EndChangeCheck())
             EditorUtility.SetDirty(proxy.LevelData);
     }
