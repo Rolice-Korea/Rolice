@@ -56,11 +56,28 @@ public static class RcLevelAutoGenerator
         for (int i = 0; i < active.Length; i++)
             if (active[i]) actives.Add(i);
 
-        // 스폰 위치: 활성 타일 중 랜덤 선택
-        if (actives.Count > 0)
+        // ③ actives가 비어있으면 중앙 셀로 폴백
+        if (actives.Count == 0)
+        {
+            int fallback = (levelData.Height / 2) * levelData.Width + (levelData.Width / 2);
+            actives.Add(fallback);
+        }
+
+        // 스폰 위치: 활성 타일 중 랜덤 선택 (항상 갱신 보장)
         {
             int spawnIdx = actives[rng.Next(actives.Count)];
             levelData.SpawnGridPosition = new Vector2Int(spawnIdx % levelData.Width, spawnIdx / levelData.Width);
+        }
+
+        // ② Hybrid 역산 전에 다이스 초기 면을 먼저 임시 설정 (랜덤 색풀 기반)
+        if (levelData.InitialDiceFaces == null || levelData.InitialDiceFaces.Length != 6)
+            levelData.InitialDiceFaces = new RcColorType[6];
+        {
+            int clampedColorCount = Mathf.Clamp(p.ColorCount, 1, AllColors.Length);
+            var tempPool = AllColors.ToList();
+            Shuffle(tempPool, rng);
+            for (int i = 0; i < 6; i++)
+                levelData.InitialDiceFaces[i] = tempPool[i % clampedColorCount];
         }
 
         // Hybrid: 핵심 구간 먼저 역방향 설계
@@ -81,12 +98,20 @@ public static class RcLevelAutoGenerator
         int star2 = Mathf.Max(tileCount + 2, Mathf.RoundToInt(tileCount * 1.25f) + 1);
         levelData.StageInfo.MoveCountThreshold = star2;
 
-        // 다이스 초기 면 — ColorCount 내에서만 순환 할당
-        if (levelData.InitialDiceFaces == null || levelData.InitialDiceFaces.Length != 6)
-            levelData.InitialDiceFaces = new RcColorType[6];
-        int clampedColorCount = Mathf.Clamp(p.ColorCount, 1, AllColors.Length);
-        for (int i = 0; i < 6; i++)
-            levelData.InitialDiceFaces[i] = AllColors[i % clampedColorCount];
+        // ① 실제 타일에 사용된 색 기반으로 다이스 면 최종 확정
+        var tileColors = levelData.Tiles
+            .Where(t => t != null && t.colorType != RcColorType.None)
+            .Select(t => t.colorType)
+            .Distinct()
+            .ToList();
+
+        if (tileColors.Count > 0)
+        {
+            // 6면에 tileColors를 순환 배치 — 모든 타일 색이 최소 1면에 존재
+            for (int i = 0; i < 6; i++)
+                levelData.InitialDiceFaces[i] = tileColors[i % tileColors.Count];
+        }
+        // tileColors가 비어있으면 임시 설정값 유지
 
         return seed;
     }
@@ -99,15 +124,17 @@ public static class RcLevelAutoGenerator
         bool[]    mask       = GetShapeMask(p.Shape, w, h);
         List<int> maskCells  = Enumerable.Range(0, w * h).Where(i => mask[i]).ToList();
 
-        int targetCount = Mathf.RoundToInt(maskCells.Count * Mathf.Clamp(p.FillRatio, 0.1f, 1f));
-        targetCount = Mathf.Clamp(targetCount, p.ColorCount, maskCells.Count);
+        // ⑤ maskCells가 ColorCount보다 적을 수 있으므로 min을 maskCells.Count로 제한
+        int safeColorCount = Mathf.Min(p.ColorCount, Mathf.Max(1, maskCells.Count));
+        int targetCount    = Mathf.RoundToInt(maskCells.Count * Mathf.Clamp(p.FillRatio, 0.1f, 1f));
+        targetCount        = Mathf.Clamp(targetCount, safeColorCount, maskCells.Count);
 
         return p.Preset switch
         {
             Preset.Full    => GenerateFull(rng, w, h, targetCount, maskCells),
-            Preset.Path    => GeneratePath(rng, w, h, targetCount, mask),
-            Preset.Cluster => GenerateCluster(rng, w, h, targetCount, p.ColorCount, mask),
-            Preset.Hybrid  => GeneratePath(rng, w, h, targetCount, mask),
+            Preset.Path    => GeneratePath(rng, w, h, targetCount, mask, p.FillRatio >= 1f),
+            Preset.Cluster => GenerateCluster(rng, w, h, targetCount, safeColorCount, mask),
+            Preset.Hybrid  => GeneratePath(rng, w, h, targetCount, mask, p.FillRatio >= 1f),
             _              => GenerateFull(rng, w, h, targetCount, maskCells),
         };
     }
@@ -158,11 +185,18 @@ public static class RcLevelAutoGenerator
         return active;
     }
 
-    private static bool[] GeneratePath(System.Random rng, int w, int h, int target, bool[] mask)
+    private static bool[] GeneratePath(System.Random rng, int w, int h, int target, bool[] mask, bool fillAll = false)
     {
         bool[] active   = new bool[w * h];
         var    maskList = Enumerable.Range(0, w * h).Where(i => mask[i]).ToList();
         if (maskList.Count == 0) return active;
+
+        // ④ fillAll=true이면 모든 마스크 셀을 활성화 (FillRatio=1 보장)
+        if (fillAll)
+        {
+            foreach (var idx in maskList) active[idx] = true;
+            return active;
+        }
 
         int    cur     = maskList[rng.Next(maskList.Count)];
         active[cur]    = true;
@@ -364,7 +398,9 @@ public static class RcLevelAutoGenerator
         RcTileTypeSO tileType, System.Random rng)
     {
         colorCount = Mathf.Clamp(colorCount, 1, AllColors.Length);
-        var usedColors = AllColors.Take(colorCount).ToArray();
+        var colorPool = AllColors.ToList();
+        Shuffle(colorPool, rng);
+        var usedColors = colorPool.Take(colorCount).ToArray();
 
         var shuffled = cells.ToList();
         Shuffle(shuffled, rng);
@@ -402,5 +438,57 @@ public static class RcLevelAutoGenerator
             int j = rng.Next(i + 1);
             (list[i], list[j]) = (list[j], list[i]);
         }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Scaled Params (stage 1 → 100 난이도 자동 스케일)
+
+    public static GenParams BuildScaledParams(int stageNumber, System.Random rng, int minGrid = 3, int maxGrid = 8)
+    {
+        float t = Mathf.Clamp01((stageNumber - 1) / 99f);
+
+        var p = new GenParams();
+
+        // 그리드: minGrid → maxGrid
+        int size  = Mathf.RoundToInt(Mathf.Lerp(minGrid, maxGrid, t));
+        p.Width   = size;
+        p.Height  = size;
+
+        // 색 수: 2 → 6
+        p.ColorCount = Mathf.Clamp(Mathf.RoundToInt(Mathf.Lerp(2f, 6f, t)), 2, 6);
+
+        // 밀도: 100% 고정
+        p.FillRatio = 1f;
+
+        // 턴 여유: 2.0 → 1.4 (후반일수록 타이트)
+        p.TurnMultiplier = Mathf.Lerp(2.0f, 1.4f, t);
+
+        // Preset 랜덤 (초반은 Full 비중 높게)
+        float roll = (float)rng.NextDouble();
+        if (t < 0.2f)
+            p.Preset = roll < 0.7f ? Preset.Full : Preset.Path;
+        else if (t < 0.5f)
+            p.Preset = roll < 0.4f ? Preset.Full : (roll < 0.7f ? Preset.Path : Preset.Cluster);
+        else
+        {
+            var presets = (Preset[])System.Enum.GetValues(typeof(Preset));
+            p.Preset = presets[rng.Next(presets.Length)];
+        }
+
+        // Shape 랜덤 (초반은 Rectangle 고정)
+        if (t < 0.15f)
+            p.Shape = ShapePreset.Rectangle;
+        else
+        {
+            var shapes = (ShapePreset[])System.Enum.GetValues(typeof(ShapePreset));
+            p.Shape = shapes[rng.Next(shapes.Length)];
+        }
+
+        // Hybrid 전용
+        p.CriticalSegmentLength = Mathf.Clamp(Mathf.RoundToInt(Mathf.Lerp(3f, 7f, t)), 3, 8);
+        p.CriticalSegmentCount  = 1;
+
+        p.Seed = -1;
+        return p;
     }
 }

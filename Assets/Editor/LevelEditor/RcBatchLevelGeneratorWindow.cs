@@ -19,6 +19,10 @@ public class RcBatchLevelGeneratorWindow : EditorWindow
     private RcTileTypeSO[]                 _allTileTypes;
     private RcTileTypeSO                   _colorTileType;
 
+    // 스케일 생성 전용
+    private int _scaledMinGrid = 3;
+    private int _scaledMaxGrid = 8;
+
     // 결과 리포트
     private struct StageReport
     {
@@ -116,6 +120,20 @@ public class RcBatchLevelGeneratorWindow : EditorWindow
         if (GUILayout.Button($"Generate  {_fromStage} ~ {_toStage}  ({_toStage - _fromStage + 1}개)", GUILayout.Height(36)))
             RunBatch(GetStageRange(_fromStage, _toStage));
 
+        EditorGUILayout.Space(8);
+        EditorGUILayout.LabelField("Scaled Generate (1 ~ 100)", EditorStyles.boldLabel);
+
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Grid Min", GUILayout.Width(60));
+        _scaledMinGrid = Mathf.Clamp(EditorGUILayout.IntField(_scaledMinGrid, GUILayout.Width(40)), 2, 12);
+        EditorGUILayout.LabelField("Max", GUILayout.Width(30));
+        _scaledMaxGrid = Mathf.Clamp(EditorGUILayout.IntField(_scaledMaxGrid, GUILayout.Width(40)), _scaledMinGrid, 12);
+        EditorGUILayout.EndHorizontal();
+
+        GUI.backgroundColor = new Color(0.4f, 0.7f, 1.0f);
+        if (GUILayout.Button("Generate 1 ~ 100  (난이도 자동 스케일 + 랜덤 패턴)", GUILayout.Height(36)))
+            RunScaledBatch();
+
         // 실패 스테이지가 있으면 재생성 버튼 표시
         var failedStages = GetFailedStages();
         if (failedStages != null && failedStages.Count > 0)
@@ -204,6 +222,80 @@ public class RcBatchLevelGeneratorWindow : EditorWindow
             int okCount   = _lastReport.Count(r => r.Ok);
             int failCount = _lastReport.Count(r => !r.Ok);
             Debug.Log($"[BatchGenerator] {created}개 생성. OK {okCount} / Fail {failCount}");
+        }
+        finally
+        {
+            EditorUtility.ClearProgressBar();
+            Repaint();
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    private void RunScaledBatch()
+    {
+        var stageNumbers = GetStageRange(1, 100);
+        var scaledRng    = new System.Random();
+
+        if (!Directory.Exists(_outputFolder))
+            Directory.CreateDirectory(_outputFolder);
+
+        int maxStage = 100;
+        if (_database.Stages == null || _database.Stages.Length < maxStage)
+        {
+            var expanded = new RcLevelDataSO[maxStage];
+            if (_database.Stages != null)
+                _database.Stages.CopyTo(expanded, 0);
+            _database.Stages = expanded;
+        }
+
+        if (_lastReport == null) _lastReport = new List<StageReport>();
+        _lastReport.Clear();
+
+        try
+        {
+            for (int i = 0; i < stageNumbers.Count; i++)
+            {
+                int stageNumber = stageNumbers[i];
+
+                EditorUtility.DisplayProgressBar(
+                    "Scaled Batch Generator",
+                    $"생성 중: Stage {stageNumber}  (난이도 스케일)",
+                    (float)i / stageNumbers.Count);
+
+                string path = $"{_outputFolder}/Stage_{stageNumber:D3}.asset";
+
+                var ld = AssetDatabase.LoadAssetAtPath<RcLevelDataSO>(path);
+                if (ld == null)
+                {
+                    ld = CreateInstance<RcLevelDataSO>();
+                    AssetDatabase.CreateAsset(ld, path);
+                }
+
+                var p = RcLevelAutoGenerator.BuildScaledParams(stageNumber, scaledRng, _scaledMinGrid, _scaledMaxGrid);
+                RcLevelAutoGenerator.Generate(ld, p, _colorTileType);
+                ld.StageInfo.StageNumber = stageNumber;
+                ld.StageInfo.DisplayName = $"STAGE {stageNumber}";
+
+                EditorUtility.SetDirty(ld);
+                _database.Stages[stageNumber - 1] = ld;
+
+                var validation = RcLevelValidator.Validate(ld);
+                _lastReport.Add(new StageReport
+                {
+                    StageNumber = stageNumber,
+                    Ok          = validation.IsValid,
+                    Error       = validation.Errors.Count > 0 ? validation.Errors[0] : "",
+                    SolveRate   = validation.SolveRate,
+                });
+            }
+
+            EditorUtility.SetDirty(_database);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            int okCount   = _lastReport.Count(r => r.Ok);
+            int failCount = _lastReport.Count(r => !r.Ok);
+            Debug.Log($"[ScaledBatch] 100개 생성. OK {okCount} / Fail {failCount}");
         }
         finally
         {
