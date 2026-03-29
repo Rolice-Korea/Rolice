@@ -6,13 +6,13 @@ namespace Rolice.UI
 {
     public class RcPausePanel : RcUIPanel
     {
-        [Header("Current Turn")]
+        [Header("Current Move")]
         [SerializeField] private TMP_Text currentTurnText;
 
         [Header("Star Rows")]
-        // 인덱스 0 = ★★★, 1 = ★★☆, 2 = ★☆☆
+        // 인덱스 0 = ★★★(시간), 1 = ★★☆(횟수), 2 = ★☆☆(클리어)
         [SerializeField] private CanvasGroup[] starRowGroups;
-        [SerializeField] private TMP_Text[] starThresholdTexts;
+        [SerializeField] private TMP_Text[]    starThresholdTexts;
 
         [Header("Buttons")]
         [SerializeField] private RcButton retryButton;
@@ -40,57 +40,42 @@ namespace Rolice.UI
             presenter = null;
         }
 
-        public void SetCurrentTurn(int turn)
+        public void SetCurrentMove(int moveCount)
         {
             if (currentTurnText != null)
-                currentTurnText.text = $"{turn} TURN";
+                currentTurnText.text = $"{moveCount} MOVE";
         }
 
-        // thresholds[0] = ★★★ 기준턴, thresholds[1] = ★★☆ 기준턴, ★☆☆는 항상 "클리어"
-        public void SetStarConditions(int[] thresholds)
+        // Row 0 (★★★): 시간 조건 / Row 1 (★★☆): 횟수 조건 / Row 2 (★☆☆): CLEAR
+        public void SetStarConditions(int moveCountThreshold, float timeThreshold)
         {
             if (starThresholdTexts == null) return;
 
-            for (int i = 0; i < starThresholdTexts.Length; i++)
-            {
-                if (starThresholdTexts[i] == null) continue;
+            if (starThresholdTexts.Length > 0 && starThresholdTexts[0] != null)
+                starThresholdTexts[0].text = timeThreshold > 0f ? $"{timeThreshold:0}SEC" : "-";
 
-                if (i < 2)
-                {
-                    starThresholdTexts[i].text = (thresholds != null && i < thresholds.Length)
-                        ? $"{thresholds[i]}TURN"
-                        : "-";
-                }
-                else
-                {
-                    starThresholdTexts[i].text = "CLEAR";
-                }
-            }
+            if (starThresholdTexts.Length > 1 && starThresholdTexts[1] != null)
+                starThresholdTexts[1].text = moveCountThreshold > 0 ? $"{moveCountThreshold} MOVES" : "-";
+
+            if (starThresholdTexts.Length > 2 && starThresholdTexts[2] != null)
+                starThresholdTexts[2].text = "CLEAR";
         }
 
-        // 현재 턴 기준으로 달성 가능한 별 행을 밝게, 나머지는 어둡게
-        public void RefreshStarHighlights(int currentTurn, int[] thresholds)
+        public void RefreshStarHighlights(int currentMove, float elapsedTime, int moveCountThreshold, float timeThreshold)
         {
             if (starRowGroups == null) return;
 
-            for (int i = 0; i < starRowGroups.Length; i++)
-            {
-                if (starRowGroups[i] == null) continue;
+            // Row 0: 시간 조건
+            if (starRowGroups.Length > 0 && starRowGroups[0] != null)
+                starRowGroups[0].alpha = (timeThreshold > 0f && elapsedTime <= timeThreshold) ? ActiveAlpha : DimAlpha;
 
-                bool achievable;
-                if (i < 2)
-                {
-                    achievable = thresholds != null && i < thresholds.Length
-                        && currentTurn <= thresholds[i];
-                }
-                else
-                {
-                    // ★☆☆: 클리어만 하면 항상 달성 가능
-                    achievable = true;
-                }
+            // Row 1: 횟수 조건
+            if (starRowGroups.Length > 1 && starRowGroups[1] != null)
+                starRowGroups[1].alpha = (moveCountThreshold > 0 && currentMove <= moveCountThreshold) ? ActiveAlpha : DimAlpha;
 
-                starRowGroups[i].alpha = achievable ? ActiveAlpha : DimAlpha;
-            }
+            // Row 2: 클리어 — 항상 달성 가능
+            if (starRowGroups.Length > 2 && starRowGroups[2] != null)
+                starRowGroups[2].alpha = ActiveAlpha;
         }
     }
 }

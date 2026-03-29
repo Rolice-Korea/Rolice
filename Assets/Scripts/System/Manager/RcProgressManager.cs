@@ -39,7 +39,7 @@ public class RcProgressManager : RcSingleton<RcProgressManager>
         return PlayerData.GetProgress(stageNumber);
     }
 
-    public void RecordStageClear(int stageNumber, int turnCount)
+    public void RecordStageClear(int stageNumber, int moveCount, float elapsedTime)
     {
         var levelData = stageDatabase.GetStage(stageNumber);
         if (levelData == null)
@@ -48,9 +48,9 @@ public class RcProgressManager : RcSingleton<RcProgressManager>
             return;
         }
 
-        int stars    = levelData.StageInfo.CalculateStars(turnCount);
+        int stars    = levelData.StageInfo.CalculateStars(moveCount, elapsedTime);
         var progress = PlayerData.GetProgress(stageNumber);
-        progress.UpdateClear(turnCount, stars);
+        progress.UpdateClear(moveCount, elapsedTime, stars);
 
         RcPlayerState.Instance.Save();
         RcPlayerState.Instance.NotifyChanged();

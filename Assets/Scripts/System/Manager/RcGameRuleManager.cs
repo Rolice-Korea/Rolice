@@ -6,11 +6,14 @@ public class RcGameRuleManager : RcSingletonMono<RcGameRuleManager>
     private RcLevelRules currentRules;
 
     private int currentTurn;
+    private float elapsedTime;
+    private bool isTimerRunning;
     private bool isGameOver;
     private bool isInitialized;
 
-    public bool IsGameOver => isGameOver;
-    public int CurrentTurn => currentTurn;
+    public bool IsGameOver    => isGameOver;
+    public int  CurrentTurn   => currentTurn;
+    public float ElapsedTime  => elapsedTime;
     public bool IsInitialized => isInitialized;
 
     public void Initialize(RcLevelRules rules)
@@ -21,26 +24,30 @@ public class RcGameRuleManager : RcSingletonMono<RcGameRuleManager>
             return;
         }
 
-        if (!rules.Validate())
-        {
-            Debug.LogError("[GameRuleManager] 잘못된 규칙입니다!");
-            return;
-        }
-
         UnsubscribeEvents();
 
-        currentRules = rules;
-        currentTurn = 0;
-        isGameOver = false;
-        isInitialized = true;
+        currentRules    = rules;
+        currentTurn     = 0;
+        elapsedTime     = 0f;
+        isTimerRunning  = false;
+        isGameOver      = false;
+        isInitialized   = true;
 
         SubscribeEvents();
     }
 
     public void Reset()
     {
-        currentTurn = 0;
-        isGameOver = false;
+        currentTurn    = 0;
+        elapsedTime    = 0f;
+        isTimerRunning = false;
+        isGameOver     = false;
+    }
+
+    private void Update()
+    {
+        if (isTimerRunning)
+            elapsedTime += Time.deltaTime;
     }
 
     public void IncrementTurn()
@@ -51,54 +58,37 @@ public class RcGameRuleManager : RcSingletonMono<RcGameRuleManager>
             return;
         }
 
-        if (isGameOver)
-            return;
+        if (isGameOver) return;
 
         currentTurn++;
         RcGameEvents.Instance.Publish(RcGameEvent.TurnChanged, currentTurn);
-        CheckLoseConditions();
     }
 
     public void CheckWinCondition()
     {
-        if (!isInitialized || isGameOver)
-            return;
+        if (!isInitialized || isGameOver) return;
 
         if (RcLevelManager.Instance.CheckLevelComplete())
             HandleGameWin();
     }
 
-    private void CheckLoseConditions()
-    {
-        if (isGameOver)
-            return;
-
-        if (currentRules.HasTurnLimit && currentTurn >= currentRules.MaxTurns)
-            HandleGameLose();
-    }
-
     private void HandleGameWin()
     {
-        isGameOver = true;
+        isGameOver     = true;
+        isTimerRunning = false;
         RcGameEvents.Instance.Publish(RcGameEvent.GameWin);
-    }
-
-    private void HandleGameLose()
-    {
-        isGameOver = true;
-        RcGameEvents.Instance.Publish(RcGameEvent.GameLose);
     }
 
     private void SubscribeEvents()
     {
-        RcGameEvents.Instance.Subscribe(RcGameEvent.MoveStarted, OnMoveStarted);
+        RcGameEvents.Instance.Subscribe(RcGameEvent.MoveStarted,   OnMoveStarted);
         RcGameEvents.Instance.Subscribe(RcGameEvent.MoveCompleted, OnMoveCompleted);
         RcGameEvents.Instance.Subscribe(RcGameEvent.LevelCompleted, OnLevelCompleted);
     }
 
     private void UnsubscribeEvents()
     {
-        RcGameEvents.Instance.Unsubscribe(RcGameEvent.MoveStarted, OnMoveStarted);
+        RcGameEvents.Instance.Unsubscribe(RcGameEvent.MoveStarted,   OnMoveStarted);
         RcGameEvents.Instance.Unsubscribe(RcGameEvent.MoveCompleted, OnMoveCompleted);
         RcGameEvents.Instance.Unsubscribe(RcGameEvent.LevelCompleted, OnLevelCompleted);
     }
@@ -111,6 +101,11 @@ public class RcGameRuleManager : RcSingletonMono<RcGameRuleManager>
     private void OnMoveStarted(Vector2Int pos)
     {
         if (!isInitialized || isGameOver) return;
+
+        // 첫 이동 시 타이머 시작
+        if (!isTimerRunning)
+            isTimerRunning = true;
+
         IncrementTurn();
     }
 
@@ -123,17 +118,5 @@ public class RcGameRuleManager : RcSingletonMono<RcGameRuleManager>
     private void OnLevelCompleted()
     {
         CheckWinCondition();
-    }
-
-    public int GetRemainingTurns()
-    {
-        if (!currentRules.HasTurnLimit) return -1;
-        return Mathf.Max(0, currentRules.MaxTurns - currentTurn);
-    }
-
-    public float GetTurnProgress()
-    {
-        if (!currentRules.HasTurnLimit) return 0f;
-        return (float)currentTurn / currentRules.MaxTurns;
     }
 }

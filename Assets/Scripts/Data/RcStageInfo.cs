@@ -12,43 +12,32 @@ namespace Rolice.Data
         [Tooltip("스테이지 표시 이름 (비어있으면 번호 사용)")]
         public string DisplayName;
 
-        [Tooltip("최대 별 개수")]
-        public int MaxStars = 3;
+        [Header("Star Conditions")]
+        [Tooltip("별 2: 이 횟수 이하로 클리어 시 획득 (0 = 비활성)")]
+        public int MoveCountThreshold = 0;
 
-        [Tooltip("별 획득 기준 턴 수 (3성, 2성, 1성 순서)")]
-        public int[] StarThresholds = { 10, 15, 20 };
+        [Tooltip("별 3: 이 시간(초) 이하로 클리어 시 획득 (0 = 비활성)")]
+        public float TimeThreshold = 0f;
 
         public string GetDisplayName()
         {
             return string.IsNullOrEmpty(DisplayName) ? $"Stage {StageNumber}" : DisplayName;
         }
 
-        public int CalculateStars(int turnCount)
+        // 별 1: 클리어 자체 / 별 2: 횟수 조건 / 별 3: 시간 조건
+        public int CalculateStars(int moveCount, float elapsedTime)
         {
-            if (StarThresholds == null || StarThresholds.Length == 0)
-                return 1;
+            int stars = 1; // 클리어하면 무조건 1성
 
-            for (int i = 0; i < StarThresholds.Length; i++)
-            {
-                if (turnCount <= StarThresholds[i])
-                    return MaxStars - i;
-            }
+            if (MoveCountThreshold > 0 && moveCount <= MoveCountThreshold)
+                stars++;
 
-            return 1;
+            if (TimeThreshold > 0f && elapsedTime <= TimeThreshold)
+                stars++;
+
+            return stars;
         }
 
-        public void Validate()
-        {
-            MaxStars = Mathf.Clamp(MaxStars, 1, 3);
-
-            if (StarThresholds == null || StarThresholds.Length != MaxStars)
-            {
-                StarThresholds = new int[MaxStars];
-                for (int i = 0; i < MaxStars; i++)
-                {
-                    StarThresholds[i] = 10 + (i * 5);
-                }
-            }
-        }
+        public void Validate() { }
     }
 }

@@ -6,9 +6,11 @@ namespace Rolice.UI
 {
     public class RcGameHudPanel : RcUIPanel
     {
-        [Header("Turn")]
-        [SerializeField] private TMP_Text turnText;
-        [SerializeField] private RcTweenAnimator animatorGameOver;
+        [Header("Move Count")]
+        [SerializeField] private TMP_Text moveCountText;
+
+        [Header("Timer")]
+        [SerializeField] private TMP_Text timerText;
 
         [Header("Pause")]
         [SerializeField] private RcButton pauseButton;
@@ -20,9 +22,9 @@ namespace Rolice.UI
         [SerializeField] private RcButton rotateLeftButton;
         [SerializeField] private RcButton rotateRightButton;
 
-        public RcSwipeArea SwipeArea => swipeArea;
-        public RcButton RotateLeftButton => rotateLeftButton;
-        public RcButton RotateRightButton => rotateRightButton;
+        public RcSwipeArea SwipeArea        => swipeArea;
+        public RcButton    RotateLeftButton  => rotateLeftButton;
+        public RcButton    RotateRightButton => rotateRightButton;
 
         private RcGameHudPresenter presenter;
 
@@ -38,25 +40,22 @@ namespace Rolice.UI
             presenter = null;
         }
 
-        public void SetRemainingTurns(int remaining)
+        private void Update()
         {
-            if (turnText == null) return;
+            if (timerText == null) return;
+            var mgr = RcGameRuleManager.Instance;
+            if (mgr == null || !mgr.IsInitialized) return;
 
-            turnText.text = $"{remaining}";
+            float t = mgr.ElapsedTime;
+            int minutes = (int)(t / 60f);
+            int seconds = (int)(t % 60f);
+            timerText.text = $"{minutes:D2}:{seconds:D2}";
         }
 
-        public void PlayGameOverAnimation()
+        public void SetMoveCount(int count)
         {
-            if (animatorGameOver != null && !animatorGameOver.IsPlaying())
-            {
-                animatorGameOver.OnComplete = OnGameOverAnimationComplete;
-                animatorGameOver.Play("GameOver");
-            }
-        }
-
-        private void OnGameOverAnimationComplete()
-        {
-            RcGameResultManager.Instance.ShowGameOverResult();
+            if (moveCountText != null)
+                moveCountText.text = $"{count}";
         }
     }
 }
