@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Rolice;
+using Rolice.System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,11 +11,13 @@ namespace Engine.UI
         private readonly Transform root;
         private Camera camera;
         private readonly Dictionary<RcUILayer, Canvas> canvases = new();
+        private readonly List<CanvasScaler> scalers = new();
 
         public RcUICanvasLayer(Transform root, Camera camera = null)
         {
             this.root = root;
             this.camera = camera;
+            RcScreenOrientationApplier.OnModeApplied += OnOrientationChanged;
         }
 
         public void UpdateCamera(Camera camera)
@@ -69,8 +73,8 @@ namespace Engine.UI
 
             var scaler = go.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920, 1080);
-            scaler.matchWidthOrHeight = 0.5f;
+            ApplyScalerForCurrentOrientation(scaler);
+            scalers.Add(scaler);
 
             go.AddComponent<GraphicRaycaster>();
             go.AddComponent<CanvasGroup>();
@@ -89,8 +93,42 @@ namespace Engine.UI
             }
         }
 
+        private void OnOrientationChanged(RcScreenMode mode)
+        {
+            foreach (var scaler in scalers)
+            {
+                if (scaler != null)
+                    ApplyScalerForMode(scaler, mode);
+            }
+        }
+
+        private static void ApplyScalerForCurrentOrientation(CanvasScaler scaler)
+        {
+            bool isPortrait = Screen.height > Screen.width;
+            ApplyScalerForMode(scaler, isPortrait ? RcScreenMode.Portrait : RcScreenMode.Landscape);
+        }
+
+        private static void ApplyScalerForMode(CanvasScaler scaler, RcScreenMode mode)
+        {
+            if (mode == RcScreenMode.Portrait)
+            {
+                // 세로: 너비 기준으로 스케일 → 캔버스 너비 = 1080 고정
+                scaler.referenceResolution = new Vector2(1080, 1920);
+                scaler.matchWidthOrHeight = 0f;
+            }
+            else
+            {
+                // 가로: 높이 기준으로 스케일 → 캔버스 높이 = 1080 고정
+                scaler.referenceResolution = new Vector2(1920, 1080);
+                scaler.matchWidthOrHeight = 1f;
+            }
+        }
+
         public void Dispose()
         {
+            RcScreenOrientationApplier.OnModeApplied -= OnOrientationChanged;
+            scalers.Clear();
+
             foreach (var kvp in canvases)
             {
                 if (kvp.Value != null)

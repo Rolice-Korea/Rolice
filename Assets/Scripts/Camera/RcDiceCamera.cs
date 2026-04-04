@@ -14,9 +14,12 @@ public class RcDiceCamera : MonoBehaviour
 
     [Header("Target Tracking")]
     [SerializeField] private Transform target;
-    [SerializeField] private float distance = 12f;      // 주사위와의 거리
+    [SerializeField] private float distance = 12f;      // 주사위와의 거리 (가로 기준)
     [SerializeField] private float heightOffset = 0.5f; // 주사위의 중심점 (축)
     [SerializeField] private float rotationSmoothSpeed = 8f;
+
+    // 가로 기준 기준 종횡비 (16:9)
+    private const float ReferenceAspect = 16f / 9f;
 
     [Header("Angles")]
     [SerializeField] private float pitch = 35f;  // 내려다보는 각도
@@ -68,9 +71,12 @@ public class RcDiceCamera : MonoBehaviour
         // 회전 축(Pivot) 위치 계산
         Vector3 pivotPos = target.position + Vector3.up * heightOffset;
 
-        // 회전 방향의 반대(뒤쪽)로 거리만큼 떨어진 위치를 '직접' 계산
-        // 이 방식은 직선으로 이동하지 않고 항상 pivotPos 주위를 원형으로 돕니다.
-        Vector3 position = pivotPos - (rotation * Vector3.forward * distance);
+        // 세로모드에서 종횡비 보정: 화면이 좁아질수록 더 멀리 물러남
+        float currentAspect = (float)Screen.width / Screen.height;
+        float aspectScale = Mathf.Max(1f, ReferenceAspect / currentAspect);
+        float effectiveDistance = distance * aspectScale;
+
+        Vector3 position = pivotPos - (rotation * Vector3.forward * effectiveDistance);
 
         transform.position = position;
         transform.rotation = rotation;
