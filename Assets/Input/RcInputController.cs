@@ -16,7 +16,8 @@ public class RcInputController : MonoBehaviour
         Instance = this;
         inputManager = new RcInputManager(minSwipeDistance);
         inputManager.OnMoveInput += OnMove;
-        inputManager.OnCameraRotateInput += OnCameraRotate;
+        inputManager.OnStartCameraRotate += OnStartCameraRotate;
+        inputManager.OnStopCameraRotate  += OnStopCameraRotate;
         inputManager.Init();
     }
 
@@ -25,7 +26,8 @@ public class RcInputController : MonoBehaviour
         if (inputManager == null) return;
 
         inputManager.OnMoveInput -= OnMove;
-        inputManager.OnCameraRotateInput -= OnCameraRotate;
+        inputManager.OnStartCameraRotate -= OnStartCameraRotate;
+        inputManager.OnStopCameraRotate  -= OnStopCameraRotate;
         inputManager.End();
         inputManager = null;
         if (Instance == this) Instance = null;
@@ -47,11 +49,19 @@ public class RcInputController : MonoBehaviour
         pawn.Move(dir);
     }
 
-    private void OnCameraRotate(int direction)
+    private void OnStartCameraRotate(int direction)
     {
-        RcDiceCamera.Instance?.Rotate(direction);
+        RcDiceCamera.Instance?.StartCameraRotate(direction);
+    }
+
+    private void OnStopCameraRotate()
+    {
+        RcDiceCamera.Instance?.StopCameraRotate();
     }
 
     public void TriggerMove(Vector2Int dir) => inputManager?.TriggerMove(dir);
     public void TriggerRotate(int dir) => inputManager?.TriggerRotate(dir);
+
+    public void StartCameraRotate(int dir) => RcDiceCamera.Instance?.StartCameraRotate(dir);
+    public void StopCameraRotate()         => RcDiceCamera.Instance?.StopCameraRotate();
 }

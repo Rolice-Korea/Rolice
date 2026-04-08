@@ -6,6 +6,8 @@ public class RcInputManager
 {
     public event Action<Vector2Int> OnMoveInput;
     public event Action<int> OnCameraRotateInput;
+    public event Action<int> OnStartCameraRotate;
+    public event Action       OnStopCameraRotate;
 
     private InputAction moveUpAction;
     private InputAction moveDownAction;
@@ -27,8 +29,10 @@ public class RcInputManager
         moveLeftAction.started  += OnMoveLeftStarted;
         moveRightAction.started += OnMoveRightStarted;
 
-        cameraLeftAction.started  += OnCameraLeftStarted;
-        cameraRightAction.started += OnCameraRightStarted;
+        cameraLeftAction.started   += OnCameraLeftStarted;
+        cameraLeftAction.canceled  += OnCameraLeftCanceled;
+        cameraRightAction.started  += OnCameraRightStarted;
+        cameraRightAction.canceled += OnCameraRightCanceled;
 
         moveUpAction.Enable();
         moveDownAction.Enable();
@@ -45,8 +49,10 @@ public class RcInputManager
         moveLeftAction.started  -= OnMoveLeftStarted;
         moveRightAction.started -= OnMoveRightStarted;
 
-        cameraLeftAction.started  -= OnCameraLeftStarted;
-        cameraRightAction.started -= OnCameraRightStarted;
+        cameraLeftAction.started   -= OnCameraLeftStarted;
+        cameraLeftAction.canceled  -= OnCameraLeftCanceled;
+        cameraRightAction.started  -= OnCameraRightStarted;
+        cameraRightAction.canceled -= OnCameraRightCanceled;
 
         moveUpAction.Dispose();
         moveDownAction.Dispose();
@@ -72,8 +78,10 @@ public class RcInputManager
     private void OnMoveLeftStarted(InputAction.CallbackContext _)  => OnMoveInput?.Invoke(Vector2Int.left);
     private void OnMoveRightStarted(InputAction.CallbackContext _) => OnMoveInput?.Invoke(Vector2Int.right);
 
-    private void OnCameraLeftStarted(InputAction.CallbackContext _)  => TriggerRotate(1);
-    private void OnCameraRightStarted(InputAction.CallbackContext _) => TriggerRotate(-1);
+    private void OnCameraLeftStarted(InputAction.CallbackContext _)   => OnStartCameraRotate?.Invoke(1);
+    private void OnCameraLeftCanceled(InputAction.CallbackContext _)  => OnStopCameraRotate?.Invoke();
+    private void OnCameraRightStarted(InputAction.CallbackContext _)  => OnStartCameraRotate?.Invoke(-1);
+    private void OnCameraRightCanceled(InputAction.CallbackContext _) => OnStopCameraRotate?.Invoke();
 
     public void TriggerMove(Vector2Int dir) => OnMoveInput?.Invoke(dir);
     public void TriggerRotate(int dir) => OnCameraRotateInput?.Invoke(dir);

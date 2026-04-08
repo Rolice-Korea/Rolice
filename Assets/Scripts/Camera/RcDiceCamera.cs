@@ -18,6 +18,10 @@ public class RcDiceCamera : MonoBehaviour
     [SerializeField] private float heightOffset = 0.5f; // 주사위의 중심점 (축)
     [SerializeField] private float rotationSmoothSpeed = 8f;
 
+    [Header("Hold Rotation")]
+    [SerializeField] private float rotateSpeed = 90f;
+    private int rotateDirection;
+
     // 가로 기준 기준 종횡비 (16:9)
     private const float ReferenceAspect = 16f / 9f;
 
@@ -56,6 +60,12 @@ public class RcDiceCamera : MonoBehaviour
     {
         if (target == null) return;
 
+        // 홀드 회전 처리
+        if (rotateDirection != 0)
+        {
+            yaw += rotateDirection * rotateSpeed * Time.deltaTime;
+        }
+
         // 1. 수평 각도(Yaw)만 부드럽게 보간
         currentYaw = Mathf.LerpAngle(currentYaw, yaw, Time.deltaTime * rotationSmoothSpeed);
 
@@ -87,22 +97,34 @@ public class RcDiceCamera : MonoBehaviour
         yaw += direction * 90f;
     }
 
+    public void StartCameraRotate(int direction)
+    {
+        rotateDirection = direction;
+    }
+
+    public void StopCameraRotate()
+    {
+        rotateDirection = 0;
+    }
+
     public Vector2Int GetAdjustedDirection(Vector2Int inputDir)
     {
         if (inputDir == Vector2Int.zero) return Vector2Int.zero;
 
-        // 카메라의 현재 yaw 각도만큼 입력을 회전시킵니다.
-        float rad = -yaw * Mathf.Deg2Rad;
+        // 현재 카메라의 실제 각도로 입력 방향을 회전
+        float rad = -currentYaw * Mathf.Deg2Rad;
 
         float cos = Mathf.Cos(rad);
         float sin = Mathf.Sin(rad);
 
-        // 2D 벡터 회전 공식 (Y축 기준 회전이므로 평면상의 회전과 동일)
         float rx = inputDir.x * cos - inputDir.y * sin;
         float ry = inputDir.x * sin + inputDir.y * cos;
 
-        // 회전된 결과를 가장 가까운 정수 축 방향으로 반올림하여 반환합니다.
-        return new Vector2Int(Mathf.RoundToInt(rx), Mathf.RoundToInt(ry));
+        // 절대값이 큰 축을 우선하여 항상 4방향(상하좌우) 중 하나만 반환
+        if (Mathf.Abs(rx) >= Mathf.Abs(ry))
+            return new Vector2Int(rx > 0 ? 1 : -1, 0);
+        else
+            return new Vector2Int(0, ry > 0 ? 1 : -1);
     }
 
     public void SetTarget(Transform newTarget)
