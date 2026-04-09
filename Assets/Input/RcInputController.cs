@@ -59,7 +59,15 @@ public class RcInputController : MonoBehaviour
         RcDiceCamera.Instance?.StopCameraRotate();
     }
 
-    public void TriggerMove(Vector2Int dir) => inputManager?.TriggerMove(dir);
+    /// <summary>
+    /// 외부에서 이미 카메라 보정이 완료된 방향으로 이동 (예: 스와이프)
+    /// GetAdjustedDirection을 거치지 않음
+    /// </summary>
+    public void TriggerMove(Vector2Int dir)
+    {
+        if (inputBlocked || pawn == null) return;
+        pawn.Move(dir);
+    }
     public void TriggerRotate(int dir) => inputManager?.TriggerRotate(dir);
 
     public void StartCameraRotate(int dir) => RcDiceCamera.Instance?.StartCameraRotate(dir);

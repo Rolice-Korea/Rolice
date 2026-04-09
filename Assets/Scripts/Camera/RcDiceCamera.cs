@@ -30,6 +30,7 @@ public class RcDiceCamera : MonoBehaviour
     [SerializeField] private float yaw = 45f;    // 목표 수평 각도
     private float currentYaw = 45f;
 
+    public float CurrentYaw => currentYaw;
     public bool IsRotating => Mathf.Abs(Mathf.DeltaAngle(currentYaw, yaw)) > 0.1f;
 
     private void Awake()
