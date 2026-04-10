@@ -1,5 +1,6 @@
 using System.Collections;
 using Cysharp.Threading.Tasks;
+using Rolice.System;
 using DG.Tweening;
 using Engine;
 using Engine.UI;
@@ -87,16 +88,22 @@ public class RcGameResultManager : RcSingletonMono<RcGameResultManager>
 
         yield return new WaitUntil(() => flashDone && effectDone);
 
-        ShowVictoryResult();
+        ShowVictoryResultAsync().Forget();
     }
 
-    private void ShowVictoryResult()
+    private async UniTaskVoid ShowVictoryResultAsync()
     {
         int   moveCount   = RcGameRuleManager.Instance.CurrentTurn;
         float elapsedTime = RcGameRuleManager.Instance.ElapsedTime;
 
         if (currentStageNumber > 0)
             RcProgressManager.Instance.RecordStageClear(currentStageNumber, moveCount, elapsedTime);
+
+        // 클라우드 저장 완료 후 결과 화면 표시 (실패 시 재시도 UI)
+        await RcCloudRetryOverlay.ShowUntilSuccessAsync(
+            () => RcPlayerState.Instance.SaveToCloudAsync(),
+            "저장에 실패했습니다.\n재시도해 주세요."
+        );
 
         int stars = 0;
         if (currentStageNumber > 0)

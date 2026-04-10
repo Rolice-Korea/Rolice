@@ -52,7 +52,7 @@ public class RcProgressManager : RcSingleton<RcProgressManager>
         var progress = PlayerData.GetProgress(stageNumber);
         progress.UpdateClear(moveCount, elapsedTime, stars);
 
-        RcPlayerState.Instance.Save();
+        RcPlayerState.Instance.SaveLocal();
         RcPlayerState.Instance.NotifyChanged();
     }
 

@@ -23,11 +23,10 @@ namespace Rolice.System
             _localSave    = new RcJsonSaveSystem();
             _data         = _localSave.Load();
             IsInitialized = true;
-
-            SyncFromCloudAsync().Forget(); // 앱 시작 시 백그라운드 동기화
         }
 
-        public async UniTask SyncFromCloudAsync()
+        // 클라우드 → 로컬 동기화. 성공 여부 반환.
+        public async UniTask<bool> SyncFromCloudAsync()
         {
             try
             {
@@ -45,36 +44,37 @@ namespace Rolice.System
                 {
                     await RcBackendServices.CloudSync.SaveAsync(CloudKey, JsonUtility.ToJson(_data));
                 }
+
+                return true;
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"[PlayerState] 클라우드 동기화 실패 (로컬 캐시 사용 중): {e.Message}");
+                Debug.LogWarning($"[PlayerState] 클라우드 동기화 실패: {e.Message}");
+                return false;
             }
         }
 
-        public void Save()
-        {
-            _localSave.Save(_data);
-            SyncToCloudAsync().Forget();
-        }
-
+        // 로컬에만 저장
         public void SaveLocal() => _localSave.Save(_data);
 
-        private async UniTaskVoid SyncToCloudAsync()
+        // 클라우드에 저장. 성공 여부 반환.
+        public async UniTask<bool> SaveToCloudAsync()
         {
             if (!RcBackendServices.Auth.IsAuthenticated)
             {
                 try { await RcBackendServices.Auth.EnsureAuthAsync(); }
-                catch { return; }
+                catch { return false; }
             }
 
             try
             {
                 await RcBackendServices.CloudSync.SaveAsync(CloudKey, JsonUtility.ToJson(_data));
+                return true;
             }
             catch (Exception e)
             {
                 Debug.LogWarning($"[PlayerState] 클라우드 저장 실패: {e.Message}");
+                return false;
             }
         }
 
@@ -84,7 +84,7 @@ namespace Rolice.System
         {
             _localSave.Delete();
             _data = RcPlayerData.CreateNew();
-            SyncToCloudAsync().Forget();
+            SaveToCloudAsync().Forget();
             NotifyChanged();
         }
     }

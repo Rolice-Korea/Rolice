@@ -50,7 +50,11 @@ namespace Rolice.UI
             if (_isSyncing) return;
             _isSyncing = true;
 
-            await RcPlayerState.Instance.SyncFromCloudAsync();
+            // 클라우드 동기화 실패 시 재시도 UI 표시 (차단)
+            await RcCloudRetryOverlay.ShowUntilSuccessAsync(
+                () => RcPlayerState.Instance.SyncFromCloudAsync(),
+                "서버 연결에 실패했습니다.\n재시도해 주세요."
+            );
 
             int stageNumber = Panel.Data.StageNumber;
 

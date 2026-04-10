@@ -5,7 +5,7 @@ namespace Rolice.System.Backend
     public sealed class RcFirebaseProvider : IBackendProvider
     {
         public IAuthService      Auth      { get; } = new RcFirebaseAuthService();
-        public ICloudSyncService CloudSync { get; } = new NullCloudSyncServiceImpl();
+        public ICloudSyncService CloudSync { get; } = new RcFirestoreService();
     }
 
     // Firebase Firestore 연동 전까지 임시 — 로컬 저장만 사용

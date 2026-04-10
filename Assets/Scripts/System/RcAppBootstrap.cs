@@ -1,9 +1,12 @@
-using Cysharp.Threading.Tasks;
 using Rolice.Data;
 using Rolice.System;
 using Rolice.System.Backend;
 using UnityEngine;
 
+/// <summary>
+/// 앱 전역 인프라 초기화. 씬 독립적인 싱글톤·서비스 등록만 담당.
+/// 인증/데이터 싱크 등 사용자 플로우는 RcInitBootstrap(Init씬)이 처리.
+/// </summary>
 public static class RcAppBootstrap
 {
     private const string CorePrefabPath    = "Core";
@@ -15,30 +18,8 @@ public static class RcAppBootstrap
         LoadCorePrefab();
         RcBackendServices.Register(new RcFirebaseProvider());
         RcPlayerState.Instance.Initialize();
-        EnsureLoginAsync().Forget();
         InitializeProgressManager();
         RcScreenOrientationApplier.Apply(RcGameSettingsData.Current.GetScreenMode());
-    }
-
-    private static async UniTaskVoid EnsureLoginAsync()
-    {
-        try
-        {
-            await RcBackendServices.Auth.EnsureAuthAsync();
-        }
-        catch (AuthRequiredException)
-        {
-            // 자동 로그인 실패 — 로그인 UI 표시 (중복 방지)
-            if (Object.FindObjectOfType<RcLoginProtoUI>() != null) return;
-            var go = new GameObject("LoginUI");
-            var ui = go.AddComponent<RcLoginProtoUI>();
-            ui.OnLoginSucceeded = () => RcPlayerState.Instance.SyncFromCloudAsync();
-            Object.DontDestroyOnLoad(go);
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogWarning($"[AppBootstrap] 인증 실패: {e.Message}");
-        }
     }
 
     private static void LoadCorePrefab()

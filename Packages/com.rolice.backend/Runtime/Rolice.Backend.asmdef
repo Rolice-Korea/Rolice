@@ -3,11 +3,9 @@
     "rootNamespace": "Rolice.System.Backend",
     "references": [
         "UniTask",
-        "Unity.Services.CloudSave",
-        "Unity.Services.Authentication",
-        "Unity.Services.Core",
         "Google.SignIn",
-        "Firebase.Auth"
+        "Firebase.Auth",
+        "Firebase.Firestore"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
