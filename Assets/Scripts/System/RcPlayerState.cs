@@ -9,6 +9,8 @@ namespace Rolice.System
 {
     public class RcPlayerState : RcSingleton<RcPlayerState>
     {
+        private const string     CloudKey   = "player_data";
+
         private RcPlayerData     _data;
         private RcJsonSaveSystem _localSave;
 
@@ -30,17 +32,18 @@ namespace Rolice.System
             try
             {
                 await RcBackendServices.Auth.EnsureAuthAsync();
-                var cloudData = await RcBackendServices.CloudSync.LoadAsync();
+                string json = await RcBackendServices.CloudSync.LoadAsync(CloudKey);
 
-                if (cloudData != null)
+                if (json != null)
                 {
-                    _data = cloudData;
+                    _data = JsonUtility.FromJson<RcPlayerData>(json);
+                    _data?.RebuildCache();
                     _localSave.Save(_data);
                     NotifyChanged();
                 }
                 else
                 {
-                    await RcBackendServices.CloudSync.SaveAsync(_data);
+                    await RcBackendServices.CloudSync.SaveAsync(CloudKey, JsonUtility.ToJson(_data));
                 }
             }
             catch (Exception e)
@@ -67,7 +70,7 @@ namespace Rolice.System
 
             try
             {
-                await RcBackendServices.CloudSync.SaveAsync(_data);
+                await RcBackendServices.CloudSync.SaveAsync(CloudKey, JsonUtility.ToJson(_data));
             }
             catch (Exception e)
             {

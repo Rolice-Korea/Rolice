@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Rolice.Data;
 using Rolice.System;
 using Rolice.System.Backend;
@@ -12,10 +13,32 @@ public static class RcAppBootstrap
     private static void Initialize()
     {
         LoadCorePrefab();
-        RcBackendServices.Register(new RcUgsProvider()); // UGS 제거 시 이 줄만 제거
+        RcBackendServices.Register(new RcFirebaseProvider());
         RcPlayerState.Instance.Initialize();
+        EnsureLoginAsync().Forget();
         InitializeProgressManager();
         RcScreenOrientationApplier.Apply(RcGameSettingsData.Current.GetScreenMode());
+    }
+
+    private static async UniTaskVoid EnsureLoginAsync()
+    {
+        try
+        {
+            await RcBackendServices.Auth.EnsureAuthAsync();
+        }
+        catch (AuthRequiredException)
+        {
+            // 자동 로그인 실패 — 로그인 UI 표시 (중복 방지)
+            if (Object.FindObjectOfType<RcLoginProtoUI>() != null) return;
+            var go = new GameObject("LoginUI");
+            var ui = go.AddComponent<RcLoginProtoUI>();
+            ui.OnLoginSucceeded = () => RcPlayerState.Instance.SyncFromCloudAsync();
+            Object.DontDestroyOnLoad(go);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[AppBootstrap] 인증 실패: {e.Message}");
+        }
     }
 
     private static void LoadCorePrefab()

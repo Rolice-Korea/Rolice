@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "972066935813",
+    "project_id": "project-rolice",
+    "storage_bucket": "project-rolice.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:972066935813:android:912dccde5530aaffc3786c",
+        "android_client_info": {
+          "package_name": "com.studio.rolice"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "972066935813-1ofu5h591nbnj2bqml57g1le3m09ojdf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.studio.rolice",
+            "certificate_hash": "62cd42cabe2f3e99a234e03fe44049ef78d0cdc2"
+          }
+        },
+        {
+          "client_id": "972066935813-6e3cv2l05o0ijp922qi17r8l8dkucpo9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKhn9l_pblpFyJJUj-_4jO9sTsBNSvKHU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "972066935813-6e3cv2l05o0ijp922qi17r8l8dkucpo9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

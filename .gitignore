@@ -105,3 +105,17 @@ InitTestScene*.unity*
 
 # Gemini CLI's temporary directory
 .gemini/
+
+# Firebase auto-generated local repository (빌드 시 자동 생성)
+/[Aa]ssets/GeneratedLocalRepo/
+/[Aa]ssets/GeneratedLocalRepo.meta
+
+# Android resolver settings (자동 생성)
+ProjectSettings/AndroidResolverDependencies.xml
+ProjectSettings/GvhProjectSettings.xml
+
+# Firebase native editor binaries (100MB+ 초과, Unity 에디터용 런타임에만 필요)
+Assets/Firebase/Plugins/x86_64/*.so
+Assets/Firebase/Plugins/x86_64/*.so.meta
+Assets/Firebase/Plugins/x86_64/*.bundle
+Assets/Firebase/Plugins/x86_64/*.bundle.meta

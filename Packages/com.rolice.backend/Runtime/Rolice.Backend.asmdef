@@ -1,0 +1,17 @@
+{
+    "name": "Rolice.Backend",
+    "rootNamespace": "Rolice.System.Backend",
+    "references": [
+        "UniTask",
+        "Unity.Services.CloudSave",
+        "Unity.Services.Authentication",
+        "Unity.Services.Core",
+        "Google.SignIn",
+        "Firebase.Auth"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "autoReferenced": true
+}

@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/gcm_defaultSenderId,@string/google_storage_bucket,@string/project_id,@string/google_api_key,@string/google_crash_reporting_api_key,@string/google_app_id,@string/default_android_client_id,@string/default_web_client_id">
+  <string name="gcm_defaultSenderId" translatable="false">972066935813</string>
+  <string name="google_storage_bucket" translatable="false">project-rolice.firebasestorage.app</string>
+  <string name="project_id" translatable="false">project-rolice</string>
+  <string name="google_api_key" translatable="false">AIzaSyDKhn9l_pblpFyJJUj-_4jO9sTsBNSvKHU</string>
+  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDKhn9l_pblpFyJJUj-_4jO9sTsBNSvKHU</string>
+  <string name="google_app_id" translatable="false">1:972066935813:android:912dccde5530aaffc3786c</string>
+  <string name="default_android_client_id" translatable="false">972066935813-1ofu5h591nbnj2bqml57g1le3m09ojdf.apps.googleusercontent.com</string>
+  <string name="default_web_client_id" translatable="false">972066935813-6e3cv2l05o0ijp922qi17r8l8dkucpo9.apps.googleusercontent.com</string>
+</resources>
