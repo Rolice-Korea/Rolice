@@ -1610,6 +1610,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2013521495}
+  - component: {fileID: 2013521496}
   m_Layer: 0
   m_Name: Default
   m_TagString: Untagged
@@ -1635,6 +1636,18 @@ Transform:
   - {fileID: 1412490437}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2013521496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2013521494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1259c737b55297c4e89ca8a93f80105f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Rolice.DebugTools.RcAdRewardDebugUI
 --- !u!1001 &1244255302583443400
 PrefabInstance:
   m_ObjectHideFlags: 0
