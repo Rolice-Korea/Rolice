@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using Rolice.System;
 using Rolice.System.Backend;
@@ -14,11 +15,7 @@ public sealed class RcInitBootstrap : MonoBehaviour
 
     private void Start()
     {
-#if UNITY_EDITOR
-        RcSceneLoader.Instance.LoadScene("LobbyScene");
-#else
         RunAsync().Forget();
-#endif
     }
 
     private void OnGUI()
@@ -38,8 +35,25 @@ public sealed class RcInitBootstrap : MonoBehaviour
     private async UniTaskVoid RunAsync()
     {
         await AuthenticateAsync();
-        await RcPlayerState.Instance.SyncFromCloudAsync();
+        await SyncDataAsync();
         RcSceneLoader.Instance.LoadScene("LobbyScene");
+    }
+
+    private async UniTask SyncDataAsync()
+    {
+        while (true)
+        {
+            try
+            {
+                await RcPlayerState.Instance.SyncFromCloudAsync();
+                return;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[InitBootstrap] 데이터 동기화 실패: {e.Message}");
+                await ShowRetryAndWaitAsync();
+            }
+        }
     }
 
     // 인증 성공할 때까지 루프

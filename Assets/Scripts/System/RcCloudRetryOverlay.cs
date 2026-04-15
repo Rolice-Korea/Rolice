@@ -12,16 +12,24 @@ public sealed class RcCloudRetryOverlay : MonoBehaviour
     private string                  _message;
 
     /// <summary>
-    /// operation이 true를 반환할 때까지 재시도 UI를 반복 표시.
+    /// operation이 예외 없이 완료될 때까지 재시도 UI를 반복 표시.
+    /// operation은 실패 시 예외를 throw해야 한다.
     /// </summary>
     public static async UniTask ShowUntilSuccessAsync(
-        Func<UniTask<bool>> operation,
+        Func<UniTask> operation,
         string message = "서버 연결에 실패했습니다.\n재시도해 주세요.")
     {
         while (true)
         {
-            bool success = await operation();
-            if (success) return;
+            try
+            {
+                await operation();
+                return;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[CloudRetry] 재시도 대기: {e.Message}");
+            }
 
             var go      = new GameObject("CloudRetryOverlay");
             var overlay = go.AddComponent<RcCloudRetryOverlay>();

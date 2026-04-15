@@ -19,7 +19,7 @@ public static class RcAppBootstrap
         LoadCorePrefab();
         RcBackendServices.Register(new RcFirebaseProvider());
         RcPlayerState.Instance.Initialize();
-        RcBackendServices.RegisterEconomy(new RcLocalEconomyService(RcPlayerState.Instance));
+        RcBackendServices.RegisterEconomy(new RcFirestoreEconomyService(RcPlayerState.Instance));
         RcBackendServices.RegisterAds(new RcDummyAdsService());
         RcBackendServices.RegisterAdReward(new RcFirestoreAdRewardStorage());
         InitializeProgressManager();

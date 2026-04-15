@@ -62,7 +62,7 @@ namespace Rolice.System
                 return AdRewardResult.AdFailed;
             }
 
-            RcBackendServices.Economy.Add(RcCurrencyId.Gem.ToKey(), 1);
+            await RcBackendServices.Economy.AddAsync(RcCurrencyId.Gem.ToKey(), 1);
             await RcBackendServices.AdReward.RecordRewardAsync();
 
             Debug.Log("[AdReward] 보상 지급 완료: Gem +1");

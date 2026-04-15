@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Engine;
 using Rolice.Data;
 using Rolice.System.Backend;
+using Rolice.System.Economy;
 using UnityEngine;
 
 namespace Rolice.System
@@ -15,6 +16,7 @@ namespace Rolice.System
         private RcJsonSaveSystem _localSave;
 
         public bool IsInitialized { get; private set; }
+        public bool IsSynced      { get; private set; }
         public event Action OnProgressChanged;
         public RcPlayerData Data => _data;
 
@@ -25,66 +27,51 @@ namespace Rolice.System
             IsInitialized = true;
         }
 
-        // 클라우드 → 로컬 동기화. 성공 여부 반환.
-        public async UniTask<bool> SyncFromCloudAsync()
+        // 클라우드 → 로컬 동기화. 실패 시 예외.
+        public async UniTask SyncFromCloudAsync()
         {
-            try
-            {
-                await RcBackendServices.Auth.EnsureAuthAsync();
-                string json = await RcBackendServices.CloudSync.LoadAsync(CloudKey);
+            await RcBackendServices.Auth.EnsureAuthAsync();
 
-                if (json != null)
-                {
-                    _data = JsonUtility.FromJson<RcPlayerData>(json);
-                    _data?.RebuildCache();
-                    _localSave.Save(_data);
-                    NotifyChanged();
-                }
-                else
-                {
-                    await RcBackendServices.CloudSync.SaveAsync(CloudKey, JsonUtility.ToJson(_data));
-                }
+            string json = await RcBackendServices.CloudSync.LoadAsync(CloudKey);
 
-                return true;
-            }
-            catch (Exception e)
+            if (json != null)
             {
-                Debug.LogWarning($"[PlayerState] 클라우드 동기화 실패: {e.Message}");
-                return false;
+                _data = JsonUtility.FromJson<RcPlayerData>(json);
+                _data?.RebuildCache();
             }
+            else
+            {
+                // 최초 가입: 새 데이터로 초기화 후 서버에 업로드
+                _data = RcPlayerData.CreateNew();
+                await RcBackendServices.CloudSync.SaveAsync(CloudKey, JsonUtility.ToJson(_data));
+            }
+
+            // 재화/아이템은 별도 Firestore 경로에서 동기화
+            if (RcBackendServices.Economy is RcFirestoreEconomyService firestoreEconomy)
+                await firestoreEconomy.SyncFromCloudAsync();
+
+            _localSave.Save(_data);
+            IsSynced = true;
+            NotifyChanged();
         }
 
-        // 로컬에만 저장
+        // 로컬 캐시에만 저장 (읽기 캐시 갱신용)
         public void SaveLocal() => _localSave.Save(_data);
 
-        // 클라우드에 저장. 성공 여부 반환.
-        public async UniTask<bool> SaveToCloudAsync()
+        // 진행도 등 player_data를 클라우드에 저장. 실패 시 예외.
+        public async UniTask SaveToCloudAsync()
         {
-            if (!RcBackendServices.Auth.IsAuthenticated)
-            {
-                try { await RcBackendServices.Auth.EnsureAuthAsync(); }
-                catch { return false; }
-            }
-
-            try
-            {
-                await RcBackendServices.CloudSync.SaveAsync(CloudKey, JsonUtility.ToJson(_data));
-                return true;
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[PlayerState] 클라우드 저장 실패: {e.Message}");
-                return false;
-            }
+            await RcBackendServices.Auth.EnsureAuthAsync();
+            await RcBackendServices.CloudSync.SaveAsync(CloudKey, JsonUtility.ToJson(_data));
         }
 
         public void NotifyChanged() => OnProgressChanged?.Invoke();
 
-        public void ResetAll()
+        public async UniTask ResetAllAsync()
         {
             _localSave.Delete();
             _data = RcPlayerData.CreateNew();
-            SaveToCloudAsync().Forget();
+            await SaveToCloudAsync();
             NotifyChanged();
         }
     }

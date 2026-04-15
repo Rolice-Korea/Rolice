@@ -45,11 +45,11 @@ namespace Rolice.System.Backend
 
     internal sealed class NullEconomyService : IEconomyService
     {
-        public int  GetBalance(string currencyKey)            => 0;
-        public void Add(string currencyKey, int amount)       { }
-        public bool Spend(string currencyKey, int amount)     => false;
-        public bool HasItem(string itemId)                    => false;
-        public void AddItem(string itemId)                    { }
+        public int           GetBalance(string currencyKey)           => 0;
+        public UniTask       AddAsync(string currencyKey, int amount) => UniTask.CompletedTask;
+        public UniTask<bool> SpendAsync(string currencyKey, int amount) => UniTask.FromResult(false);
+        public bool          HasItem(string itemId)                   => false;
+        public UniTask       AddItemAsync(string itemId)              => UniTask.CompletedTask;
     }
 
     internal sealed class NullAdsService : IAdsService

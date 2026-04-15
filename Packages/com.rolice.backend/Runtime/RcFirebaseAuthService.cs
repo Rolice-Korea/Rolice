@@ -22,6 +22,16 @@ namespace Rolice.System.Backend
 
         public async UniTask EnsureAuthAsync()
         {
+#if UNITY_EDITOR
+            // 에디터: Google 계정 캐시가 남아있을 수 있으므로 익명 계정이 아니면 로그아웃 후 재로그인
+            if (_auth.CurrentUser != null && !_auth.CurrentUser.IsAnonymous)
+                _auth.SignOut();
+
+            if (!IsAuthenticated)
+                await _auth.SignInAnonymouslyAsync();
+
+            Debug.Log($"[FirebaseAuth] 에디터 익명 로그인 완료 | UID: {_auth.CurrentUser?.UserId} | IsAnonymous: {_auth.CurrentUser?.IsAnonymous}");
+#else
             if (IsAuthenticated) return;
 
             // 1. 자동(조용한) 로그인 먼저 시도
@@ -35,6 +45,7 @@ namespace Rolice.System.Backend
                 Debug.Log($"[FirebaseAuth] 자동 로그인 실패, 수동 로그인 필요: {e.Message}");
                 throw new AuthRequiredException();
             }
+#endif
         }
 
         // 자동 로그인 (계정 선택 UI 없음)

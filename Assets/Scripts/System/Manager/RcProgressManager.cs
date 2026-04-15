@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Engine;
 using Rolice.Data;
 using Rolice.System;
@@ -56,9 +57,9 @@ public class RcProgressManager : RcSingleton<RcProgressManager>
         RcPlayerState.Instance.NotifyChanged();
     }
 
-    public void ResetProgress()
+    public async UniTask ResetProgressAsync()
     {
-        RcPlayerState.Instance.ResetAll();
+        await RcPlayerState.Instance.ResetAllAsync();
     }
 
     public RcStageDatabaseSO StageDatabase  => stageDatabase;

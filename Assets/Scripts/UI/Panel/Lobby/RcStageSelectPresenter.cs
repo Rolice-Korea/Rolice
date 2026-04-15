@@ -21,6 +21,8 @@ namespace Rolice.UI
 
         public void RefreshStageList()
         {
+            if (!RcPlayerState.Instance.IsSynced) return;
+
             if (!RcProgressManager.Instance.IsInitialized)
             {
                 Debug.LogWarning("[StageSelectPresenter] ProgressManager 미초기화");
