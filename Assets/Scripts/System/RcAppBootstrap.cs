@@ -20,6 +20,8 @@ public static class RcAppBootstrap
         RcBackendServices.Register(new RcFirebaseProvider());
         RcPlayerState.Instance.Initialize();
         RcBackendServices.RegisterEconomy(new RcLocalEconomyService(RcPlayerState.Instance));
+        RcBackendServices.RegisterAds(new RcDummyAdsService());
+        RcBackendServices.RegisterAdReward(new RcFirestoreAdRewardStorage());
         InitializeProgressManager();
         RcScreenOrientationApplier.Apply(RcGameSettingsData.Current.GetScreenMode());
     }
