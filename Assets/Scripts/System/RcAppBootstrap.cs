@@ -1,6 +1,7 @@
 using Rolice.Data;
 using Rolice.System;
 using Rolice.System.Backend;
+using Rolice.System.Economy;
 using UnityEngine;
 
 /// <summary>
@@ -18,6 +19,7 @@ public static class RcAppBootstrap
         LoadCorePrefab();
         RcBackendServices.Register(new RcFirebaseProvider());
         RcPlayerState.Instance.Initialize();
+        RcBackendServices.RegisterEconomy(new RcLocalEconomyService(RcPlayerState.Instance));
         InitializeProgressManager();
         RcScreenOrientationApplier.Apply(RcGameSettingsData.Current.GetScreenMode());
     }
