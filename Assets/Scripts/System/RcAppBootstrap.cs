@@ -16,9 +16,22 @@ public static class RcAppBootstrap
     private static void Initialize()
     {
         LoadCorePrefab();
-        RcBackendServices.Register(new RcDefaultBackend(RcPlayerState.Instance));
+        RegisterBackend();
         InitializeProgressManager();
         RcScreenOrientationApplier.Apply(RcGameSettingsData.Current.GetScreenMode());
+    }
+
+    private static void RegisterBackend()
+    {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        var devSettings = Resources.Load<RcDeveloperSettingsSO>("DeveloperSettings");
+        if (devSettings != null && devSettings.offlineMode)
+        {
+            RcBackendServices.RegisterOffline(devSettings.backendAlwaysSucceed);
+            return;
+        }
+#endif
+        RcBackendServices.Register(new RcDefaultBackend(RcPlayerState.Instance));
     }
 
     private static void LoadCorePrefab()
