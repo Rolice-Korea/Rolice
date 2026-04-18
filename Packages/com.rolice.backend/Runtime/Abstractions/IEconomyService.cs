@@ -30,5 +30,8 @@ namespace Rolice.System.Backend
 
         /// <summary>아이템 추가. Firestore merge. 실패 시 예외.</summary>
         UniTask AddItemAsync(string itemId);
+
+        /// <summary>앱 시작 시 서버에서 재화·아이템 데이터를 로컬 캐시에 반영한다.</summary>
+        UniTask SyncFromCloudAsync();
     }
 }

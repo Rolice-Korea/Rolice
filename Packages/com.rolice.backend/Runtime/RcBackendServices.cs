@@ -5,30 +5,24 @@ namespace Rolice.System.Backend
 {
     public static class RcBackendServices
     {
-        public static IBackendProvider  Provider  { get; private set; } = new NullBackendProvider();
+        private static IBackend _backend = new NullBackend();
 
-        public static IAuthService      Auth      => Provider.Auth;
-        public static ICloudSyncService CloudSync => Provider.CloudSync;
+        public static IAuthService      Auth      => _backend.Auth;
+        public static ICloudSyncService CloudSync => _backend.CloudSync;
+        public static IEconomyService   Economy   => _backend.Economy;
+        public static IAdsService       Ads       => _backend.Ads;
+        public static IAdRewardStorage  AdReward  => _backend.AdReward;
 
-        // Economy는 로컬 저장 의존으로 IBackendProvider와 분리 등록
-        public static IEconomyService   Economy   { get; private set; } = new NullEconomyService();
-
-        // 광고·보상 이력은 SDK/스토리지 구현체가 결정되기 전까지 분리 등록
-        public static IAdsService       Ads       { get; private set; } = new NullAdsService();
-        public static IAdRewardStorage  AdReward  { get; private set; } = new NullAdRewardStorage();
-
-        // UGS 제거 시 이 한 줄만 주석처리
-        public static void Register(IBackendProvider provider) => Provider = provider;
-
-        public static void RegisterEconomy(IEconomyService economy) => Economy = economy;
-        public static void RegisterAds(IAdsService ads)             => Ads = ads;
-        public static void RegisterAdReward(IAdRewardStorage storage) => AdReward = storage;
+        public static void Register(IBackend backend) => _backend = backend;
     }
 
-    internal sealed class NullBackendProvider : IBackendProvider
+    internal sealed class NullBackend : IBackend
     {
         public IAuthService      Auth      { get; } = new NullAuthService();
         public ICloudSyncService CloudSync { get; } = new NullCloudSyncService();
+        public IEconomyService   Economy   { get; } = new NullEconomyService();
+        public IAdsService       Ads       { get; } = new NullAdsService();
+        public IAdRewardStorage  AdReward  { get; } = new NullAdRewardStorage();
     }
 
     internal sealed class NullAuthService : IAuthService
@@ -45,11 +39,12 @@ namespace Rolice.System.Backend
 
     internal sealed class NullEconomyService : IEconomyService
     {
-        public int           GetBalance(string currencyKey)           => 0;
-        public UniTask       AddAsync(string currencyKey, int amount) => UniTask.CompletedTask;
-        public UniTask<bool> SpendAsync(string currencyKey, int amount) => UniTask.FromResult(false);
-        public bool          HasItem(string itemId)                   => false;
-        public UniTask       AddItemAsync(string itemId)              => UniTask.CompletedTask;
+        public int           GetBalance(string currencyKey)              => 0;
+        public UniTask       AddAsync(string currencyKey, int amount)    => UniTask.CompletedTask;
+        public UniTask<bool> SpendAsync(string currencyKey, int amount)  => UniTask.FromResult(false);
+        public bool          HasItem(string itemId)                      => false;
+        public UniTask       AddItemAsync(string itemId)                 => UniTask.CompletedTask;
+        public UniTask       SyncFromCloudAsync()                        => UniTask.CompletedTask;
     }
 
     internal sealed class NullAdsService : IAdsService
