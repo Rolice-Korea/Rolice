@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4573002009885458275}
   - component: {fileID: 7645422261376620935}
+  - component: {fileID: 5109955696653897277}
   m_Layer: 0
   m_Name: Core
   m_TagString: Untagged
@@ -50,6 +51,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 476c081a3a14e7143a18d3721e266a30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RcGameFlowManager
+--- !u!114 &5109955696653897277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 819770867480300385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21583aab288bbbe42af22efe6490825c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Rolice.System.RcSystemDialogManager
 --- !u!1 &981475483481693073
 GameObject:
   m_ObjectHideFlags: 0
@@ -98,8 +111,6 @@ MonoBehaviour:
   effectYOffset: 0.5
   zoomOutAmount: 0.4
   zoomDuration: 0.5
-  defeatPauseDelay: 0.5
-  resultDelay: 0.15
 --- !u!1 &4774361319047239809
 GameObject:
   m_ObjectHideFlags: 0
