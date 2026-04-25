@@ -42,6 +42,7 @@ namespace Rolice.System.Backend
 
         public bool IsAuthenticated => alwaysSucceed;
         public UniTask EnsureAuthAsync() => UniTask.CompletedTask;
+        public UniTask SignInAsync()      => UniTask.CompletedTask;
     }
 
     internal sealed class NullCloudSyncService : ICloudSyncService

@@ -100,7 +100,7 @@ public class RcGameResultManager : RcSingletonMono<RcGameResultManager>
             RcProgressManager.Instance.RecordStageClear(currentStageNumber, moveCount, elapsedTime);
 
         // 클라우드 저장 완료 후 결과 화면 표시 (실패 시 재시도 UI)
-        await RcCloudRetryOverlay.ShowUntilSuccessAsync(
+        await RcSystemDialogManager.Instance.ShowUntilSuccessAsync(
             () => RcPlayerState.Instance.SaveToCloudAsync(),
             "저장에 실패했습니다.\n재시도해 주세요."
         );
