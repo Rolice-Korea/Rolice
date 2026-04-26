@@ -34,4 +34,10 @@ namespace Rolice
         Landscape = 0,
         Portrait  = 1,
     }
+
+    public enum RcBagTabType
+    {
+        Face,
+        Edge
+    }
 }

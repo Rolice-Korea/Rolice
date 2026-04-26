@@ -1,6 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 using Rolice;
+using Rolice.System;
 
 public class RcDiceFaceController : MonoBehaviour
 {
@@ -67,7 +68,7 @@ public class RcDiceFaceController : MonoBehaviour
         var table = RcDataTableManager.FaceDataTable;
         if (table == null) return;
 
-        var skinData = table.GetFaceData(RcFaceSkinType.Default);
+        var skinData = table.GetFaceData(RcSkinSystem.ActiveFaceSkinType);
 
         for (int i = 0; i < 6; i++)
         {

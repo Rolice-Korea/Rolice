@@ -140,6 +140,12 @@ namespace Engine.UI
                 Open<T>();
         }
 
+        public void OpenBagPanel()
+        {
+            // 명시적인 네임스페이스 사용
+            this.Open<Rolice.UI.RcUIBagPanel>();
+        }
+
         public bool IsOpen<T>() where T : RcUIPanel
         {
             if (!instanceCache.TryGetValue(typeof(T), out var panel)) return false;

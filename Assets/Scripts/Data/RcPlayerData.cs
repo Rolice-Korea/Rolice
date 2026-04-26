@@ -7,6 +7,10 @@ namespace Rolice.Data
     public class RcPlayerData
     {
         public int Version = 1;
+        
+        public RcFaceSkinType SelectedFaceSkin = RcFaceSkinType.Default;
+        public RcEdgeSkinType SelectedEdgeSkin = RcEdgeSkinType.Default;
+
         public List<RcStageProgress> StageProgressList = new();
 
         // --- 재화 ---

@@ -1,5 +1,6 @@
 using UnityEngine;
 using Rolice;
+using Rolice.System;
 
 public class RcColorTile : RcTileBase
 {
@@ -42,7 +43,7 @@ public class RcColorTile : RcTileBase
         if (RcDataTableManager.FaceDataTable == null) return;
 
         // 현재 사용 중인 스킨 데이터를 가져옴
-        var faceData = RcDataTableManager.FaceDataTable.GetFaceData(RcFaceSkinType.Default);
+        var faceData = RcDataTableManager.FaceDataTable.GetFaceData(RcSkinSystem.ActiveFaceSkinType);
         if (faceData == null) return;
 
         Material skinMat = faceData?.GetFaceMaterial(colorType);

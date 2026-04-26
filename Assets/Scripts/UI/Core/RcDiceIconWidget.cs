@@ -1,6 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 using Rolice;
+using Rolice.System;
 
 
 public class RcDiceIconWidget : MonoBehaviour
@@ -110,7 +111,7 @@ public class RcDiceIconWidget : MonoBehaviour
 
         var table = RcDataTableManager.FaceDataTable;
         if (table == null) return;
-        var skin = table.GetFaceData(RcFaceSkinType.Default);
+        var skin = table.GetFaceData(RcSkinSystem.ActiveFaceSkinType);
         var material = skin?.GetFaceMaterial(bottomColor);
         if (material == null) return;
 

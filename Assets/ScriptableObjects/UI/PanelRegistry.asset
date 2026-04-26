@@ -27,3 +27,5 @@ MonoBehaviour:
     Layer: 200
   - Prefab: {fileID: 2530096921433720940, guid: 5d65029159039794ab7ad7237fc26f5f, type: 3}
     Layer: 300
+  - Prefab: {fileID: -9016838546640545506, guid: a8a378ce13e2d064e87e29036bfbd113, type: 3}
+    Layer: 200
