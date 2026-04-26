@@ -53,7 +53,7 @@ namespace Rolice.UI
             // 클라우드 동기화 실패 시 재시도 UI 표시 (차단)
             await RcSystemDialogManager.Instance.ShowUntilSuccessAsync(
                 () => RcPlayerState.Instance.SyncFromCloudAsync(),
-                "서버 연결에 실패했습니다.\n재시도해 주세요."
+                "Connection failed.\nPlease retry."
             );
 
             int stageNumber = Panel.Data.StageNumber;

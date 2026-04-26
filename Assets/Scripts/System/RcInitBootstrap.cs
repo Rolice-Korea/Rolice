@@ -32,10 +32,10 @@ public sealed class RcInitBootstrap : MonoBehaviour
             {
                 await RcBackendServices.Auth.SignInAsync();
             }
-        }, "서버에 연결할 수 없습니다.\n네트워크 상태를 확인해 주세요.");
+        }, "Connection failed.\nPlease check your network.");
 
     private UniTask SyncDataAsync() =>
         RcSystemDialogManager.Instance.ShowUntilSuccessAsync(
             () => RcPlayerState.Instance.SyncFromCloudAsync(),
-            "서버에 연결할 수 없습니다.\n네트워크 상태를 확인해 주세요.");
+            "Connection failed.\nPlease check your network.");
 }

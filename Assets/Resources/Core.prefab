@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4573002009885458275}
   - component: {fileID: 7645422261376620935}
   - component: {fileID: 5109955696653897277}
+  - component: {fileID: 4656565883118407529}
   m_Layer: 0
   m_Name: Core
   m_TagString: Untagged
@@ -63,6 +64,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21583aab288bbbe42af22efe6490825c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rolice.System.RcSystemDialogManager
+--- !u!114 &4656565883118407529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 819770867480300385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f43031860c475af409b06a80f6ff5dee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Rolice.DebugTools.RcDebugOverlay
 --- !u!1 &981475483481693073
 GameObject:
   m_ObjectHideFlags: 0

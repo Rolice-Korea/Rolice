@@ -7,5 +7,6 @@ namespace Rolice.System.Backend
         bool IsAuthenticated { get; }
         UniTask EnsureAuthAsync();
         UniTask SignInAsync();
+        void SignOut();
     }
 }

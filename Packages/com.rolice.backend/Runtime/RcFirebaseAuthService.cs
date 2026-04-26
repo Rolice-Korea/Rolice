@@ -32,9 +32,14 @@ namespace Rolice.System.Backend
 
             Debug.Log($"[FirebaseAuth] 에디터 익명 로그인 완료 | UID: {_auth.CurrentUser?.UserId} | IsAnonymous: {_auth.CurrentUser?.IsAnonymous}");
 #else
-            if (IsAuthenticated) return;
+            if (IsAuthenticated)
+            {
+                // 캐시된 토큰을 서버에서 강제 갱신 — 네트워크 없으면 예외 발생
+                await _auth.CurrentUser.TokenAsync(forceRefresh: true);
+                return;
+            }
 
-            // 1. 자동(조용한) 로그인 먼저 시도
+            // 자동(조용한) 로그인 먼저 시도
             try
             {
                 await SignInSilentlyAsync();
@@ -67,7 +72,7 @@ namespace Rolice.System.Backend
         public void SignOut()
         {
             _auth.SignOut();
-            GoogleSignIn.DefaultInstance.SignOut();
+            GoogleSignIn.DefaultInstance.Disconnect(); // OAuth 토큰 완전 파기 → 다음 로그인 시 새 scope 적용
         }
 
         private void ConfigureGoogleSignIn()
@@ -78,6 +83,7 @@ namespace Rolice.System.Backend
             {
                 WebClientId    = WebClientId,
                 RequestIdToken = true,
+                RequestEmail   = true,
                 UseGameSignIn  = false
             };
         }

@@ -11,9 +11,17 @@ namespace Rolice.System
     {
         private void Awake() => InitializeSingleton();
 
+#if UNITY_EDITOR
+        [ContextMenu("Test: Show Retry Dialog")]
+        private void TestShowRetryDialog()
+        {
+            RcUIManager.Instance.Open<RcRetryDialogPanel, string>("Connection failed.\nPlease retry.");
+        }
+#endif
+
         public async UniTask ShowUntilSuccessAsync(
             Func<UniTask> operation,
-            string message = "서버 연결에 실패했습니다.\n재시도해 주세요.")
+            string message = "Connection failed.\nPlease retry.")
         {
             while (true)
             {
