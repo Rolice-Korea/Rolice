@@ -146,6 +146,11 @@ namespace Engine.UI
             this.Open<Rolice.UI.RcUIBagPanel>();
         }
 
+        public void OpenShopPanel()
+        {
+            this.Open<Rolice.UI.RcUIShopPanel>();
+        }
+
         public bool IsOpen<T>() where T : RcUIPanel
         {
             if (!instanceCache.TryGetValue(typeof(T), out var panel)) return false;

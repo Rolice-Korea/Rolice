@@ -6,37 +6,41 @@ using UnityEngine;
 namespace Rolice.UI
 {
     /// <summary>
-    /// 가방 UI의 전체 뷰(View)를 담당하는 클래스.
+    /// 상점 UI의 전체 뷰(View)를 담당하는 클래스.
     /// UI 요소들에 대한 참조를 가지고 있으며, 프레젠터의 명령에 따라 화면을 갱신함.
+    /// 
+    /// 레이아웃:
+    ///   미리보기(좌측) | 탭(우측 상단) + 나가기(우측 상단 끝)
+    ///                  | 아이템 목록(우측 중단)
+    ///                  | 구매 버튼(우측 하단)
     /// </summary>
-    public class RcUIBagPanel : RcUIPanel
+    public class RcUIShopPanel : RcUIPanel
     {
         public void OpenManaged()
         {
-            RcUIManager.Instance.OpenBagPanel();
+            RcUIManager.Instance.OpenShopPanel();
         }
 
         [Header("Bind Widgets")]
         [SerializeField] private RcUICommonTabList tabList;
         
         [Header("Widget Class")]
-        [SerializeField] private RcUIBagItem itemTemplate;
+        [SerializeField] private RcUIShopItem itemTemplate;
         
         [Header("Buttons")]
-        [SerializeField] private RcButton applyButton;
-        [SerializeField] private RcButton resetButton;
+        [SerializeField] private RcButton buyButton;
         [SerializeField] private RcButton closeButton;
         
         [Header("Preview & Info")]
         [SerializeField] private GameObject previewRoot;
-        [SerializeField] private TMPro.TMP_Text skinNameText;
+        [SerializeField] private TMPro.TMP_Text itemNameText;
+        [SerializeField] private TMPro.TMP_Text priceText;
 
-        private RcUIBagPresenter presenter;
-        private readonly List<RcUIBagItem> itemPool = new();
+        private RcUIShopPresenter presenter;
+        private readonly List<RcUIShopItem> itemPool = new();
 
         public event Action OnCloseClicked;
-        public event Action OnApplyClicked;
-        public event Action OnResetClicked;
+        public event Action OnBuyClicked;
         
         public event Action<int> OnTabChanged
         {
@@ -49,8 +53,7 @@ namespace Rolice.UI
             base.Awake();
             
             if (closeButton != null) closeButton.OnClick += () => OnCloseClicked?.Invoke();
-            if (applyButton != null) applyButton.OnClick += () => OnApplyClicked?.Invoke();
-            if (resetButton != null) resetButton.OnClick += () => OnResetClicked?.Invoke();
+            if (buyButton != null) buyButton.OnClick += () => OnBuyClicked?.Invoke();
             
             if (tabList != null) tabList.Initialize();
             
@@ -59,7 +62,7 @@ namespace Rolice.UI
 
         protected override void OnOpen()
         {
-            presenter = new RcUIBagPresenter();
+            presenter = new RcUIShopPresenter();
             presenter.Bind(this);
         }
 
@@ -75,15 +78,27 @@ namespace Rolice.UI
                 tabList.SelectTab(index);
         }
 
-        public void SetSelectedSkinName(string name)
+        public void SetSelectedItemName(string name)
         {
-            if (skinNameText != null)
-                skinNameText.text = name;
+            if (itemNameText != null)
+                itemNameText.text = name;
+        }
+
+        public void SetSelectedItemPrice(string price)
+        {
+            if (priceText != null)
+                priceText.text = price;
+        }
+
+        public void SetBuyButtonInteractable(bool interactable)
+        {
+            if (buyButton != null)
+                buyButton.Interactable = interactable;
         }
 
         public Transform CurrentItemListParent => tabList != null ? tabList.ActiveTargetContent : null;
 
-        public void RefreshItemList(int count, Action<int, RcUIBagItem> binder)
+        public void RefreshItemList(int count, Action<int, RcUIShopItem> binder)
         {
             var parent = CurrentItemListParent;
             if (parent == null) return;
@@ -93,7 +108,7 @@ namespace Rolice.UI
 
             for (int i = 0; i < count; i++)
             {
-                RcUIBagItem widget;
+                RcUIShopItem widget;
                 if (i < itemPool.Count)
                 {
                     widget = itemPool[i];

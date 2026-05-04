@@ -17,7 +17,6 @@ namespace Rolice.UI
             public string label;                 // 탭 표시 이름
             public RcUICommonTabButton tabButton; // 연결된 탭 버튼 슬롯
             public GameObject targetContent;     // 탭 선택 시 활성화될 콘텐츠 패널
-            public Transform itemListParent;     // 해당 탭의 아이템들이 담길 부모 (추가됨)
         }
 
         [Header("Tab Configuration")]
@@ -26,16 +25,18 @@ namespace Rolice.UI
 
         public event Action<int> OnTabChanged;
         public int ActiveTabIndex { get; private set; } = -1;
-
-        public Transform ActiveItemListParent
+        
+        public Transform ActiveTargetContent 
         {
             get
             {
                 if (ActiveTabIndex >= 0 && ActiveTabIndex < tabEntries.Count)
-                    return tabEntries[ActiveTabIndex].itemListParent;
+                    return tabEntries[ActiveTabIndex].targetContent != null ? tabEntries[ActiveTabIndex].targetContent.transform : null;
                 return null;
             }
         }
+
+
 
         public override void Initialize()
         {

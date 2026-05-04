@@ -40,4 +40,11 @@ namespace Rolice
         Face,
         Edge
     }
+
+    public enum RcShopTabType
+    {
+        Currency,
+        Face,
+        Edge
+    }
 }
