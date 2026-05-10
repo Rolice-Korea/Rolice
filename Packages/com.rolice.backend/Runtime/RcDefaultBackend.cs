@@ -18,7 +18,7 @@ namespace Rolice.System.Backend
             Auth      = new RcFirebaseAuthService();
             CloudSync = new RcFirestoreService();
             Economy   = new RcFirestoreEconomyService(playerData);
-            Ads       = new RcDummyAdsService();
+            Ads       = new RcAdMobAdsService();
             AdReward  = new RcFirestoreAdRewardStorage();
         }
     }

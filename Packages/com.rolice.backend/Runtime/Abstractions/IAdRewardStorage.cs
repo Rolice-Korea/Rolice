@@ -14,5 +14,8 @@ namespace Rolice.System.Backend
 
         /// <summary>마지막 수령 시각을 UTC 기준으로 반환. 이력 없으면 null.</summary>
         UniTask<DateTime?> GetLastRewardTimeAsync();
+
+        /// <summary>수령 이력을 초기화한다. 디버그/테스트 전용.</summary>
+        UniTask ClearAsync();
     }
 }

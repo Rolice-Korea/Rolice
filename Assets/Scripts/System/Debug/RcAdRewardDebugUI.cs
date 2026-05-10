@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using Cysharp.Threading.Tasks;
 using Rolice.Define;
 using Rolice.System;
@@ -18,10 +17,11 @@ namespace Rolice.DebugTools
 
         private void OnGUI()
         {
-            var panelRect  = new Rect(20, 20, 260, 110);
+            var panelRect  = new Rect(20, 20, 260, 140);
             var gemRect    = new Rect(30, 30, 240, 25);
             var buttonRect = new Rect(30, 60, 240, 30);
-            var statusRect = new Rect(30, 95, 240, 25);
+            var resetRect  = new Rect(30, 95, 240, 25);
+            var statusRect = new Rect(30, 122, 240, 25);
 
             GUI.Box(panelRect, "");
 
@@ -31,9 +31,19 @@ namespace Rolice.DebugTools
             GUI.enabled = !_isBusy;
             if (GUI.Button(buttonRect, _isBusy ? "처리 중..." : "광고 보고 보석 받기"))
                 ClaimAsync().Forget();
+            if (GUI.Button(resetRect, "수령 이력 초기화 (테스트용)"))
+                ResetAsync().Forget();
             GUI.enabled = true;
 
             GUI.Label(statusRect, _statusMessage);
+        }
+
+        private async UniTaskVoid ResetAsync()
+        {
+            _isBusy = true;
+            await RcBackendServices.AdReward.ClearAsync();
+            _statusMessage = "이력 초기화 완료";
+            _isBusy = false;
         }
 
         private async UniTaskVoid ClaimAsync()
@@ -56,4 +66,3 @@ namespace Rolice.DebugTools
         }
     }
 }
-#endif

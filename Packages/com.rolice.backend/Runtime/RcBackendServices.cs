@@ -78,5 +78,6 @@ namespace Rolice.System.Backend
     {
         public UniTask RecordRewardAsync()                  => UniTask.CompletedTask;
         public UniTask<DateTime?> GetLastRewardTimeAsync() => UniTask.FromResult<DateTime?>(null);
+        public UniTask ClearAsync()                        => UniTask.CompletedTask;
     }
 }

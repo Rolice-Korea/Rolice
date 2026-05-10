@@ -53,5 +53,15 @@ namespace Rolice.System.Backend
 
             return ts.ToDateTime(); // UTC DateTime
         }
+
+        public async UniTask ClearAsync()
+        {
+            if (Uid == null) return;
+
+            var docRef = Db.Collection(CollectionName).Document(Uid)
+                           .Collection("data").Document(DocKey);
+            await docRef.DeleteAsync();
+            Debug.Log("[AdReward] 수령 이력 초기화 완료");
+        }
     }
 }
