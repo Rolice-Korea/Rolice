@@ -7,6 +7,7 @@ public class RcLobbyBootstrap : MonoBehaviour
     private void Start()
     {
         RcGameContext.Clear();
+        RcUIManager.Instance.Open<RcCurrencyHudPanel>();
         RcUIManager.Instance.Open<RcStageSelectPanel>();
     }
 }

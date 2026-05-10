@@ -73,6 +73,7 @@ namespace Rolice.System
         {
             Data.SetCurrency(key, value);
             SaveLocal();
+            NotifyChanged();
         }
 
         public bool HasOwnedItem(string itemId) => Data.HasOwnedItem(itemId);
