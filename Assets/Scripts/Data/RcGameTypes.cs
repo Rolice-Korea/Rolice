@@ -17,6 +17,10 @@ namespace Rolice
     public enum RcFaceSkinType
     {
         Default,
+        Wood,
+        Stone,
+        Metal,
+        Water,
         Max
     }
 

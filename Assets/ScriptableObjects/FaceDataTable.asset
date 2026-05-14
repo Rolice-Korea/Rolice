@@ -39,6 +39,26 @@ MonoBehaviour:
       FaceMaterial: {fileID: 2100000, guid: 74371cfe276423745bcdc617e783bc30, type: 2}
       TileMaterial: {fileID: 2100000, guid: e74dc88759ff0a2498ddf6aeb8a921e7, type: 2}
       MatchEffect: {fileID: 6946120282878016763, guid: 45bb622c063981a438a8cb8714938e4d, type: 3}
+  - SkinType: 1
+    Colors:
+    - ColorType: 3
+      FaceMaterial: {fileID: 2100000, guid: 4dcdd863a801d3d44abe4553b282bbc5, type: 2}
+      TileMaterial: {fileID: 2100000, guid: 39e8550e279185640b098c7090257b44, type: 2}
+      MatchEffect: {fileID: 6946120282878016763, guid: a0c7bd4533a315747b2249443052a876, type: 3}
+    - ColorType: 5
+      FaceMaterial: {fileID: 2100000, guid: ee32cda6f158a7241ada424afcdda4e3, type: 2}
+      TileMaterial: {fileID: 2100000, guid: 6469e6d667efa3f47bab0703f1cc6004, type: 2}
+      MatchEffect: {fileID: 6946120282878016763, guid: 52447422aaa2bdc4680f62534e5d8deb, type: 3}
+    - ColorType: 2
+      FaceMaterial: {fileID: 2100000, guid: 7bada31283bc1d64383d0fb0b4e42dc5, type: 2}
+      TileMaterial: {fileID: 2100000, guid: e6ab13c4b97d5e94f9f1c0da87223bda, type: 2}
+      MatchEffect: {fileID: 6946120282878016763, guid: cef8ec880b064c84ebc50ecafc46e126, type: 3}
+  - SkinType: 2
+    Colors: []
+  - SkinType: 3
+    Colors: []
+  - SkinType: 4
+    Colors: []
   faceDataEntries:
   - SkinType: 0
     materialEntries:
@@ -80,3 +100,37 @@ MonoBehaviour:
       Effect: {fileID: 6946120282878016763, guid: 52447422aaa2bdc4680f62534e5d8deb, type: 3}
     - ColorType: 6
       Effect: {fileID: 6946120282878016763, guid: 45bb622c063981a438a8cb8714938e4d, type: 3}
+  - SkinType: 1
+    materialEntries:
+    - ColorType: 3
+      Material: {fileID: 2100000, guid: 4dcdd863a801d3d44abe4553b282bbc5, type: 2}
+    - ColorType: 5
+      Material: {fileID: 2100000, guid: ee32cda6f158a7241ada424afcdda4e3, type: 2}
+    - ColorType: 2
+      Material: {fileID: 2100000, guid: 7bada31283bc1d64383d0fb0b4e42dc5, type: 2}
+    tileMaterialEntries:
+    - ColorType: 3
+      Material: {fileID: 2100000, guid: 39e8550e279185640b098c7090257b44, type: 2}
+    - ColorType: 5
+      Material: {fileID: 2100000, guid: 6469e6d667efa3f47bab0703f1cc6004, type: 2}
+    - ColorType: 2
+      Material: {fileID: 2100000, guid: e6ab13c4b97d5e94f9f1c0da87223bda, type: 2}
+    effectEntries:
+    - ColorType: 3
+      Effect: {fileID: 6946120282878016763, guid: a0c7bd4533a315747b2249443052a876, type: 3}
+    - ColorType: 5
+      Effect: {fileID: 6946120282878016763, guid: 52447422aaa2bdc4680f62534e5d8deb, type: 3}
+    - ColorType: 2
+      Effect: {fileID: 6946120282878016763, guid: cef8ec880b064c84ebc50ecafc46e126, type: 3}
+  - SkinType: 2
+    materialEntries: []
+    tileMaterialEntries: []
+    effectEntries: []
+  - SkinType: 3
+    materialEntries: []
+    tileMaterialEntries: []
+    effectEntries: []
+  - SkinType: 4
+    materialEntries: []
+    tileMaterialEntries: []
+    effectEntries: []
