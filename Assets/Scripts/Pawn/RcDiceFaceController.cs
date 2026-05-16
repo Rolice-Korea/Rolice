@@ -65,10 +65,10 @@ public class RcDiceFaceController : MonoBehaviour
         if (diceRenderer == null) return;
 
         var mats = diceRenderer.materials;
-        var table = RcDataTableManager.FaceDataTable;
-        if (table == null) return;
+        var registry = RcDataTableManager.FaceSkinRegistry;
+        if (registry == null) return;
 
-        var skinData = table.GetFaceData(RcSkinSystem.ActiveFaceSkinType);
+        var skinData = registry.GetFaceData(RcSkinSystem.ActiveFaceSkinType);
 
         for (int i = 0; i < 6; i++)
         {

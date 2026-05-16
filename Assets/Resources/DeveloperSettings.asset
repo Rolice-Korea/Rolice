@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69016e1bba57d6548808953b0d03907e, type: 3}
   m_Name: DeveloperSettings
   m_EditorClassIdentifier: Assembly-CSharp::Rolice.System.RcDeveloperSettingsSO
-  offlineMode: 1
+  offlineMode: 0
   backendAlwaysSucceed: 1

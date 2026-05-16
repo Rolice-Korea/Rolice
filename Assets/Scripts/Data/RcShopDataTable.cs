@@ -6,33 +6,24 @@ using Rolice;
 [Serializable]
 public struct RcShopItemData
 {
-    public string ItemId;
-    public string DisplayName;
-    public RcShopTabType TabType;
-    public int Price;
-    public string CurrencyKey;
-    public Color PreviewColor;
+    [RcColumn(120f)] public string        ItemId;
+    [RcColumn(120f)] public string        DisplayName;
+    [RcColumn( 80f)] public RcShopTabType TabType;
+    [RcColumn( 60f)] public int           Price;
+    [RcColumn(100f)] public string        CurrencyKey;
+    [RcColumn( 80f)] public Color         PreviewColor;
 }
 
 [CreateAssetMenu(fileName = "NewShopDataTable", menuName = "Rolice/Shop Data Table")]
-public class RcShopDataTable : ScriptableObject
+public class RcShopDataTable : RcDataTableSO<RcShopItemData>
 {
-    [SerializeField] private RcShopItemData[] shopItems;
-
     private Dictionary<RcShopTabType, List<RcShopItemData>> itemsByTab;
 
-    private void OnEnable()
-    {
-        BuildLookup();
-    }
-
-    private void BuildLookup()
+    protected override void OnTableChanged()
     {
         itemsByTab = new Dictionary<RcShopTabType, List<RcShopItemData>>();
-
-        if (shopItems == null) return;
-
-        foreach (var item in shopItems)
+        if (Rows == null) return;
+        foreach (var item in Rows)
         {
             if (!itemsByTab.TryGetValue(item.TabType, out var list))
             {
@@ -45,24 +36,17 @@ public class RcShopDataTable : ScriptableObject
 
     public List<RcShopItemData> GetItemsByTab(RcShopTabType tabType)
     {
-        if (itemsByTab == null) BuildLookup();
-
+        if (itemsByTab == null) OnTableChanged();
         if (itemsByTab.TryGetValue(tabType, out var list))
             return list;
-
         return new List<RcShopItemData>();
     }
 
     public RcShopItemData? GetItemById(string itemId)
     {
-        if (shopItems == null) return null;
-
-        foreach (var item in shopItems)
-        {
-            if (item.ItemId == itemId)
-                return item;
-        }
-
+        if (Rows == null) return null;
+        foreach (var item in Rows)
+            if (item.ItemId == itemId) return item;
         return null;
     }
 }

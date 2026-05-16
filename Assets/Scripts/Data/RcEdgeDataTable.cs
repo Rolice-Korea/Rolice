@@ -1,31 +1,26 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Rolice;
 
-[CreateAssetMenu(fileName = "NewEdgeDataTable", menuName = "Rolice/Edge Data Table")]
-public class RcEdgeDataTable : ScriptableObject
+[Serializable]
+public struct RcEdgeData
 {
-    [SerializeField] private RcEdgeData[] edgeDataEntries;
+    [RcColumn(120f)] public RcEdgeSkinType SkinType;
+    [RcColumn(200f)] public Material       EdgeMaterial;
+}
 
+[CreateAssetMenu(fileName = "NewEdgeDataTable", menuName = "Rolice/Edge Data Table")]
+public class RcEdgeDataTable : RcDataTableSO<RcEdgeData>
+{
     private Dictionary<RcEdgeSkinType, RcEdgeData> edgeDatas;
 
-    private void OnEnable()
-    {
-        BuildLookup();
-    }
-
-    private void BuildLookup()
-    {
-        edgeDatas = new Dictionary<RcEdgeSkinType, RcEdgeData>();
-        if (edgeDataEntries == null) return;
-        foreach (var entry in edgeDataEntries)
-            edgeDatas[entry.SkinType] = entry;
-    }
+    protected override void OnTableChanged() =>
+        edgeDatas = BuildLookup(r => r.SkinType);
 
     public RcEdgeData GetEdgeData(RcEdgeSkinType skinType)
     {
-        if (edgeDatas == null) BuildLookup();
-
+        if (edgeDatas == null) OnTableChanged();
         if (edgeDatas.TryGetValue(skinType, out var edgeData))
             return edgeData;
 

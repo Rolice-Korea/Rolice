@@ -109,9 +109,9 @@ public class RcDiceIconWidget : MonoBehaviour
         var bottomColor = dicePawn.GetBottomColor();
         if (bottomColor == RcColorType.None) return;
 
-        var table = RcDataTableManager.FaceDataTable;
-        if (table == null) return;
-        var skin = table.GetFaceData(RcSkinSystem.ActiveFaceSkinType);
+        var registry = RcDataTableManager.FaceSkinRegistry;
+        if (registry == null) return;
+        var skin = registry.GetFaceData(RcSkinSystem.ActiveFaceSkinType);
         var material = skin?.GetFaceMaterial(bottomColor);
         if (material == null) return;
 

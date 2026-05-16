@@ -79,20 +79,20 @@ public class RcLevelEditorProxy : MonoBehaviour
             ApplyEditorTileColor(go, tileData.colorType);
     }
 
-    static RcFaceDataTable _cachedFaceDataTable;
+    static RcFaceSkinRegistry _cachedFaceSkinRegistry;
 
     static void ApplyEditorTileColor(GameObject go, RcColorType color)
     {
-        if (_cachedFaceDataTable == null)
+        if (_cachedFaceSkinRegistry == null)
         {
-            var guids = AssetDatabase.FindAssets("t:RcFaceDataTable");
+            var guids = AssetDatabase.FindAssets("t:RcFaceSkinRegistry");
             if (guids.Length > 0)
-                _cachedFaceDataTable = AssetDatabase.LoadAssetAtPath<RcFaceDataTable>(
+                _cachedFaceSkinRegistry = AssetDatabase.LoadAssetAtPath<RcFaceSkinRegistry>(
                     AssetDatabase.GUIDToAssetPath(guids[0]));
         }
-        if (_cachedFaceDataTable == null) return;
+        if (_cachedFaceSkinRegistry == null) return;
 
-        var mat = _cachedFaceDataTable.GetFaceData(RcFaceSkinType.Default)?.GetTileMaterial(color);
+        var mat = _cachedFaceSkinRegistry.GetFaceData(RcFaceSkinType.Default)?.GetTileMaterial(color);
         if (mat == null) return;
 
         var renderer = go.GetComponentInChildren<Renderer>();

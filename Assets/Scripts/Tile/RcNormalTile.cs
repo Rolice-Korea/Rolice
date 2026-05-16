@@ -20,7 +20,7 @@ public class RcNormalTile : RcTileBase
     private void ApplyColorMaterial()
     {
         if (tileRenderer == null) return;
-        var mat = RcDataTableManager.FaceDataTable?.GetFaceData(RcSkinSystem.ActiveFaceSkinType)?.GetTileMaterial(color);
+        var mat = RcDataTableManager.FaceSkinRegistry?.GetFaceData(RcSkinSystem.ActiveFaceSkinType)?.GetTileMaterial(color);
         if (mat != null)
             tileRenderer.material = mat;
     }
@@ -41,7 +41,7 @@ public class RcNormalTile : RcTileBase
 
             if (RcDataTableManager.Instance != null)
             {
-                var faceData = RcDataTableManager.FaceDataTable.GetFaceData(RcSkinSystem.ActiveFaceSkinType);
+                var faceData = RcDataTableManager.FaceSkinRegistry.GetFaceData(RcSkinSystem.ActiveFaceSkinType);
                 var fxPrefab = faceData?.GetMatchEffect(color);
                 if (fxPrefab != null)
                 {

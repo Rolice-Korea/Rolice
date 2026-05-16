@@ -63,7 +63,7 @@ namespace Rolice.UI
 
         private void RefreshFaceList()
         {
-            var table = RcDataTableManager.FaceDataTable;
+            var table = RcDataTableManager.FaceSkinRegistry;
             if (table == null) return;
 
             // TODO: 실제 데이터 테이블에서 리스트를 가져오는 기능을 보강해야 할 수도 있음

@@ -40,10 +40,9 @@ public class RcColorTile : RcTileBase
         colorType = newColorType;
         
         if (meshRenderer == null) return;
-        if (RcDataTableManager.FaceDataTable == null) return;
+        if (RcDataTableManager.FaceSkinRegistry == null) return;
 
-        // 현재 사용 중인 스킨 데이터를 가져옴
-        var faceData = RcDataTableManager.FaceDataTable.GetFaceData(RcSkinSystem.ActiveFaceSkinType);
+        var faceData = RcDataTableManager.FaceSkinRegistry.GetFaceData(RcSkinSystem.ActiveFaceSkinType);
         if (faceData == null) return;
 
         Material skinMat = faceData?.GetFaceMaterial(colorType);
