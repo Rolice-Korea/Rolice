@@ -7,19 +7,21 @@ namespace Rolice.System.Backend
     /// </summary>
     public sealed class RcDefaultBackend : IBackend
     {
-        public IAuthService      Auth      { get; }
-        public ICloudSyncService CloudSync { get; }
-        public IEconomyService   Economy   { get; }
-        public IAdsService       Ads       { get; }
-        public IAdRewardStorage  AdReward  { get; }
+        public IAuthService        Auth       { get; }
+        public ICloudSyncService   CloudSync  { get; }
+        public IEconomyService     Economy    { get; }
+        public IHeartRegenService  HeartRegen { get; }
+        public IAdsService         Ads        { get; }
+        public IAdRewardStorage    AdReward   { get; }
 
         public RcDefaultBackend(IPlayerDataCache playerData)
         {
-            Auth      = new RcFirebaseAuthService();
-            CloudSync = new RcFirestoreService();
-            Economy   = new RcFirestoreEconomyService(playerData);
-            Ads       = new RcAdMobAdsService();
-            AdReward  = new RcFirestoreAdRewardStorage();
+            Auth       = new RcFirebaseAuthService();
+            CloudSync  = new RcFirestoreService();
+            Economy    = new RcFirestoreEconomyService(playerData);
+            HeartRegen = new RcFirestoreHeartRegenService(playerData);
+            Ads        = new RcAdMobAdsService();
+            AdReward   = new RcFirestoreAdRewardStorage();
         }
     }
 }

@@ -66,6 +66,21 @@ namespace Rolice.UI
                 return;
             }
 
+            // 하트 소모 시도 (네트워크 오류 시 재시도, 잔액 부족 시 하트샵 진입)
+            bool heartSpent = false;
+            await RcSystemDialogManager.Instance.ShowUntilSuccessAsync(async () =>
+            {
+                heartSpent = await RcHeartManager.Instance.TrySpendAsync();
+            }, "Connection failed.\nPlease retry.");
+
+            if (!heartSpent)
+            {
+                Panel.Close();
+                RcUIManager.Instance.Open<RcHeartShopPanel>();
+                _isSyncing = false;
+                return;
+            }
+
             _isSyncing = false;
             Panel.Close();
             RcGameFlowManager.Instance.GoToStage(stageNumber);

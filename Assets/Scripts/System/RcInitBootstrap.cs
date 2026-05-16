@@ -35,7 +35,9 @@ public sealed class RcInitBootstrap : MonoBehaviour
         }, "Connection failed.\nPlease check your network.");
 
     private UniTask SyncDataAsync() =>
-        RcSystemDialogManager.Instance.ShowUntilSuccessAsync(
-            () => RcPlayerState.Instance.SyncFromCloudAsync(),
-            "Connection failed.\nPlease check your network.");
+        RcSystemDialogManager.Instance.ShowUntilSuccessAsync(async () =>
+        {
+            await RcPlayerState.Instance.SyncFromCloudAsync();
+            await RcHeartManager.Instance.SyncAsync();
+        }, "Connection failed.\nPlease check your network.");
 }

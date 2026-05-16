@@ -7,31 +7,34 @@ namespace Rolice.System.Backend
     {
         private static IBackend _backend = new NullBackend();
 
-        public static IAuthService      Auth      => _backend.Auth;
-        public static ICloudSyncService CloudSync => _backend.CloudSync;
-        public static IEconomyService   Economy   => _backend.Economy;
-        public static IAdsService       Ads       => _backend.Ads;
-        public static IAdRewardStorage  AdReward  => _backend.AdReward;
+        public static IAuthService        Auth       => _backend.Auth;
+        public static ICloudSyncService   CloudSync  => _backend.CloudSync;
+        public static IEconomyService     Economy    => _backend.Economy;
+        public static IHeartRegenService  HeartRegen => _backend.HeartRegen;
+        public static IAdsService         Ads        => _backend.Ads;
+        public static IAdRewardStorage    AdReward   => _backend.AdReward;
 
-        public static void Register(IBackend backend)               => _backend = backend;
+        public static void Register(IBackend backend)                 => _backend = backend;
         public static void RegisterOffline(bool alwaysSucceed = true) => _backend = new NullBackend(alwaysSucceed);
     }
 
     internal sealed class NullBackend : IBackend
     {
-        public IAuthService      Auth      { get; }
-        public ICloudSyncService CloudSync { get; }
-        public IEconomyService   Economy   { get; }
-        public IAdsService       Ads       { get; }
-        public IAdRewardStorage  AdReward  { get; }
+        public IAuthService        Auth       { get; }
+        public ICloudSyncService   CloudSync  { get; }
+        public IEconomyService     Economy    { get; }
+        public IHeartRegenService  HeartRegen { get; }
+        public IAdsService         Ads        { get; }
+        public IAdRewardStorage    AdReward   { get; }
 
         public NullBackend(bool alwaysSucceed = false)
         {
-            Auth      = new NullAuthService(alwaysSucceed);
-            CloudSync = new NullCloudSyncService();
-            Economy   = new NullEconomyService(alwaysSucceed);
-            Ads       = new NullAdsService(alwaysSucceed);
-            AdReward  = new NullAdRewardStorage();
+            Auth       = new NullAuthService(alwaysSucceed);
+            CloudSync  = new NullCloudSyncService();
+            Economy    = new NullEconomyService(alwaysSucceed);
+            HeartRegen = new NullHeartRegenService(alwaysSucceed);
+            Ads        = new NullAdsService(alwaysSucceed);
+            AdReward   = new NullAdRewardStorage();
         }
     }
 
@@ -79,5 +82,15 @@ namespace Rolice.System.Backend
         public UniTask RecordRewardAsync()                  => UniTask.CompletedTask;
         public UniTask<DateTime?> GetLastRewardTimeAsync() => UniTask.FromResult<DateTime?>(null);
         public UniTask ClearAsync()                        => UniTask.CompletedTask;
+    }
+
+    internal sealed class NullHeartRegenService : IHeartRegenService
+    {
+        private readonly bool _alwaysSucceed;
+        public NullHeartRegenService(bool alwaysSucceed) => _alwaysSucceed = alwaysSucceed;
+
+        public UniTask       SyncRegenAsync(int maxHearts)          => UniTask.CompletedTask;
+        public UniTask<bool> SpendHeartAsync(int maxHearts)         => UniTask.FromResult(_alwaysSucceed);
+        public UniTask<DateTime?> GetLastRegenAtAsync()             => UniTask.FromResult<DateTime?>(null);
     }
 }
