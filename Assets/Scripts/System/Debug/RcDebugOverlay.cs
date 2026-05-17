@@ -88,7 +88,7 @@ namespace Rolice.DebugTools
         private async UniTaskVoid AddHeartAsync()
         {
             _isBusy = true;
-            await RcBackendServices.Economy.AddAsync(RcCurrencyId.Heart, 1);
+            await RcBackendServices.Economy.AddAsync(RcCurrencyId.Heart.ToKey(), 1);
             await RcHeartManager.Instance.SyncAsync();
             _isBusy = false;
         }
