@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using Rolice.Define;
 using Rolice.System;
 using Rolice.System.Backend;
 using UnityEngine;
@@ -7,6 +9,7 @@ namespace Rolice.DebugTools
     public sealed class RcDebugOverlay : MonoBehaviour
     {
         private bool _visible;
+        private bool _isBusy;
 
         private void OnGUI()
         {
@@ -74,8 +77,20 @@ namespace Rolice.DebugTools
                 GUI.Label(new Rect(padding, 30 + padding + lineH * i, w - padding * 2, lineH), lines[i]);
 
             float btnY = 30 + padding + lineH * lines.Length + 4f;
+            GUI.enabled = !_isBusy;
             if (GUI.Button(new Rect(padding, btnY, w - padding * 2, 28f), "Sign Out"))
                 auth.SignOut();
+            if (GUI.Button(new Rect(padding, btnY + 32f, w - padding * 2, 28f), "+1 Heart (Debug)"))
+                AddHeartAsync().Forget();
+            GUI.enabled = true;
+        }
+
+        private async UniTaskVoid AddHeartAsync()
+        {
+            _isBusy = true;
+            await RcBackendServices.Economy.AddAsync(RcCurrencyId.Heart, 1);
+            await RcHeartManager.Instance.SyncAsync();
+            _isBusy = false;
         }
     }
 }
