@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Engine.UI;
 using Rolice;
 using Rolice.System;
+using Rolice.System.Backend;
 using UnityEngine;
 
 namespace Rolice.UI
@@ -19,6 +21,7 @@ namespace Rolice.UI
         private RcShopTabType currentTab = RcShopTabType.Currency;
         private List<RcShopItemData> currentItems = new();
         private int selectedIndex = -1;
+        private bool isBuying;
 
         protected override void OnInitialize()
         {
@@ -103,36 +106,48 @@ namespace Rolice.UI
             RefreshItemList();
         }
 
-        private void HandleBuy()
+        private void HandleBuy() => HandleBuyAsync().Forget();
+
+        private async UniTaskVoid HandleBuyAsync()
         {
+            if (isBuying) return;
             if (selectedIndex < 0 || selectedIndex >= currentItems.Count) return;
 
             var item = currentItems[selectedIndex];
-            var playerState = RcPlayerState.Instance;
 
-            // 이미 보유한 아이템은 구매 불가
-            if (playerState.HasOwnedItem(item.ItemId))
+            // 이미 보유한 아이템은 구매 불가 (이중 클릭 방어)
+            if (RcPlayerState.Instance.HasOwnedItem(item.ItemId)) return;
+
+            isBuying = true;
+            Panel.SetBuyButtonInteractable(false);
+
+            var economy = RcBackendServices.Economy;
+
+            // 재화 차감 (Firestore 트랜잭션, 네트워크 오류 시 재시도 다이얼로그)
+            bool success = false;
+            await RcSystemDialogManager.Instance.ShowUntilSuccessAsync(async () =>
             {
-                Debug.Log($"[RcUIShop] 이미 보유한 아이템: {item.ItemId}");
+                success = await economy.SpendAsync(item.CurrencyKey, item.Price);
+            }, "Connection failed.\nPlease retry.");
+
+            if (!success)
+            {
+                // TODO: 재화 부족 전용 팝업 (RcGemShopPanel 등 연계)
+                Debug.Log($"[RcUIShop] 재화 부족: {item.CurrencyKey} 필요={item.Price}");
+                isBuying = false;
+                UpdateSelectedDisplay();
                 return;
             }
 
-            // TODO: 서버 연동 — 구매 요청을 서버로 보내고 응답 후 처리
-            // 현재는 로컬 처리만 수행 (서버 미구현)
-            
-            Debug.Log($"[RcUIShop] 구매 요청: {item.ItemId}, 가격: {item.Price} {item.CurrencyKey}");
+            // 아이템 지급 (Firestore merge, 네트워크 오류 시 재시도 다이얼로그)
+            // SpendAsync 성공 후 AddItemAsync 실패 시 재화만 차감되는 문제를 막기 위해 반드시 성공까지 대기
+            await RcSystemDialogManager.Instance.ShowUntilSuccessAsync(
+                () => economy.AddItemAsync(item.ItemId),
+                "Connection failed.\nPlease retry.");
 
-            // --- 로컬 처리 (서버 연동 시 아래 로직을 서버 응답 콜백으로 이동) ---
-            // int currentCurrency = playerState.GetCurrency(item.CurrencyKey);
-            // if (currentCurrency < item.Price)
-            // {
-            //     Debug.Log($"[RcUIShop] 재화 부족: {item.CurrencyKey} 현재={currentCurrency}, 필요={item.Price}");
-            //     return;
-            // }
-            // playerState.SetCurrency(item.CurrencyKey, currentCurrency - item.Price);
-            // playerState.AddOwnedItem(item.ItemId);
-            // --- 로컬 처리 끝 ---
+            Debug.Log($"[RcUIShop] 구매 완료: {item.ItemId}");
 
+            isBuying = false;
             RefreshItemList();
         }
 
