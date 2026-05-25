@@ -6,7 +6,7 @@ using Rolice;
 [Serializable]
 public struct RcEdgeSkinRow
 {
-    [RcColumn(100f)] public string          Id;
+    [RcColumn(100f)] public uint            Id;
     [RcColumn(120f)] public RcEdgeSkinType SkinType;
     [RcColumn(200f)] public Material       EdgeMaterial;
     [RcColumn(150f)] public Sprite         IconSprite;

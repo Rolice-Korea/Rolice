@@ -9,7 +9,7 @@ using Rolice;
 [Serializable]
 public struct RcFaceSkinEntry
 {
-    [RcColumn(100f)] public string              Id;
+    [RcColumn(100f)] public uint                Id;
     [RcColumn(120f)] public RcFaceSkinType      SkinType;
     [RcColumn(220f)] public RcFaceSkinDataTable Table;
 }
