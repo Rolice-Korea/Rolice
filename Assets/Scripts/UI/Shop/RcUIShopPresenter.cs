@@ -92,7 +92,7 @@ namespace Rolice.UI
             Panel.RefreshItemList((int)currentTab, count, (index, widget) =>
             {
                 var    entry      = registry.Rows[index];
-                string itemId     = entry.Id;
+                string itemId     = entry.Id.ToString();
                 currentItemIds.Add(itemId);
 
                 var    skinData   = entry.Table;
@@ -122,7 +122,7 @@ namespace Rolice.UI
             Panel.RefreshItemList((int)currentTab, count, (index, widget) =>
             {
                 var    row    = table.Rows[index];
-                string itemId = row.Id;
+                string itemId = row.Id.ToString();
                 currentItemIds.Add(itemId);
 
                 Sprite icon   = row.IconSprite;
