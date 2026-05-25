@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 6650510152926458488}
   - component: {fileID: 4990481259826459002}
   m_Layer: 0
-  m_Name: FaceDataManger
+  m_Name: DataManger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -169,8 +169,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RcDataTableManager
   faceSkinRegistryRef: {fileID: 11400000, guid: 10836fbff62fd9745ab19d337e0ca698, type: 2}
-  edgeDataTableRef: {fileID: 0}
-  shopDataTableRef: {fileID: 0}
+  edgeSkinDataTableRef: {fileID: 11400000, guid: 7a289ca65c7759041a05fe030332dc2f, type: 2}
 --- !u!1 &5123981453975841652
 GameObject:
   m_ObjectHideFlags: 0

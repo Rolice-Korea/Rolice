@@ -38,13 +38,24 @@ namespace Rolice.UI
             onClicked = null;
         }
 
-        public void Setup(int index, Color previewColor, string price, Action<int> callback)
+        public void Setup(int index, Color previewColor, Sprite iconSprite, string price, Action<int> callback)
         {
             itemIndex = index;
             onClicked = callback;
 
             if (skinImage != null)
-                skinImage.color = previewColor;
+            {
+                if (iconSprite != null)
+                {
+                    skinImage.sprite = iconSprite;
+                    skinImage.color = Color.white;
+                }
+                else
+                {
+                    skinImage.sprite = null;
+                    skinImage.color = previewColor;
+                }
+            }
 
             if (priceText != null)
                 priceText.text = price;

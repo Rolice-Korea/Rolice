@@ -9,6 +9,7 @@ using Rolice;
 [Serializable]
 public struct RcFaceSkinEntry
 {
+    [RcColumn(100f)] public string              Id;
     [RcColumn(120f)] public RcFaceSkinType      SkinType;
     [RcColumn(220f)] public RcFaceSkinDataTable Table;
 }
@@ -32,13 +33,15 @@ public class RcFaceSkinRegistry : RcDataTableSO<RcFaceSkinEntry>
     }
 
     /// <summary>
-    /// 기존 GetFaceData(skinType) 호출부와 동일한 시그니처 유지.
+    /// 지정된 스킨 타입에 매핑된 데이터 테이블(클래스)을 곧바로 반환합니다.
     /// </summary>
-    public RcFaceData? GetFaceData(RcFaceSkinType skinType)
+    public RcFaceSkinDataTable GetFaceData(RcFaceSkinType skinType)
     {
         if (lookup == null) OnTableChanged();
         if (lookup.TryGetValue(skinType, out var table))
-            return table.GetFaceData();
+        {
+            return table;
+        }
 
         Debug.LogWarning($"[RcFaceSkinRegistry] SkinType not found: {skinType}");
         return null;

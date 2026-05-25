@@ -56,7 +56,7 @@ namespace Rolice.UI
         private void RefreshCurrencyList()
         {
             // TODO: Currency 탭 — 동료 작업 예정
-            Panel.RefreshItemList(0, null);
+            Panel.RefreshItemList((int)currentTab, 0, null);
         }
 
         private void RefreshFaceList()
@@ -65,33 +65,42 @@ namespace Rolice.UI
             if (table == null) return;
 
             int count = (int)RcFaceSkinType.Max;
-            Panel.RefreshItemList(count, (index, widget) =>
+            Panel.RefreshItemList((int)currentTab, count, (index, widget) =>
             {
                 var type = (RcFaceSkinType)index;
                 var skinData = table.GetFaceData(type);
+                Sprite iconSprite = skinData != null ? skinData.IconSprite : null;
 
                 Color previewColor = Color.white;
-                if (skinData.HasValue)
+                if (skinData != null)
                 {
-                    var colorMat = skinData.Value.GetFaceMaterial(RcColorType.White);
+                    var colorMat = skinData.GetFaceMaterial(RcColorType.White);
                     if (colorMat != null) previewColor = colorMat.color;
                 }
 
-                widget.Setup(index, previewColor, "", HandleItemSelected);
+                widget.Setup(index, previewColor, iconSprite, "", HandleItemSelected);
                 widget.SetState(index == selectedIndex, false);
             });
         }
 
         private void RefreshEdgeList()
         {
-            var table = RcDataTableManager.EdgeDataTable;
-            if (table == null) return;
+            var table = RcDataTableManager.EdgeSkinDataTable;
+            if (table == null || table.Rows == null) return;
 
-            int count = (int)RcEdgeSkinType.Max;
-            Panel.RefreshItemList(count, (index, widget) =>
+            int count = table.Rows.Length;
+            Panel.RefreshItemList((int)currentTab, count, (index, widget) =>
             {
-                var type = (RcEdgeSkinType)index;
-                widget.Setup(index, Color.gray, "", HandleItemSelected);
+                var row = table.Rows[index];
+                Sprite iconSprite = row.IconSprite;
+                
+                Color previewColor = Color.gray;
+                if (row.EdgeMaterial != null)
+                {
+                    previewColor = row.EdgeMaterial.color;
+                }
+
+                widget.Setup(index, previewColor, iconSprite, "", HandleItemSelected);
                 widget.SetState(index == selectedIndex, false);
             });
         }

@@ -37,7 +37,7 @@ namespace Rolice.UI
         [SerializeField] private TMPro.TMP_Text priceText;
 
         private RcUIShopPresenter presenter;
-        private readonly List<RcUIShopItem> itemPool = new();
+        private readonly Dictionary<int, List<RcUIShopItem>> tabItemPools = new();
 
         public event Action OnCloseClicked;
         public event Action OnBuyClicked;
@@ -98,26 +98,33 @@ namespace Rolice.UI
 
         public Transform CurrentItemListParent => tabList != null ? tabList.ActiveTargetContent : null;
 
-        public void RefreshItemList(int count, Action<int, RcUIShopItem> binder)
+        public void RefreshItemList(int tabIndex, int count, Action<int, RcUIShopItem> binder)
         {
             var parent = CurrentItemListParent;
             if (parent == null) return;
 
-            // 리스트 초기화 (풀링 또는 재생성)
-            foreach (var item in itemPool) item.gameObject.SetActive(false);
+            // 해당 탭 전용 격리 풀 획득
+            if (!tabItemPools.TryGetValue(tabIndex, out var pool))
+            {
+                pool = new List<RcUIShopItem>();
+                tabItemPools[tabIndex] = pool;
+            }
+
+            // 해당 탭 풀 내부의 모든 아이템 비활성화
+            foreach (var item in pool) item.gameObject.SetActive(false);
 
             for (int i = 0; i < count; i++)
             {
                 RcUIShopItem widget;
-                if (i < itemPool.Count)
+                if (i < pool.Count)
                 {
-                    widget = itemPool[i];
+                    widget = pool[i];
                 }
                 else
                 {
                     widget = Instantiate(itemTemplate, parent);
                     widget.Initialize();
-                    itemPool.Add(widget);
+                    pool.Add(widget);
                 }
 
                 widget.gameObject.SetActive(true);
@@ -127,7 +134,10 @@ namespace Rolice.UI
 
         private void OnDestroy()
         {
-            foreach (var item in itemPool) item.Cleanup();
+            foreach (var pool in tabItemPools.Values)
+            {
+                foreach (var item in pool) item.Cleanup();
+            }
             if (tabList != null) tabList.Cleanup();
         }
     }

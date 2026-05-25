@@ -69,23 +69,21 @@ namespace Rolice.UI
             // TODO: 실제 데이터 테이블에서 리스트를 가져오는 기능을 보강해야 할 수도 있음
             // 현재는 Enum을 기반으로 루프 (데이터 테이블 확장에 따라 변경 가능)
             int count = (int)RcFaceSkinType.Max;
-            Panel.RefreshItemList(count, (index, widget) =>
+            Panel.RefreshItemList((int)currentTab, count, (index, widget) =>
             {
                 var type = (RcFaceSkinType)index;
                 var skinData = table.GetFaceData(type);
-                
-                // RcFaceData에는 Name 필드가 없으므로 Enum 타입명을 기본 이름으로 사용
-                string label = type.ToString();
+                Sprite iconSprite = skinData != null ? skinData.IconSprite : null;
                 
                 // 프리뷰 색상 (필요 시 데이터에서 추출)
                 Color previewColor = Color.white;
-                if (skinData.HasValue)
+                if (skinData != null)
                 {
-                    var colorMat = skinData.Value.GetFaceMaterial(RcColorType.White);
+                    var colorMat = skinData.GetFaceMaterial(RcColorType.White);
                     if (colorMat != null) previewColor = colorMat.color;
                 }
 
-                widget.Setup(index, previewColor, HandleItemSelected);
+                widget.Setup(index, previewColor, iconSprite, HandleItemSelected);
                 widget.SetState(selectedFaceSkin == type, false);
             });
 
@@ -105,15 +103,23 @@ namespace Rolice.UI
 
         private void RefreshEdgeList()
         {
-            var table = RcDataTableManager.EdgeDataTable;
-            if (table == null) return;
+            var table = RcDataTableManager.EdgeSkinDataTable;
+            if (table == null || table.Rows == null) return;
 
-            int count = (int)RcEdgeSkinType.Max;
-            Panel.RefreshItemList(count, (index, widget) =>
+            int count = table.Rows.Length;
+            Panel.RefreshItemList((int)currentTab, count, (index, widget) =>
             {
-                var type = (RcEdgeSkinType)index;
-                widget.Setup(index, Color.gray, HandleItemSelected);
-                widget.SetState(selectedEdgeSkin == type, false);
+                var row = table.Rows[index];
+                Sprite iconSprite = row.IconSprite;
+                
+                Color previewColor = Color.gray;
+                if (row.EdgeMaterial != null)
+                {
+                    previewColor = row.EdgeMaterial.color;
+                }
+
+                widget.Setup(index, previewColor, iconSprite, HandleItemSelected);
+                widget.SetState(selectedEdgeSkin == row.SkinType, false);
             });
 
             UpdateSelectedNameDisplay();
