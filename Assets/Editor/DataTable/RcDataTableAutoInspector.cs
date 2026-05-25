@@ -29,6 +29,17 @@ public class RcDataTableAutoInspector : Editor
     {
         serializedObject.Update();
 
+        // rows 제외한 헤더 필드 먼저 표시
+        var iter = serializedObject.GetIterator();
+        iter.NextVisible(true); // m_Script skip
+        while (iter.NextVisible(false))
+        {
+            if (iter.name == "rows") continue;
+            EditorGUILayout.PropertyField(iter, true);
+        }
+
+        EditorGUILayout.Space(4);
+
         if (_list != null)
             _list.DoLayoutList();
 

@@ -51,4 +51,17 @@ namespace Rolice
         Face,
         Edge
     }
+
+    public enum RcItemType
+    {
+        Currency,
+        FaceSkin,
+        EdgeSkin,
+    }
+
+    public enum RcCostType
+    {
+        Gold,
+        Jewel,
+    }
 }
