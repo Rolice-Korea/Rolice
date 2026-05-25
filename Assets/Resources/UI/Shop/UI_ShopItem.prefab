@@ -11,14 +11,14 @@ GameObject:
   - component: {fileID: 1361799993175859266}
   - component: {fileID: 6581757413585855588}
   - component: {fileID: 7423454164510816011}
-  - component: {fileID: 1814125249066840764}
+  - component: {fileID: 6954486520398708496}
   m_Layer: 5
   m_Name: UI_ShopItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1361799993175859266
 RectTransform:
   m_ObjectHideFlags: 0
@@ -77,7 +77,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1814125249066840764
+--- !u!114 &6954486520398708496
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -86,11 +86,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 509603268904454218}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5663d0d9f83e8a942ac687305da836d8, type: 3}
+  m_Script: {fileID: 11500000, guid: 0aed7599db7b7cd428bea40dfe90dbee, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Rolice.UI.RcUIBagItem
+  m_EditorClassIdentifier: Assembly-CSharp::Rolice.UI.RcUIShopItem
   button: {fileID: 8210101593720859514}
   skinImage: {fileID: 2938007430508637871}
+  priceText: {fileID: 0}
   stateMachine: {fileID: 0}
 --- !u!1 &3301294040100640230
 GameObject:

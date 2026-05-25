@@ -1,27 +1,19 @@
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
+using System;
 using Engine.UI;
 using Rolice;
 using Rolice.System;
-using Rolice.System.Backend;
 using UnityEngine;
 
 namespace Rolice.UI
 {
     /// <summary>
     /// 상점 UI의 비즈니스 로직을 담당하는 프레젠터.
-    /// Shop 데이터 테이블에서 아이템을 가져와 뷰를 갱신하고, 구매 처리를 수행함.
-    /// 
-    /// Bag과의 핵심 차이:
-    ///   - Bag: RcPlayerState(플레이어 보유 데이터)에서 아이템 목록 생성
-    ///   - Shop: RcShopDataTable(상점 데이터 테이블)에서 판매 아이템 목록 생성
+    /// 각 탭(Currency/Face/Edge)별로 해당 DataTable을 직접 참조하여 아이템 목록을 생성함.
     /// </summary>
     public class RcUIShopPresenter : RcUIPresenter<RcUIShopPanel>
     {
         private RcShopTabType currentTab = RcShopTabType.Currency;
-        private List<RcShopItemData> currentItems = new();
         private int selectedIndex = -1;
-        private bool isBuying;
 
         protected override void OnInitialize()
         {
@@ -44,49 +36,95 @@ namespace Rolice.UI
         private void RefreshView()
         {
             Panel.SelectTab((int)currentTab);
-            RefreshItemList();
-        }
 
-        private void RefreshItemList()
-        {
-            var table = RcDataTableManager.ShopDataTable;
-            if (table == null) return;
-
-            currentItems = table.GetItemsByTab(currentTab);
-            var playerState = RcPlayerState.Instance;
-
-            Panel.RefreshItemList(currentItems.Count, (index, widget) =>
+            switch (currentTab)
             {
-                var itemData = currentItems[index];
-                bool isOwned = playerState.HasOwnedItem(itemData.ItemId);
-                string priceLabel = isOwned ? "보유" : $"{itemData.Price}";
-
-                widget.Setup(index, itemData.PreviewColor, priceLabel, HandleItemSelected);
-                widget.SetState(index == selectedIndex, isOwned);
-            });
+                case RcShopTabType.Currency:
+                    RefreshCurrencyList();
+                    break;
+                case RcShopTabType.Face:
+                    RefreshFaceList();
+                    break;
+                case RcShopTabType.Edge:
+                    RefreshEdgeList();
+                    break;
+            }
 
             UpdateSelectedDisplay();
+        }
+
+        private void RefreshCurrencyList()
+        {
+            // TODO: Currency 탭 — 동료 작업 예정
+            Panel.RefreshItemList(0, null);
+        }
+
+        private void RefreshFaceList()
+        {
+            var table = RcDataTableManager.FaceSkinRegistry;
+            if (table == null) return;
+
+            int count = (int)RcFaceSkinType.Max;
+            Panel.RefreshItemList(count, (index, widget) =>
+            {
+                var type = (RcFaceSkinType)index;
+                var skinData = table.GetFaceData(type);
+
+                Color previewColor = Color.white;
+                if (skinData.HasValue)
+                {
+                    var colorMat = skinData.Value.GetFaceMaterial(RcColorType.White);
+                    if (colorMat != null) previewColor = colorMat.color;
+                }
+
+                widget.Setup(index, previewColor, "", HandleItemSelected);
+                widget.SetState(index == selectedIndex, false);
+            });
+        }
+
+        private void RefreshEdgeList()
+        {
+            var table = RcDataTableManager.EdgeDataTable;
+            if (table == null) return;
+
+            int count = (int)RcEdgeSkinType.Max;
+            Panel.RefreshItemList(count, (index, widget) =>
+            {
+                var type = (RcEdgeSkinType)index;
+                widget.Setup(index, Color.gray, "", HandleItemSelected);
+                widget.SetState(index == selectedIndex, false);
+            });
         }
 
         private void UpdateSelectedDisplay()
         {
             if (Panel == null) return;
 
-            if (selectedIndex >= 0 && selectedIndex < currentItems.Count)
-            {
-                var item = currentItems[selectedIndex];
-                bool isOwned = RcPlayerState.Instance.HasOwnedItem(item.ItemId);
-
-                Panel.SetSelectedItemName(item.DisplayName);
-                Panel.SetSelectedItemPrice(isOwned ? "보유 중" : $"{item.Price} {item.CurrencyKey}");
-                Panel.SetBuyButtonInteractable(!isOwned);
-            }
-            else
+            if (selectedIndex < 0)
             {
                 Panel.SetSelectedItemName("");
                 Panel.SetSelectedItemPrice("");
                 Panel.SetBuyButtonInteractable(false);
+                return;
             }
+
+            string itemName = "";
+            string itemPrice = ""; // 가격 정보는 나중에 표시
+
+            if (currentTab == RcShopTabType.Face)
+            {
+                var type = (RcFaceSkinType)selectedIndex;
+                itemName = type.ToString();
+            }
+            else if (currentTab == RcShopTabType.Edge)
+            {
+                var type = (RcEdgeSkinType)selectedIndex;
+                itemName = type.ToString();
+            }
+
+            Panel.SetSelectedItemName(itemName);
+            Panel.SetSelectedItemPrice(itemPrice);
+            Panel.SetBuyButtonInteractable(true);
         }
 
         private void HandleTabChanged(int index)
@@ -102,53 +140,13 @@ namespace Rolice.UI
         private void HandleItemSelected(int index)
         {
             selectedIndex = index;
-            UpdateSelectedDisplay();
-            RefreshItemList();
+            RefreshView();
         }
 
-        private void HandleBuy() => HandleBuyAsync().Forget();
-
-        private async UniTaskVoid HandleBuyAsync()
+        private void HandleBuy()
         {
-            if (isBuying) return;
-            if (selectedIndex < 0 || selectedIndex >= currentItems.Count) return;
-
-            var item = currentItems[selectedIndex];
-
-            // 이미 보유한 아이템은 구매 불가 (이중 클릭 방어)
-            if (RcPlayerState.Instance.HasOwnedItem(item.ItemId)) return;
-
-            isBuying = true;
-            Panel.SetBuyButtonInteractable(false);
-
-            var economy = RcBackendServices.Economy;
-
-            // 재화 차감 (Firestore 트랜잭션, 네트워크 오류 시 재시도 다이얼로그)
-            bool success = false;
-            await RcSystemDialogManager.Instance.ShowUntilSuccessAsync(async () =>
-            {
-                success = await economy.SpendAsync(item.CurrencyKey, item.Price);
-            }, "Connection failed.\nPlease retry.");
-
-            if (!success)
-            {
-                // TODO: 재화 부족 전용 팝업 (RcGemShopPanel 등 연계)
-                Debug.Log($"[RcUIShop] 재화 부족: {item.CurrencyKey} 필요={item.Price}");
-                isBuying = false;
-                UpdateSelectedDisplay();
-                return;
-            }
-
-            // 아이템 지급 (Firestore merge, 네트워크 오류 시 재시도 다이얼로그)
-            // SpendAsync 성공 후 AddItemAsync 실패 시 재화만 차감되는 문제를 막기 위해 반드시 성공까지 대기
-            await RcSystemDialogManager.Instance.ShowUntilSuccessAsync(
-                () => economy.AddItemAsync(item.ItemId),
-                "Connection failed.\nPlease retry.");
-
-            Debug.Log($"[RcUIShop] 구매 완료: {item.ItemId}");
-
-            isBuying = false;
-            RefreshItemList();
+            // TODO: 구매 로직 — 나중에 구현
+            Debug.Log($"[RcUIShop] Buy requested: tab={currentTab}, index={selectedIndex}");
         }
 
         private void HandleClose()
