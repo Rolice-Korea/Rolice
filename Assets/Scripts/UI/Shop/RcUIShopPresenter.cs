@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Engine.UI;
 using Rolice;
-using Rolice.System;
 using Rolice.System.Backend;
 using Rolice.System.Economy;
 using UnityEngine;
@@ -11,25 +10,24 @@ using UnityEngine;
 namespace Rolice.UI
 {
     /// <summary>
-    /// 상점 UI의 비즈니스 로직을 담당하는 프레젠터.
-    /// 각 탭(Currency/Face/Edge)별로 해당 DataTable을 직접 참조하여 아이템 목록을 생성함.
-    /// 아이템 선택·구매는 string ItemId 기반으로 동작한다.
+    /// 상점 UI 프레젠터.
+    /// ShopDataTable이 카탈로그 주도권을 가지며, 비주얼은 각 DataTable에서 역조회.
+    /// 구매 효과는 IItemEffect.ApplyAsync()에 위임.
     /// </summary>
     public class RcUIShopPresenter : RcUIPresenter<RcUIShopPanel>
     {
-        private RcShopTabType  currentTab    = RcShopTabType.Currency;
-        private int            selectedIndex = -1;
-        private string         selectedItemId;
+        private RcShopTabType    currentTab    = RcShopTabType.Currency;
+        private int              selectedIndex = -1;
+        private RcShopRow?       selectedRow;
 
-        // 현재 탭 기준 index → itemId 매핑 (Refresh 시 재구성)
-        private readonly List<string> currentItemIds = new();
+        // 현재 탭 index → ShopRow 매핑 (Refresh 시 재구성)
+        private readonly List<RcShopRow> currentRows = new();
 
         protected override void OnInitialize()
         {
             Panel.OnCloseClicked += HandleClose;
             Panel.OnBuyClicked   += HandleBuy;
             Panel.OnTabChanged   += HandleTabChanged;
-
             RefreshView();
         }
 
@@ -45,96 +43,60 @@ namespace Rolice.UI
         private void RefreshView()
         {
             Panel.SelectTab((int)currentTab);
+            currentRows.Clear();
 
-            currentItemIds.Clear();
+            var itemType = TabToItemType(currentTab);
+            var rows     = RcDataTableManager.ShopDataTable?.GetItemsByType(itemType);
 
-            switch (currentTab)
+            if (rows == null || rows.Count == 0)
             {
-                case RcShopTabType.Currency: RefreshCurrencyList(); break;
-                case RcShopTabType.Face:     RefreshFaceList();     break;
-                case RcShopTabType.Edge:     RefreshEdgeList();     break;
+                Panel.RefreshItemList((int)currentTab, 0, null);
+                UpdateSelectedDisplay();
+                return;
             }
+
+            foreach (var r in rows) currentRows.Add(r);
+
+            Panel.RefreshItemList((int)currentTab, currentRows.Count, (index, widget) =>
+            {
+                var    row     = currentRows[index];
+                bool   isOwned = IsOwned(row);
+                string price   = FormatPrice(row);
+                var    visual  = GetVisual(row);
+
+                widget.Setup(index, visual.color, visual.icon, price, HandleItemSelected);
+                widget.SetState(index == selectedIndex, isOwned);
+            });
 
             UpdateSelectedDisplay();
         }
 
-        private void RefreshCurrencyList()
+        // ─── Visual ─────────────────────────────────────────────────────────
+
+        private (Color color, Sprite icon) GetVisual(RcShopRow row)
         {
-            var currencyTable = RcDataTableManager.CurrencyDataTable;
-            if (currencyTable == null || currencyTable.Rows == null)
+            switch (row.ItemType)
             {
-                Panel.RefreshItemList((int)currentTab, 0, null);
-                return;
-            }
-
-            int count = currencyTable.Rows.Length;
-            Panel.RefreshItemList((int)currentTab, count, (index, widget) =>
-            {
-                var    row      = currencyTable.Rows[index];
-                string itemId   = row.ItemId;
-                currentItemIds.Add(itemId);
-
-                var    shopRow  = RcDataTableManager.ShopDataTable?.GetItem(itemId);
-                string price    = FormatPrice(shopRow);
-                bool   isOwned  = RcBackendServices.Economy.HasItem(itemId);
-
-                widget.Setup(index, Color.white, null, price, HandleItemSelected);
-                widget.SetState(index == selectedIndex, isOwned);
-            });
-        }
-
-        private void RefreshFaceList()
-        {
-            var registry = RcDataTableManager.FaceSkinRegistry;
-            if (registry == null || registry.Rows == null) return;
-
-            int count = registry.Rows.Length;
-            Panel.RefreshItemList((int)currentTab, count, (index, widget) =>
-            {
-                var    entry      = registry.Rows[index];
-                string itemId     = entry.Id.ToString();
-                currentItemIds.Add(itemId);
-
-                var    skinData   = entry.Table;
-                Sprite icon       = skinData != null ? skinData.IconSprite : null;
-                Color  color      = Color.white;
-                if (skinData != null)
+                case RcItemType.FaceSkin:
                 {
-                    var mat = skinData.GetFaceMaterial(RcColorType.White);
-                    if (mat != null) color = mat.color;
+                    var table = RcDataTableManager.FaceSkinRegistry?.GetByItemId(row.ItemId);
+                    var icon  = table != null ? table.IconSprite : null;
+                    var mat   = table?.GetFaceMaterial(RcColorType.White);
+                    var color = mat != null ? mat.color : Color.white;
+                    return (color, icon);
                 }
-
-                var    shopRow = RcDataTableManager.ShopDataTable?.GetItem(itemId);
-                string price   = FormatPrice(shopRow);
-                bool   isOwned = RcBackendServices.Economy.HasItem(itemId);
-
-                widget.Setup(index, color, icon, price, HandleItemSelected);
-                widget.SetState(index == selectedIndex, isOwned);
-            });
-        }
-
-        private void RefreshEdgeList()
-        {
-            var table = RcDataTableManager.EdgeSkinDataTable;
-            if (table == null || table.Rows == null) return;
-
-            int count = table.Rows.Length;
-            Panel.RefreshItemList((int)currentTab, count, (index, widget) =>
-            {
-                var    row    = table.Rows[index];
-                string itemId = row.Id.ToString();
-                currentItemIds.Add(itemId);
-
-                Sprite icon   = row.IconSprite;
-                Color  color  = row.EdgeMaterial != null ? row.EdgeMaterial.color : Color.gray;
-
-                var    shopRow = RcDataTableManager.ShopDataTable?.GetItem(itemId);
-                string price   = FormatPrice(shopRow);
-                bool   isOwned = RcBackendServices.Economy.HasItem(itemId);
-
-                widget.Setup(index, color, icon, price, HandleItemSelected);
-                widget.SetState(index == selectedIndex, isOwned);
-            });
+                case RcItemType.EdgeSkin:
+                {
+                    var rowData = RcDataTableManager.EdgeSkinDataTable?.GetByItemId(row.ItemId);
+                    var icon    = rowData.HasValue ? rowData.Value.IconSprite : null;
+                    var color   = rowData.HasValue && rowData.Value.EdgeMaterial != null
+                        ? rowData.Value.EdgeMaterial.color
+                        : Color.gray;
+                    return (color, icon);
+                }
+                default:
+                    return (Color.white, null);
+            }
         }
 
         // ─── Selected Display ────────────────────────────────────────────────
@@ -143,7 +105,7 @@ namespace Rolice.UI
         {
             if (Panel == null) return;
 
-            if (selectedIndex < 0 || string.IsNullOrEmpty(selectedItemId))
+            if (selectedIndex < 0 || !selectedRow.HasValue)
             {
                 Panel.SetSelectedItemName("");
                 Panel.SetSelectedItemPrice("");
@@ -151,79 +113,68 @@ namespace Rolice.UI
                 return;
             }
 
-            // 이미 보유한 아이템은 구매 버튼 비활성
-            bool isOwned = RcBackendServices.Economy.HasItem(selectedItemId);
-            if (isOwned)
+            var row = selectedRow.Value;
+            Panel.SetSelectedItemName(row.ItemId.ToString());
+
+            if (IsOwned(row))
             {
-                Panel.SetSelectedItemName(selectedItemId);
                 Panel.SetSelectedItemPrice("보유 중");
                 Panel.SetBuyButtonInteractable(false);
                 return;
             }
 
-            var shopRow = RcDataTableManager.ShopDataTable?.GetItem(selectedItemId);
-            Panel.SetSelectedItemName(selectedItemId);
-            Panel.SetSelectedItemPrice(FormatPrice(shopRow));
-            Panel.SetBuyButtonInteractable(shopRow.HasValue);
+            Panel.SetSelectedItemPrice(FormatPrice(row));
+            Panel.SetBuyButtonInteractable(row.Effect != null);
         }
 
         // ─── Handlers ───────────────────────────────────────────────────────
 
         private void HandleTabChanged(int index)
         {
-            var nextTab = (RcShopTabType)index;
-            if (currentTab == nextTab) return;
-
-            currentTab     = nextTab;
-            selectedIndex  = -1;
-            selectedItemId = null;
+            var next = (RcShopTabType)index;
+            if (currentTab == next) return;
+            currentTab    = next;
+            selectedIndex = -1;
+            selectedRow   = null;
             RefreshView();
         }
 
         private void HandleItemSelected(int index)
         {
-            selectedIndex  = index;
-            selectedItemId = (index >= 0 && index < currentItemIds.Count)
-                ? currentItemIds[index]
-                : null;
+            selectedIndex = index;
+            selectedRow   = (index >= 0 && index < currentRows.Count)
+                ? currentRows[index]
+                : (RcShopRow?)null;
             RefreshView();
         }
 
-        private void HandleBuy() => HandleBuyAsync().Forget();
+        private void HandleBuy()  => HandleBuyAsync().Forget();
 
         private async UniTaskVoid HandleBuyAsync()
         {
-            if (string.IsNullOrEmpty(selectedItemId))
+            if (!selectedRow.HasValue || selectedRow.Value.Effect == null)
             {
-                Debug.LogWarning("[RcUIShop] 선택된 아이템 없음");
+                Debug.LogWarning("[RcUIShop] 선택된 아이템 없음 또는 Effect 미설정");
                 return;
             }
 
-            var shopRow = RcDataTableManager.ShopDataTable?.GetItem(selectedItemId);
-            if (!shopRow.HasValue)
-            {
-                Debug.LogWarning($"[RcUIShop] ShopDataTable에 없는 아이템: {selectedItemId}");
-                return;
-            }
-
-            string currencyKey = shopRow.Value.CostType.ToKey();
-            int    cost        = shopRow.Value.CostValue;
+            var row = selectedRow.Value;
 
             Panel.SetBuyButtonInteractable(false);
             try
             {
-                bool success = await RcBackendServices.Economy.SpendAsync(currencyKey, cost);
+                bool success = await RcBackendServices.Economy
+                    .SpendAsync(row.CostType.ToKey(), row.CostValue);
+
                 if (!success)
                 {
-                    Debug.Log($"[RcUIShop] 잔액 부족: {currencyKey} {cost}");
+                    Debug.Log($"[RcUIShop] 잔액 부족: {row.CostType} {row.CostValue}");
                     Panel.SetSelectedItemPrice("잔액 부족");
                     return;
                 }
 
-                await RcBackendServices.Economy.AddItemAsync(selectedItemId);
-                Debug.Log($"[RcUIShop] 구매 완료: {selectedItemId}");
-
-                // 구매 후 목록 갱신 (Owned 상태 반영)
+                await row.Effect.ApplyAsync(row.ItemId);
+                Debug.Log($"[RcUIShop] 구매 완료: {row.ItemId}");
                 RefreshView();
             }
             catch (Exception e)
@@ -237,11 +188,23 @@ namespace Rolice.UI
 
         // ─── Helpers ────────────────────────────────────────────────────────
 
-        private static string FormatPrice(RcShopRow? shopRow)
+        private static RcItemType TabToItemType(RcShopTabType tab) => tab switch
         {
-            if (!shopRow.HasValue) return "";
-            string symbol = shopRow.Value.CostType == RcCostType.Gold ? "⭐" : "💎";
-            return $"{shopRow.Value.CostValue} {symbol}";
+            RcShopTabType.Currency => RcItemType.Currency,
+            RcShopTabType.Face     => RcItemType.FaceSkin,
+            RcShopTabType.Edge     => RcItemType.EdgeSkin,
+            _                      => RcItemType.Currency,
+        };
+
+        private static bool IsOwned(RcShopRow row)
+            => row.Effect != null
+            && !row.Effect.IsRepurchasable
+            && RcBackendServices.Economy.HasItem(row.ItemId.ToString());
+
+        private static string FormatPrice(RcShopRow row)
+        {
+            string symbol = row.CostType == RcCostType.Gold ? "⭐" : "💎";
+            return $"{row.CostValue} {symbol}";
         }
     }
 }

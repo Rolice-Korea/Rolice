@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEditorInternal;
@@ -12,6 +13,7 @@ public struct RcTableColumnDef
     public string PropertyName;
     public string Header;
     public float  Width;
+    public bool   IsManagedReference;  // [SerializeReference] 필드 여부
 }
 
 public class RcDataTableAutoEditorWindow : EditorWindow
@@ -56,12 +58,14 @@ public class RcDataTableAutoEditorWindow : EditorWindow
         _list = new ReorderableList(_so, rowsProp,
             draggable: true, displayHeader: true,
             displayAddButton: true, displayRemoveButton: true);
-        _list.drawHeaderCallback  = DrawListHeader;
-        _list.drawElementCallback = DrawListElement;
-        _list.elementHeight       = EditorGUIUtility.singleLineHeight + 2f;
+        _list.drawHeaderCallback    = DrawListHeader;
+        _list.drawElementCallback   = DrawListElement;
+        _list.elementHeightCallback = GetElementHeight;
 
         Repaint();
     }
+
+    // ------------------------------------------------------------------ header / element
 
     private void DrawListHeader(Rect rect)
     {
@@ -74,6 +78,25 @@ public class RcDataTableAutoEditorWindow : EditorWindow
         }
     }
 
+    private float GetElementHeight(int index)
+    {
+        if (_list.serializedProperty.arraySize <= index) return EditorGUIUtility.singleLineHeight + 2f;
+
+        var row       = _list.serializedProperty.GetArrayElementAtIndex(index);
+        float maxH    = EditorGUIUtility.singleLineHeight;
+
+        foreach (var col in _columns)
+        {
+            if (!col.IsManagedReference) continue;
+            var prop = row.FindPropertyRelative(col.PropertyName);
+            if (prop == null) continue;
+            float h = EditorGUI.GetPropertyHeight(prop, GUIContent.none, true);
+            maxH = Mathf.Max(maxH, h);
+        }
+
+        return maxH + 2f;
+    }
+
     private void DrawListElement(Rect rect, int index, bool isActive, bool isFocused)
     {
         var row = _list.serializedProperty.GetArrayElementAtIndex(index);
@@ -84,10 +107,20 @@ public class RcDataTableAutoEditorWindow : EditorWindow
         foreach (var col in _columns)
         {
             var prop = row.FindPropertyRelative(col.PropertyName);
-            if (prop != null)
-                EditorGUI.PropertyField(new Rect(x, y, col.Width, h), prop, GUIContent.none);
-            else
+            if (prop == null)
+            {
                 EditorGUI.LabelField(new Rect(x, y, col.Width, h), $"?{col.PropertyName}");
+            }
+            else if (col.IsManagedReference)
+            {
+                // [SerializeReference] — 타입 선택 + 자식 필드 포함 드로
+                float propH = EditorGUI.GetPropertyHeight(prop, GUIContent.none, true);
+                EditorGUI.PropertyField(new Rect(x, y, col.Width, propH), prop, GUIContent.none, true);
+            }
+            else
+            {
+                EditorGUI.PropertyField(new Rect(x, y, col.Width, h), prop, GUIContent.none);
+            }
             x += col.Width;
         }
     }
@@ -104,13 +137,16 @@ public class RcDataTableAutoEditorWindow : EditorWindow
 
         for (int i = 0; i < fields.Length; i++)
         {
-            var f    = fields[i];
-            var attr = f.GetCustomAttribute<RcColumnAttribute>();
-            defs[i]  = new RcTableColumnDef
+            var f             = fields[i];
+            var attr          = f.GetCustomAttribute<RcColumnAttribute>();
+            bool isManagedRef = f.IsDefined(typeof(SerializeReference), false);
+
+            defs[i] = new RcTableColumnDef
             {
-                PropertyName = f.Name,
-                Header       = attr?.Header ?? ObjectNames.NicifyVariableName(f.Name),
-                Width        = attr?.Width  ?? 150f,
+                PropertyName       = f.Name,
+                Header             = attr?.Header ?? ObjectNames.NicifyVariableName(f.Name),
+                Width              = attr?.Width  ?? 150f,
+                IsManagedReference = isManagedRef,
             };
         }
         return defs;
@@ -175,8 +211,6 @@ public class RcDataTableAutoEditorWindow : EditorWindow
 
         EditorGUILayout.EndHorizontal();
     }
-
-
 }
 
 } // namespace Rolice.Editor

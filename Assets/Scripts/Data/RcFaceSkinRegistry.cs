@@ -22,28 +22,36 @@ public struct RcFaceSkinEntry
 public class RcFaceSkinRegistry : RcDataTableSO<RcFaceSkinEntry>
 {
     private Dictionary<RcFaceSkinType, RcFaceSkinDataTable> lookup;
+    private Dictionary<uint, RcFaceSkinDataTable>           lookupById;
 
     protected override void OnTableChanged()
     {
-        lookup = new Dictionary<RcFaceSkinType, RcFaceSkinDataTable>();
+        lookup     = new Dictionary<RcFaceSkinType, RcFaceSkinDataTable>();
+        lookupById = new Dictionary<uint, RcFaceSkinDataTable>();
         if (Rows == null) return;
         foreach (var entry in Rows)
-            if (entry.Table != null)
-                lookup[entry.SkinType] = entry.Table;
+        {
+            if (entry.Table == null) continue;
+            lookup[entry.SkinType] = entry.Table;
+            lookupById[entry.Id]   = entry.Table;
+        }
     }
 
-    /// <summary>
-    /// 지정된 스킨 타입에 매핑된 데이터 테이블(클래스)을 곧바로 반환합니다.
-    /// </summary>
+    /// <summary>스킨 타입으로 데이터 테이블 조회.</summary>
     public RcFaceSkinDataTable GetFaceData(RcFaceSkinType skinType)
     {
         if (lookup == null) OnTableChanged();
-        if (lookup.TryGetValue(skinType, out var table))
-        {
-            return table;
-        }
-
+        if (lookup.TryGetValue(skinType, out var table)) return table;
         Debug.LogWarning($"[RcFaceSkinRegistry] SkinType not found: {skinType}");
+        return null;
+    }
+
+    /// <summary>ItemId(uint)로 데이터 테이블 조회.</summary>
+    public RcFaceSkinDataTable GetByItemId(uint itemId)
+    {
+        if (lookupById == null) OnTableChanged();
+        if (lookupById.TryGetValue(itemId, out var table)) return table;
+        Debug.LogWarning($"[RcFaceSkinRegistry] ItemId not found: {itemId}");
         return null;
     }
 }
