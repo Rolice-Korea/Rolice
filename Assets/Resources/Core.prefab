@@ -1,4 +1,4 @@
-%YAML 1.1
+﻿%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!1 &819770867480300385
 GameObject:
@@ -170,6 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RcDataTableManager
   faceSkinRegistryRef: {fileID: 11400000, guid: 10836fbff62fd9745ab19d337e0ca698, type: 2}
   edgeSkinDataTableRef: {fileID: 11400000, guid: 7a289ca65c7759041a05fe030332dc2f, type: 2}
+  shopDataTableRef: {fileID: 11400000, guid: 76684b2451f9638428829e3ef73550a2, type: 2}
 --- !u!1 &5123981453975841652
 GameObject:
   m_ObjectHideFlags: 0
@@ -377,3 +378,4 @@ MonoBehaviour:
   fadeOutDuration: 0.4
   fadeInDuration: 0.4
   minimumLoadTime: 0.8
+

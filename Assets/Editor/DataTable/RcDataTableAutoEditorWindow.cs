@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
@@ -82,16 +83,15 @@ public class RcDataTableAutoEditorWindow : EditorWindow
     {
         if (_list.serializedProperty.arraySize <= index) return EditorGUIUtility.singleLineHeight + 2f;
 
-        var row       = _list.serializedProperty.GetArrayElementAtIndex(index);
-        float maxH    = EditorGUIUtility.singleLineHeight;
+        var   row  = _list.serializedProperty.GetArrayElementAtIndex(index);
+        float maxH = EditorGUIUtility.singleLineHeight;
 
         foreach (var col in _columns)
         {
             if (!col.IsManagedReference) continue;
             var prop = row.FindPropertyRelative(col.PropertyName);
             if (prop == null) continue;
-            float h = EditorGUI.GetPropertyHeight(prop, GUIContent.none, true);
-            maxH = Mathf.Max(maxH, h);
+            maxH = Mathf.Max(maxH, GetManagedReferenceHeight(prop));
         }
 
         return maxH + 2f;
@@ -113,9 +113,7 @@ public class RcDataTableAutoEditorWindow : EditorWindow
             }
             else if (col.IsManagedReference)
             {
-                // [SerializeReference] — 타입 선택 + 자식 필드 포함 드로
-                float propH = EditorGUI.GetPropertyHeight(prop, GUIContent.none, true);
-                EditorGUI.PropertyField(new Rect(x, y, col.Width, propH), prop, GUIContent.none, true);
+                DrawManagedReferenceField(new Rect(x, y, col.Width, rect.height), prop);
             }
             else
             {
@@ -124,6 +122,97 @@ public class RcDataTableAutoEditorWindow : EditorWindow
             x += col.Width;
         }
     }
+
+    // ------------------------------------------------------------------ managed reference
+
+    private static float GetManagedReferenceHeight(SerializedProperty prop)
+    {
+        float h = EditorGUIUtility.singleLineHeight + 2f; // 타입 선택 버튼
+        if (prop.managedReferenceValue == null) return h;
+
+        var child = prop.Copy();
+        var end   = prop.GetEndProperty();
+        if (child.Next(true))
+        {
+            while (!SerializedProperty.EqualContents(child, end))
+            {
+                h += EditorGUI.GetPropertyHeight(child, true) + 2f;
+                if (!child.Next(false)) break;
+            }
+        }
+        return h;
+    }
+
+    private static void DrawManagedReferenceField(Rect cellRect, SerializedProperty prop)
+    {
+        float lineH  = EditorGUIUtility.singleLineHeight;
+        float btnW   = cellRect.width;
+        var   curRef = prop.managedReferenceValue;
+        string label = curRef != null ? curRef.GetType().Name : "None";
+
+        // 타입 선택 드롭박스
+        if (EditorGUI.DropdownButton(
+            new Rect(cellRect.x, cellRect.y, btnW, lineH),
+            new GUIContent(label), FocusType.Passive))
+        {
+            var fieldType = GetManagedReferenceFieldType(prop);
+            var menu      = new GenericMenu();
+
+            menu.AddItem(new GUIContent("None"), curRef == null, () =>
+            {
+                prop.managedReferenceValue = null;
+                prop.serializedObject.ApplyModifiedProperties();
+            });
+
+            if (fieldType != null)
+            {
+                foreach (var t in GetConcreteTypes(fieldType))
+                {
+                    var  captured   = t;
+                    bool isSelected = curRef?.GetType() == t;
+                    menu.AddItem(new GUIContent(t.Name), isSelected, () =>
+                    {
+                        prop.managedReferenceValue = Activator.CreateInstance(captured);
+                        prop.serializedObject.ApplyModifiedProperties();
+                    });
+                }
+            }
+            menu.ShowAsContext();
+        }
+
+        // 자식 필드 (타입이 설정된 경우)
+        if (curRef == null) return;
+
+        float y     = cellRect.y + lineH + 2f;
+        var   child = prop.Copy();
+        var   end   = prop.GetEndProperty();
+
+        if (!child.Next(true)) return;
+        while (!SerializedProperty.EqualContents(child, end))
+        {
+            float fieldH = EditorGUI.GetPropertyHeight(child, true);
+            EditorGUI.PropertyField(
+                new Rect(cellRect.x + 8f, y, cellRect.width - 8f, fieldH),
+                child, true);
+            y += fieldH + 2f;
+            if (!child.Next(false)) break;
+        }
+    }
+
+    private static Type GetManagedReferenceFieldType(SerializedProperty prop)
+    {
+        // "assemblyName typeName" 형식
+        var parts = prop.managedReferenceFieldTypename?.Split(' ');
+        if (parts == null || parts.Length < 2) return null;
+        try { return Assembly.Load(parts[0])?.GetType(parts[1]); }
+        catch { return null; }
+    }
+
+    private static IEnumerable<Type> GetConcreteTypes(Type baseType) =>
+        AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(a => { try { return a.GetTypes(); } catch { return Array.Empty<Type>(); } })
+            .Where(t => !t.IsAbstract && !t.IsInterface && baseType.IsAssignableFrom(t))
+            .OrderBy(t => t.Name);
 
     // ------------------------------------------------------------------ reflection
 

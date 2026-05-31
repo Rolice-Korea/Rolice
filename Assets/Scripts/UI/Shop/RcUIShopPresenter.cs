@@ -82,15 +82,18 @@ namespace Rolice.UI
                     var table = RcDataTableManager.FaceSkinRegistry?.GetByItemId(row.ItemId);
                     var icon  = table != null ? table.IconSprite : null;
                     var mat   = table?.GetFaceMaterial(RcColorType.White);
-                    var color = mat != null ? mat.color : Color.white;
+                    var color = mat != null && mat.HasColor("_BaseColor")
+                        ? mat.GetColor("_BaseColor")
+                        : Color.white;
                     return (color, icon);
                 }
                 case RcItemType.EdgeSkin:
                 {
                     var rowData = RcDataTableManager.EdgeSkinDataTable?.GetByItemId(row.ItemId);
                     var icon    = rowData.HasValue ? rowData.Value.IconSprite : null;
-                    var color   = rowData.HasValue && rowData.Value.EdgeMaterial != null
-                        ? rowData.Value.EdgeMaterial.color
+                    var edgeMat = rowData.HasValue ? rowData.Value.EdgeMaterial : null;
+                    var color   = edgeMat != null && edgeMat.HasColor("_BaseColor")
+                        ? edgeMat.GetColor("_BaseColor")
                         : Color.gray;
                     return (color, icon);
                 }
