@@ -33,7 +33,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8550340442332739962}
   - {fileID: 1276303181752762807}
   - {fileID: 9009464030557336161}
   m_Father: {fileID: 0}
@@ -94,9 +93,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rolice.UI.RcUICommonTabList
   tabEntries:
-  - label: Currency
-    tabButton: {fileID: 8049167628388610903}
-    targetContent: {fileID: 0}
   - label: Face
     tabButton: {fileID: 624554353517661082}
     targetContent: {fileID: 0}
@@ -144,119 +140,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
   m_HorizontalFit: 2
   m_VerticalFit: 0
---- !u!1001 &243118541995467551
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 5328280995771790115}
-    m_Modifications:
-    - target: {fileID: 1374722995274179683, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_Name
-      value: UI_CurrencyTabButton
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_Pivot.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_Pivot.y
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_AnchorMin.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
---- !u!114 &8049167628388610903 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7848604585116454984, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-  m_PrefabInstance: {fileID: 243118541995467551}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e73ed65f5335e4abb1e3ee62e040a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Rolice.UI.RcUICommonTabButton
---- !u!224 &8550340442332739962 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 8500353334766819941, guid: 2473a3a985adbf448a67b7267ed19027, type: 3}
-  m_PrefabInstance: {fileID: 243118541995467551}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &648335411035383812
 PrefabInstance:
   m_ObjectHideFlags: 0

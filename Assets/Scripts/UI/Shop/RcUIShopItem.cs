@@ -7,6 +7,19 @@ using UnityEngine.UI;
 namespace Rolice.UI
 {
     /// <summary>
+    /// 상점 슬롯의 시각 상태.
+    /// 우선순위(presenter 결정): Owned > Locked > Selected > Normal.
+    /// 문자열 이름이 곧 RcUIStateMachine 상태 키 (애니메이션은 에디터에서 바인딩).
+    /// </summary>
+    public enum RcShopItemState
+    {
+        Normal,
+        Selected,
+        Owned,
+        Locked,
+    }
+
+    /// <summary>
     /// 상점 UI에서 개별 판매 아이템을 표시하는 슬롯 위젯.
     /// </summary>
     public class RcUIShopItem : RcUIWidget
@@ -63,22 +76,13 @@ namespace Rolice.UI
 
         /// <summary>
         /// 아이템의 시각적 상태를 설정한다.
+        /// 보유/잠금 슬롯도 선택은 가능하다 — 우측 정보 패널에서 "보유 중"·"★N 필요"를 보여주기 위함.
+        /// 실제 구매 가능 여부(Buy 버튼)는 presenter가 별도로 게이팅한다.
         /// </summary>
-        /// <param name="isSelected">현재 선택된 아이템인지</param>
-        /// <param name="isOwned">이미 보유한 아이템인지 (1회성 구매 완료 시)</param>
-        public void SetState(bool isSelected, bool isOwned)
+        public void SetState(RcShopItemState state)
         {
             if (stateMachine != null)
-            {
-                if (isOwned)
-                    stateMachine.SetState("Owned");
-                else
-                    stateMachine.SetState(isSelected ? "Selected" : "Normal");
-            }
-
-            // 보유한 아이템은 선택 불가 (이미 구매 완료)
-            if (button != null)
-                button.Interactable = !isOwned;
+                stateMachine.SetState(state.ToString());
         }
 
         private void HandleClick()

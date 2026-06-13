@@ -82,6 +82,7 @@ namespace Rolice.System
         {
             Data.AddOwnedItem(itemId);
             SaveLocal();
+            NotifyChanged();
         }
     }
 }

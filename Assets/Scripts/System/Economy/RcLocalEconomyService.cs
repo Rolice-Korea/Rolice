@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using Rolice;
 using Rolice.Define;
 using Rolice.System.Backend;
 
@@ -20,19 +19,5 @@ namespace Rolice.System.Economy
 
         public static UniTask<bool> SpendAsync(this IEconomyService svc, RcCurrencyId id, int amount)
             => svc.SpendAsync(id.ToKey(), amount);
-    }
-
-    /// <summary>
-    /// RcCostType → IEconomyService currency key 변환.
-    /// Gold = Star(별), Jewel = Gem(보석).
-    /// </summary>
-    public static class RcCostTypeExtensions
-    {
-        public static string ToKey(this RcCostType costType) => costType switch
-        {
-            RcCostType.Gold  => RcCurrencyId.Star.ToKey(),
-            RcCostType.Jewel => RcCurrencyId.Gem.ToKey(),
-            _                => costType.ToString(),
-        };
     }
 }

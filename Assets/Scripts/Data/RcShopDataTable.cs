@@ -4,16 +4,23 @@ using Rolice;
 using UnityEngine;
 
 /// <summary>
-/// 상점 카탈로그 한 행.
+/// 상점 카탈로그 한 행 (Face/Edge 코스메틱 전용).
+///
+/// 구매 가능 여부는 두 축으로 분리된다:
+///   - RequiredStars : 누적 별 합이 이 값 이상이어야 구매 칸이 열리는 해금 게이트. 별은 소모되지 않음. 0이면 게이트 없음.
+///   - CostType/Cost : 해금된 뒤 실제로 지불하는 비용. Free(무상) 또는 Gem(잼 소모).
+///
+/// 이 조합으로 "잼 전용", "별 해금 후 무상", "별 해금 후 잼 결제" 를 모두 표현한다.
 /// Effect는 [SerializeReference]로 다형성 직렬화됨 — 행마다 다른 구체 타입 가능.
 /// </summary>
 [Serializable]
 public struct RcShopRow
 {
-    [RcColumn(100f)] public uint       ItemId;
-    [RcColumn(100f)] public RcItemType ItemType;
-    [RcColumn(100f)] public RcCostType CostType;
-    [RcColumn(80f)]  public int        CostValue;
+    [RcColumn(100f)] public uint           ItemId;
+    [RcColumn(100f)] public RcItemType     ItemType;
+    [RcColumn(100f)] public int            RequiredStars; // 누적 별 해금 게이트 (0 = 없음)
+    [RcColumn(100f)] public RcShopCostType CostType;
+    [RcColumn(80f)]  public int            CostValue;     // CostType == Gem 일 때 잼 수량
     [RcColumn(220f), SerializeReference] public IItemEffect Effect;
 }
 

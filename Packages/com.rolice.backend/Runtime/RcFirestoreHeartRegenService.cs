@@ -187,6 +187,47 @@ namespace Rolice.System.Backend
             return true;
         }
 
+        // ─── AddHeartAsync ───────────────────────────────────────────────────
+
+        public async UniTask<int> AddHeartAsync(int count, int maxHearts)
+        {
+            if (count <= 0) return 0;
+            if (Uid == null)
+            {
+                Debug.LogWarning("[HeartRegen] AddHeart 실패: 로그인되지 않음");
+                return 0;
+            }
+
+            var heartDocRef = HeartDocRef();
+            int added       = 0;
+            int newBalance   = 0;
+
+            await Db.RunTransactionAsync(async transaction =>
+            {
+                added = 0;
+
+                var heartSnap = await transaction.GetSnapshotAsync(heartDocRef);
+                int balance   = heartSnap.TryGetValue(BalanceField, out long b) ? (int)b : 0;
+
+                added      = Math.Min(count, Math.Max(0, maxHearts - balance));
+                newBalance = balance + added;
+
+                if (added <= 0) return;
+
+                transaction.Set(heartDocRef,
+                    new Dictionary<string, object> { { BalanceField, (long)newBalance } },
+                    SetOptions.MergeAll);
+            });
+
+            if (added > 0)
+            {
+                _cache.SetCurrency(HeartDocKey, newBalance);
+                Debug.Log($"[HeartRegen] 충전 완료: +{added} → {newBalance}");
+            }
+
+            return added;
+        }
+
         // ─── GetLastRegenAtAsync ─────────────────────────────────────────────
 
         public async UniTask<DateTime?> GetLastRegenAtAsync()

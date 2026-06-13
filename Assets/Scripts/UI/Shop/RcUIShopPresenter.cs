@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Engine.UI;
 using Rolice;
+using Rolice.Define;
 using Rolice.System.Backend;
 using Rolice.System.Economy;
 using UnityEngine;
@@ -10,18 +11,29 @@ using UnityEngine;
 namespace Rolice.UI
 {
     /// <summary>
-    /// 상점 UI 프레젠터.
-    /// ShopDataTable이 카탈로그 주도권을 가지며, 비주얼은 각 DataTable에서 역조회.
-    /// 구매 효과는 IItemEffect.ApplyAsync()에 위임.
+    /// 메인 상점 UI 프레젠터 (Face/Edge 코스메틱 전용).
+    ///
+    /// 구매 판정은 두 축으로 분리된다:
+    ///   - 해금 게이트  : 누적 별 합(RcProgressManager.GetTotalStars) ≥ row.RequiredStars. 별은 소모되지 않음.
+    ///   - 결제 비용    : 해금된 뒤 Free(무상) 또는 Gem 소모.
+    ///
+    /// 잼 획득(광고/IAP)과 하트 충전은 별도 팝업(RcGemShopPanel / RcHeartShopPanel)이 담당한다.
     /// </summary>
     public class RcUIShopPresenter : RcUIPresenter<RcUIShopPanel>
     {
-        private RcShopTabType    currentTab    = RcShopTabType.Currency;
+        private RcShopTabType    currentTab    = RcShopTabType.Face;
         private int              selectedIndex = -1;
         private RcShopRow?       selectedRow;
 
         // 현재 탭 index → ShopRow 매핑 (Refresh 시 재구성)
         private readonly List<RcShopRow> currentRows = new();
+
+        private struct ItemVisual
+        {
+            public Color  Color;
+            public Sprite Icon;
+            public string Name;
+        }
 
         protected override void OnInitialize()
         {
@@ -57,23 +69,43 @@ namespace Rolice.UI
 
             foreach (var r in rows) currentRows.Add(r);
 
+            int totalStars = TotalStars;
+
             Panel.RefreshItemList((int)currentTab, currentRows.Count, (index, widget) =>
             {
-                var    row     = currentRows[index];
-                bool   isOwned = IsOwned(row);
-                string price   = FormatPrice(row);
-                var    visual  = GetVisual(row);
+                var row    = currentRows[index];
+                var visual = GetVisual(row);
 
-                widget.Setup(index, visual.color, visual.icon, price, HandleItemSelected);
-                widget.SetState(index == selectedIndex, isOwned);
+                widget.Setup(index, visual.Color, visual.Icon, FormatSlotLabel(row, totalStars), HandleItemSelected);
+                widget.SetState(ResolveState(row, index, totalStars));
             });
 
             UpdateSelectedDisplay();
         }
 
-        // ─── Visual ─────────────────────────────────────────────────────────
+        /// <summary>선택만 바뀐 경우 — Setup 재호출 없이 슬롯 상태만 경량 갱신.</summary>
+        private void RefreshSelectionStates()
+        {
+            int totalStars = TotalStars;
+            Panel.RefreshItemStates((int)currentTab, (index, widget) =>
+            {
+                if (index < 0 || index >= currentRows.Count) return;
+                widget.SetState(ResolveState(currentRows[index], index, totalStars));
+            });
+            UpdateSelectedDisplay();
+        }
 
-        private (Color color, Sprite icon) GetVisual(RcShopRow row)
+        // ─── State / Visual ─────────────────────────────────────────────────
+
+        private RcShopItemState ResolveState(RcShopRow row, int index, int totalStars)
+        {
+            if (IsOwned(row))                  return RcShopItemState.Owned;
+            if (totalStars < row.RequiredStars) return RcShopItemState.Locked;
+            if (index == selectedIndex)        return RcShopItemState.Selected;
+            return RcShopItemState.Normal;
+        }
+
+        private ItemVisual GetVisual(RcShopRow row)
         {
             switch (row.ItemType)
             {
@@ -85,7 +117,8 @@ namespace Rolice.UI
                     var color = mat != null && mat.HasColor("_BaseColor")
                         ? mat.GetColor("_BaseColor")
                         : Color.white;
-                    return (color, icon);
+                    var name  = table != null ? table.SkinType.ToString() : row.ItemId.ToString();
+                    return new ItemVisual { Color = color, Icon = icon, Name = name };
                 }
                 case RcItemType.EdgeSkin:
                 {
@@ -95,10 +128,11 @@ namespace Rolice.UI
                     var color   = edgeMat != null && edgeMat.HasColor("_BaseColor")
                         ? edgeMat.GetColor("_BaseColor")
                         : Color.gray;
-                    return (color, icon);
+                    var name    = rowData.HasValue ? rowData.Value.SkinType.ToString() : row.ItemId.ToString();
+                    return new ItemVisual { Color = color, Icon = icon, Name = name };
                 }
                 default:
-                    return (Color.white, null);
+                    return new ItemVisual { Color = Color.white, Icon = null, Name = row.ItemId.ToString() };
             }
         }
 
@@ -117,7 +151,7 @@ namespace Rolice.UI
             }
 
             var row = selectedRow.Value;
-            Panel.SetSelectedItemName(row.ItemId.ToString());
+            Panel.SetSelectedItemName(GetVisual(row).Name);
 
             if (IsOwned(row))
             {
@@ -126,7 +160,14 @@ namespace Rolice.UI
                 return;
             }
 
-            Panel.SetSelectedItemPrice(FormatPrice(row));
+            if (TotalStars < row.RequiredStars)
+            {
+                Panel.SetSelectedItemPrice($"★{row.RequiredStars} 필요");
+                Panel.SetBuyButtonInteractable(false);
+                return;
+            }
+
+            Panel.SetSelectedItemPrice(FormatCost(row));
             Panel.SetBuyButtonInteractable(row.Effect != null);
         }
 
@@ -148,7 +189,7 @@ namespace Rolice.UI
             selectedRow   = (index >= 0 && index < currentRows.Count)
                 ? currentRows[index]
                 : (RcShopRow?)null;
-            RefreshView();
+            RefreshSelectionStates();
         }
 
         private void HandleBuy()  => HandleBuyAsync().Forget();
@@ -163,17 +204,24 @@ namespace Rolice.UI
 
             var row = selectedRow.Value;
 
+            if (IsOwned(row))                  return;
+            if (TotalStars < row.RequiredStars) return;
+
             Panel.SetBuyButtonInteractable(false);
             try
             {
-                bool success = await RcBackendServices.Economy
-                    .SpendAsync(row.CostType.ToKey(), row.CostValue);
-
-                if (!success)
+                if (row.CostType == RcShopCostType.Gem)
                 {
-                    Debug.Log($"[RcUIShop] 잔액 부족: {row.CostType} {row.CostValue}");
-                    Panel.SetSelectedItemPrice("잔액 부족");
-                    return;
+                    bool success = await RcBackendServices.Economy
+                        .SpendAsync(RcCurrencyId.Gem, row.CostValue);
+
+                    if (!success)
+                    {
+                        Debug.Log($"[RcUIShop] 잔액 부족: Gem {row.CostValue}");
+                        Panel.SetSelectedItemPrice("잔액 부족");
+                        Panel.SetBuyButtonInteractable(true);
+                        return;
+                    }
                 }
 
                 await row.Effect.ApplyAsync(row.ItemId);
@@ -191,12 +239,13 @@ namespace Rolice.UI
 
         // ─── Helpers ────────────────────────────────────────────────────────
 
+        private static int TotalStars => RcProgressManager.Instance.GetTotalStars();
+
         private static RcItemType TabToItemType(RcShopTabType tab) => tab switch
         {
-            RcShopTabType.Currency => RcItemType.Currency,
-            RcShopTabType.Face     => RcItemType.FaceSkin,
-            RcShopTabType.Edge     => RcItemType.EdgeSkin,
-            _                      => RcItemType.Currency,
+            RcShopTabType.Face => RcItemType.FaceSkin,
+            RcShopTabType.Edge => RcItemType.EdgeSkin,
+            _                  => RcItemType.FaceSkin,
         };
 
         private static bool IsOwned(RcShopRow row)
@@ -204,10 +253,15 @@ namespace Rolice.UI
             && !row.Effect.IsRepurchasable
             && RcBackendServices.Economy.HasItem(row.ItemId.ToString());
 
-        private static string FormatPrice(RcShopRow row)
-        {
-            string symbol = row.CostType == RcCostType.Gold ? "⭐" : "💎";
-            return $"{row.CostValue} {symbol}";
-        }
+        /// <summary>슬롯 라벨: 잠금이면 해금 조건, 아니면 결제 비용.</summary>
+        private static string FormatSlotLabel(RcShopRow row, int totalStars)
+            => totalStars < row.RequiredStars
+                ? $"★{row.RequiredStars}"
+                : FormatCost(row);
+
+        private static string FormatCost(RcShopRow row)
+            => row.CostType == RcShopCostType.Free
+                ? "무료"
+                : $"{row.CostValue} 💎";
     }
 }

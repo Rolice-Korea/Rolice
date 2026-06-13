@@ -35,6 +35,12 @@ public class RcProgressManager : RcSingleton<RcProgressManager>
         return PlayerData.GetStageStars(stageNumber);
     }
 
+    /// <summary>전 스테이지 누적 별 합. 상점 스킨 해금 게이트 판정용.</summary>
+    public int GetTotalStars()
+    {
+        return PlayerData.GetTotalStars();
+    }
+
     public RcStageProgress GetStageProgress(int stageNumber)
     {
         return PlayerData.GetProgress(stageNumber);

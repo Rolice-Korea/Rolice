@@ -22,6 +22,13 @@ namespace Rolice.System.Backend
         /// </summary>
         UniTask<bool> SpendHeartAsync(int maxHearts);
 
+        /// <summary>
+        /// 하트 충전(구매). 잔액을 maxHearts까지 채운다. 실제 추가된 개수를 반환(이미 가득이면 0).
+        /// 자연 회복 타임스탬프는 건드리지 않는다(회복 계산은 maxHearts 캡으로 보호됨).
+        /// 네트워크/서버 오류 시 예외.
+        /// </summary>
+        UniTask<int> AddHeartAsync(int count, int maxHearts);
+
         /// <summary>마지막 회복 기점(UTC). 타이머 계산용. 기록 없으면 null.</summary>
         UniTask<DateTime?> GetLastRegenAtAsync();
     }

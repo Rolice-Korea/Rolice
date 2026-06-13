@@ -13,50 +13,44 @@ MonoBehaviour:
   m_Name: ShopDataTable
   m_EditorClassIdentifier: Assembly-CSharp::RcShopDataTable
   rows:
-  - ItemId: 10001
-    ItemType: 0
-    CostType: 0
-    CostValue: 500
-    Effect:
-      rid: 1
   - ItemId: 20001
-    ItemType: 1
+    ItemType: 0
+    RequiredStars: 0
     CostType: 0
-    CostValue: 100
+    CostValue: 0
     Effect:
       rid: 2
   - ItemId: 20002
-    ItemType: 1
+    ItemType: 0
+    RequiredStars: 0
     CostType: 0
-    CostValue: 100
+    CostValue: 0
     Effect:
       rid: 3
   - ItemId: 20003
-    ItemType: 1
+    ItemType: 0
+    RequiredStars: 0
     CostType: 1
     CostValue: 50
     Effect:
       rid: 4
   - ItemId: 20004
-    ItemType: 1
+    ItemType: 0
+    RequiredStars: 0
     CostType: 1
     CostValue: 50
     Effect:
       rid: 5
   - ItemId: 30000
-    ItemType: 2
+    ItemType: 1
+    RequiredStars: 0
     CostType: 0
-    CostValue: 80
+    CostValue: 0
     Effect:
       rid: 6
   references:
     version: 2
     RefIds:
-    - rid: 1
-      type: {class: RcAddCurrencyEffect, ns: , asm: Assembly-CSharp}
-      data:
-        CurrencyId: 2
-        Amount: 50
     - rid: 2
       type: {class: RcOwnItemEffect, ns: , asm: Assembly-CSharp}
       data:

@@ -12,6 +12,9 @@ GameObject:
   - component: {fileID: 6581757413585855588}
   - component: {fileID: 7423454164510816011}
   - component: {fileID: 6954486520398708496}
+  - component: {fileID: 4923093563873981415}
+  - component: {fileID: 3648258792358161305}
+  - component: {fileID: 4536316654071143459}
   m_Layer: 5
   m_Name: UI_ShopItem
   m_TagString: Untagged
@@ -92,7 +95,87 @@ MonoBehaviour:
   button: {fileID: 8210101593720859514}
   skinImage: {fileID: 2938007430508637871}
   priceText: {fileID: 0}
-  stateMachine: {fileID: 0}
+  stateMachine: {fileID: 4923093563873981415}
+--- !u!114 &4923093563873981415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 509603268904454218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 918be2b7b5dabe6429c314f5576a1721, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Engine.UI.RcUIStateMachine
+--- !u!114 &3648258792358161305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 509603268904454218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 690aa5d092377d6419508d3f5ad7e5ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Engine.UI.RcUIVisualStateAdapter
+  stateMachine: {fileID: 4923093563873981415}
+  tweenAnimator: {fileID: 4536316654071143459}
+--- !u!114 &4536316654071143459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 509603268904454218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04bb4365cdb4fd541bd2d7bf3b5e0141, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RcTweenAnimator
+  sequences:
+  - name: Normal
+    animations:
+    - rid: 576788708151525443
+    loop: 0
+    loopCount: -1
+    loopType: 0
+  - name: Selected
+    animations:
+    - rid: 576788708151525442
+    loop: 0
+    loopCount: -1
+    loopType: 0
+  playOnEnable: 0
+  onDisableBehaviorType: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 576788708151525442
+      type: {class: RcScaleConfig, ns: , asm: Assembly-CSharp}
+      data:
+        sequenceMode: 0
+        target: {fileID: 0}
+        duration: 0.1
+        ease: 1
+        delay: 0
+        targetScale: {x: 1.1, y: 1.1, z: 1.1}
+        fromCurrentScale: 1
+        startScale: {x: 1, y: 1, z: 1}
+        restoreToOriginal: 0
+    - rid: 576788708151525443
+      type: {class: RcScaleConfig, ns: , asm: Assembly-CSharp}
+      data:
+        sequenceMode: 0
+        target: {fileID: 0}
+        duration: 0.1
+        ease: 1
+        delay: 0
+        targetScale: {x: 1, y: 1, z: 1}
+        fromCurrentScale: 1
+        startScale: {x: 1, y: 1, z: 1}
+        restoreToOriginal: 0
 --- !u!1 &3301294040100640230
 GameObject:
   m_ObjectHideFlags: 0

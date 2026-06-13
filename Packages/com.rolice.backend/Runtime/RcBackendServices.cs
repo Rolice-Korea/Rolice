@@ -91,6 +91,7 @@ namespace Rolice.System.Backend
 
         public UniTask       SyncRegenAsync(int maxHearts)          => UniTask.CompletedTask;
         public UniTask<bool> SpendHeartAsync(int maxHearts)         => UniTask.FromResult(_alwaysSucceed);
+        public UniTask<int>  AddHeartAsync(int count, int maxHearts) => UniTask.FromResult(_alwaysSucceed ? count : 0);
         public UniTask<DateTime?> GetLastRegenAtAsync()             => UniTask.FromResult<DateTime?>(null);
     }
 }

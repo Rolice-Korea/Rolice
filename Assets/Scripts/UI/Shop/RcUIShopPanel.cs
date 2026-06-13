@@ -132,6 +132,22 @@ namespace Rolice.UI
             }
         }
 
+        /// <summary>
+        /// 이미 표시 중인 슬롯들의 상태(선택/보유/잠금)만 갱신한다.
+        /// Setup(아이콘·색·가격) 재호출이 없어 선택 변경 시 전체 재바인딩보다 가볍다.
+        /// </summary>
+        public void RefreshItemStates(int tabIndex, Action<int, RcUIShopItem> stateBinder)
+        {
+            if (stateBinder == null) return;
+            if (!tabItemPools.TryGetValue(tabIndex, out var pool)) return;
+
+            for (int i = 0; i < pool.Count; i++)
+            {
+                if (!pool[i].gameObject.activeSelf) continue;
+                stateBinder(i, pool[i]);
+            }
+        }
+
         private void OnDestroy()
         {
             foreach (var pool in tabItemPools.Values)

@@ -47,21 +47,23 @@ namespace Rolice
 
     public enum RcShopTabType
     {
-        Currency,
         Face,
         Edge
     }
 
     public enum RcItemType
     {
-        Currency,
         FaceSkin,
         EdgeSkin,
     }
 
-    public enum RcCostType
+    /// <summary>
+    /// 메인 상점 스킨의 결제 방식.
+    /// 별(Star)은 결제 화폐가 아니라 해금 게이트(RequiredStars)이므로 비용 타입에 포함하지 않는다.
+    /// </summary>
+    public enum RcShopCostType
     {
-        Gold,
-        Jewel,
+        Free, // 해금 조건만 충족하면 무상 획득
+        Gem,  // 잼 소모
     }
 }

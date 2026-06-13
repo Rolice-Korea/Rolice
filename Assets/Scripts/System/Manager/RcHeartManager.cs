@@ -69,6 +69,20 @@ namespace Rolice.System
             return true;
         }
 
+        // ─── 충전 (구매) ──────────────────────────────────────────────────────
+
+        /// <summary>
+        /// 하트 충전 시도. count개를 최대치까지 채운다.
+        /// 실제 추가된 개수를 반환(이미 가득이면 0). 네트워크 오류 시 예외(호출부가 처리).
+        /// 잼 차감은 호출부(상점)가 선행한다 — 이 메서드는 하트 증가만 담당.
+        /// </summary>
+        public async UniTask<int> RefillAsync(int count = 1)
+        {
+            int added = await RcBackendServices.HeartRegen.AddHeartAsync(count, MaxHearts);
+            if (added > 0) OnChanged?.Invoke();
+            return added;
+        }
+
         // ─── 타이머 ──────────────────────────────────────────────────────────
 
         /// <summary>

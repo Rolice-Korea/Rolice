@@ -57,6 +57,15 @@ namespace Rolice.Data
             return progressCache.TryGetValue(stageId, out var progress) ? progress.Stars : 0;
         }
 
+        /// <summary>전 스테이지 누적 별 합. 상점 스킨 해금 게이트(RequiredStars) 판정용.</summary>
+        public int GetTotalStars()
+        {
+            int total = 0;
+            foreach (var progress in StageProgressList)
+                total += progress.Stars;
+            return total;
+        }
+
         // ─── 재화 접근 ─────────────────────────────────────────────────────
 
         public int GetCurrency(string key)
