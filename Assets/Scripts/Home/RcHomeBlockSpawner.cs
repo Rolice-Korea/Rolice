@@ -46,6 +46,12 @@ namespace Rolice.Home
             Vector3 worldPos = RcHomeGrid.GridToWorld(block.Position);
             GameObject view = Instantiate(blockPrefab, worldPos, Quaternion.identity, blocksParent);
             view.name = $"Block_{block.Position.x}_{block.Position.y}_{block.Position.z}";
+
+            // 배치 타겟터가 면 인접 배치를 계산할 수 있도록 그리드 좌표를 마커에 기록
+            var tag = view.GetComponent<RcHomeBlockTag>();
+            if (tag == null) tag = view.AddComponent<RcHomeBlockTag>();
+            tag.Set(block.Position);
+
             views[block.Position] = view;
 
             // TODO: BlockId별 프리팹/사이즈 분기, SkinId 머티리얼 적용
