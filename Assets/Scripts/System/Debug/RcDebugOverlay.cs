@@ -69,7 +69,7 @@ namespace Rolice.DebugTools
             float w       = 260f;
             float lineH   = 22f;
             float padding = 8f;
-            float totalH  = padding * 2 + lineH * lines.Length + 36f;
+            float totalH  = padding * 2 + lineH * lines.Length + 140f;
 
             GUI.Box(new Rect(0, 30, w, totalH), "");
 
@@ -82,6 +82,10 @@ namespace Rolice.DebugTools
                 auth.SignOut();
             if (GUI.Button(new Rect(padding, btnY + 32f, w - padding * 2, 28f), "+1 Heart (Debug)"))
                 AddHeartAsync().Forget();
+            if (GUI.Button(new Rect(padding, btnY + 64f, w - padding * 2, 28f), "Go Home (Debug)"))
+                RcGameFlowManager.Instance.GoToHome();
+            if (GUI.Button(new Rect(padding, btnY + 96f, w - padding * 2, 28f), "Go Lobby (Debug)"))
+                RcGameFlowManager.Instance.GoToLobby();
             GUI.enabled = true;
         }
 

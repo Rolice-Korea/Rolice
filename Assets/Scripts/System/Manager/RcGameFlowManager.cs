@@ -5,6 +5,7 @@ public class RcGameFlowManager : RcSingletonMono<RcGameFlowManager>
 {
     private const string LobbySceneName = "LobbyScene";
     private const string MainSceneName = "MainScene";
+    private const string HomeSceneName = "HomeScene";
 
     private void Awake()
     {
@@ -45,6 +46,14 @@ public class RcGameFlowManager : RcSingletonMono<RcGameFlowManager>
 
         RcUIManager.Instance.CloseAll();
         RcSceneLoader.Instance.LoadScene(LobbySceneName, OnBeforeSceneActivate);
+    }
+
+    public void GoToHome()
+    {
+        if (RcSceneLoader.Instance.IsLoading) return;
+
+        RcUIManager.Instance.CloseAll();
+        RcSceneLoader.Instance.LoadScene(HomeSceneName, OnBeforeSceneActivate);
     }
 
     private void OnBeforeSceneActivate()
