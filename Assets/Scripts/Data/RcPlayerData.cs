@@ -22,6 +22,10 @@ namespace Rolice.Data
         // JsonUtility는 HashSet 직렬화 불가 → List로 저장 후 캐시에서 HashSet 복원
         public List<string> OwnedItemsList = new();
 
+        // --- 홈(마을 꾸미기) 레이아웃 ---
+        // 런타임 그리드 모델은 RcHomeBuildManager가 소유. 여기는 직렬화 DTO만 보관.
+        public RcHomeData Home = new();
+
         [NonSerialized]
         private Dictionary<int, RcStageProgress> progressCache;
 
@@ -151,6 +155,7 @@ namespace Rolice.Data
                 CurrencyKeys      = new List<string>(),
                 CurrencyValues    = new List<int>(),
                 OwnedItemsList    = new List<string>(),
+                Home              = new RcHomeData(),
             };
         }
     }
