@@ -17,7 +17,7 @@ namespace Engine.UI
 
             // 패널 재활성화 시 현재 상태 즉시 적용
             if (!string.IsNullOrEmpty(stateMachine.CurrentState))
-                tweenAnimator?.PlayInstant(stateMachine.CurrentState);
+                tweenAnimator?.PlayInstant(Resolve(stateMachine.CurrentState));
         }
 
         private void OnDisable()
@@ -27,7 +27,11 @@ namespace Engine.UI
 
         private void HandleStateChanged(string from, string to)
         {
-            tweenAnimator?.Play(to);
+            tweenAnimator?.Play(Resolve(to));
         }
+
+        // 정의되지 않은 시퀀스는 "Normal"로 폴백 (Owned·Locked 등 미완성 상태 대응)
+        private string Resolve(string state) =>
+            tweenAnimator != null && tweenAnimator.HasSequence(state) ? state : "Normal";
     }
 }

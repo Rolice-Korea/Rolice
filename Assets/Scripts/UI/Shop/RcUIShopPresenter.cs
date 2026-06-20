@@ -99,9 +99,9 @@ namespace Rolice.UI
 
         private RcShopItemState ResolveState(RcShopRow row, int index, int totalStars)
         {
+            if (index == selectedIndex)        return RcShopItemState.Selected;
             if (IsOwned(row))                  return RcShopItemState.Owned;
             if (totalStars < row.RequiredStars) return RcShopItemState.Locked;
-            if (index == selectedIndex)        return RcShopItemState.Selected;
             return RcShopItemState.Normal;
         }
 

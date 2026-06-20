@@ -8,7 +8,7 @@ namespace Rolice.UI
 {
     /// <summary>
     /// 상점 슬롯의 시각 상태.
-    /// 우선순위(presenter 결정): Owned > Locked > Selected > Normal.
+    /// 우선순위(presenter 결정): Selected > Owned > Locked > Normal.
     /// 문자열 이름이 곧 RcUIStateMachine 상태 키 (애니메이션은 에디터에서 바인딩).
     /// </summary>
     public enum RcShopItemState

@@ -166,6 +166,9 @@ public class RcTweenAnimator : MonoBehaviour
             currentSequence.Restart();
     }
 
+    public bool HasSequence(string sequenceName) =>
+        sequences.Exists(s => s.name == sequenceName);
+
     public bool IsPlaying() =>
         currentSequence != null && currentSequence.IsActive() && currentSequence.IsPlaying();
 
