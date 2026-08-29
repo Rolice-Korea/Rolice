@@ -45,7 +45,9 @@ namespace Rolice.Home
         {
             mainCamera = Camera.main;
 
-            if (GetComponent<Collider>() == null)
+            // 클릭 판정은 자식 콜라이더(섬 메시)로도 성립하므로 자식까지 본다.
+            // 루트에 별도 콜라이더를 두면 그게 배치 레이캐스트를 가로채므로 오히려 두지 않는 게 맞다.
+            if (GetComponentInChildren<Collider>() == null)
                 Debug.LogWarning("[HomeIslandDisplay] Collider가 없어 클릭을 받을 수 없습니다.");
         }
 

@@ -36,6 +36,11 @@ namespace Rolice.Home
         [SerializeField] private float transitionDuration = 0.7f;
         [SerializeField] private Ease  transitionEase     = Ease.InOutCubic;
 
+        [Header("로비 UI")]
+        [Tooltip("편집 중 숨길 씬 내 UI 루트(LobbyCanvas 등). RcUIManager 캔버스 레이어에 없는 " +
+                 "씬 HUD는 SetCanvasVisible로 안 숨겨지므로 여기에 넣어야 한다.")]
+        [SerializeField] private GameObject[] lobbyUiRoots;
+
         [Header("편집 UI")]
         [Tooltip("나가기 버튼 등 편집 전용 UI 루트. 로비 캔버스와 별개여야 한다.")]
         [SerializeField] private GameObject editUiRoot;
@@ -93,7 +98,7 @@ namespace Rolice.Home
             Mode = RcHomeViewMode.Transitioning;
 
             island.SetIdle(false);
-            RcUIManager.Instance.SetCanvasVisible(false);
+            SetLobbyUiVisible(false);
 
             // 섬을 포커스로 잡고, 그 컴포넌트가 도달하려는 자세를 트윈 도착점으로 삼는다.
             buildCamera.SetFocus(island.transform.position);
@@ -135,10 +140,25 @@ namespace Rolice.Home
             PlayTransition(cam, lobbyCameraAnchor.position, lobbyCameraAnchor.rotation, () =>
             {
                 island.SetIdle(true);
-                RcUIManager.Instance.SetCanvasVisible(true);
+                SetLobbyUiVisible(true);
 
                 Mode = RcHomeViewMode.Lobby;
             });
+        }
+
+        /// <summary>
+        /// 로비 UI 전체를 끄고 켠다. 두 경로가 필요하다 —
+        /// RcUIManager가 관리하는 패널(스테이지 선택/재화 HUD)은 캔버스 레이어에 있고,
+        /// 씬에 직접 놓인 HUD(LobbyCanvas 등)는 거기 없어서 따로 꺼야 한다.
+        /// </summary>
+        private void SetLobbyUiVisible(bool visible)
+        {
+            RcUIManager.Instance.SetCanvasVisible(visible);
+
+            if (lobbyUiRoots == null) return;
+
+            foreach (var root in lobbyUiRoots)
+                if (root != null) root.SetActive(visible);
         }
 
         private void PlayTransition(Camera cam, Vector3 position, Quaternion rotation, TweenCallback onComplete)
