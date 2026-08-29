@@ -17,6 +17,13 @@ namespace Rolice.Home
         [Tooltip("재고 무시하고 무제한 배치(개발용). 획득 모델 검증 시에는 반드시 끌 것.")]
         [SerializeField] private bool useUnlimitedInventory;
 
+        [Tooltip("개발용 시작 해금 블록 ID. 무한형도 '해금된 종류'만 놓을 수 있으므로 이게 비면 " +
+                 "아무것도 배치되지 않는다. 클리어 보상/상점이 붙으면 비울 것 — 세이브에 영구 반영된다.")]
+        [SerializeField] private int[] devUnlockBlockIds = { 0 };
+
+        [Tooltip("개수형일 때 위 블록을 몇 개씩 지급할지. 0이면 해금만 하고 개수는 안 준다.")]
+        [SerializeField] private int devGrantCount = 20;
+
         private readonly RcHomeSession session = new();
 
         /// <summary>인벤토리 팔레트 UI(S6)/상점이 참조할 현재 인벤토리.</summary>
@@ -25,6 +32,26 @@ namespace Rolice.Home
         private void Start()
         {
             session.Begin(RcPlayerState.Instance.Data.Home, useUnlimitedInventory);
+            ApplyDevUnlocks();
+        }
+
+        /// <summary>
+        /// 블록을 버는 경로(클리어 보상/상점)가 아직 없어서, 그것 없이 배치를 시험하기 위한 개발용 지급.
+        /// 무한형도 CanPlace가 IsUnlocked를 보므로 해금 없이는 무한형조차 아무것도 못 놓는다.
+        /// </summary>
+        private void ApplyDevUnlocks()
+        {
+            if (devUnlockBlockIds == null || devUnlockBlockIds.Length == 0)
+                return;
+
+            foreach (int blockId in devUnlockBlockIds)
+            {
+                if (devGrantCount > 0) session.Inventory.Grant(blockId, devGrantCount);
+                else                   session.Inventory.Unlock(blockId);
+            }
+
+            Debug.Log($"[HomeIslandBootstrap] 개발용 해금 {devUnlockBlockIds.Length}종 적용 " +
+                      $"(개당 {devGrantCount}개). 세이브에 영구 반영됨.");
         }
 
         private void OnDisable()
