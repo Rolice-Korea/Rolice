@@ -50,6 +50,9 @@ namespace Rolice.Home
         private void Awake()
         {
             // 시작은 항상 로비 뷰. 씬에 켜진 채로 저장돼 있어도 여기서 정리한다.
+            // 섬 상태도 여기서 확정한다 — 컴포넌트 각자의 필드 초기값에 맡기면
+            // 실행 순서에 따라 첫 프레임 상태가 갈린다.
+            if (island != null)      island.SetIdle(true);
             if (buildCamera != null) buildCamera.enabled = false;
             if (placement != null)   placement.enabled   = false;
             if (editUiRoot != null)  editUiRoot.SetActive(false);

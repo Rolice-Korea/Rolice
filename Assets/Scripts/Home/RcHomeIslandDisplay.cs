@@ -49,11 +49,13 @@ namespace Rolice.Home
                 Debug.LogWarning("[HomeIslandDisplay] Collider가 없어 클릭을 받을 수 없습니다.");
         }
 
-        /// <summary>로비 뷰(true) / 편집 뷰(false) 전환. 편집 중에는 완전히 정지한다.</summary>
+        /// <summary>
+        /// 로비 뷰(true) / 편집 뷰(false) 전환. 편집 중에는 완전히 정지한다.
+        /// 같은 값으로 다시 불러도 상태를 그대로 적용한다 — 초기 상태를 모드 컨트롤러가
+        /// 한 곳에서 확정할 수 있어야 하므로(필드 초기값과 어긋난 채 첫 프레임이 도는 것 방지).
+        /// </summary>
         public void SetIdle(bool idle)
         {
-            if (isIdle == idle) return;
-
             isIdle = idle;
 
             if (!idle)
