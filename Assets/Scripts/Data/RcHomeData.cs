@@ -32,5 +32,17 @@ namespace Rolice.Data
     public class RcHomeData
     {
         public List<RcPlacedBlock> Blocks = new();
+
+        /// <summary>섬 등급(1부터). 배치 가능 영역/높이 상한을 결정 — 마스크 해석은 그리드 담당.</summary>
+        public int IslandTier = 1;
+
+        /// <summary>해금한 블록 종류. 팔레트 노출 기준.</summary>
+        public List<int> UnlockedBlockIds = new();
+
+        // --- 미배치 보유 개수 ---
+        // JsonUtility는 Dictionary 직렬화 불가 → RcPlayerData 재화와 동일한 parallel list 패턴.
+        // 조회 캐시는 RcCountedBlockInventory가 소유한다(DTO는 순수 유지).
+        public List<int> OwnedBlockIds    = new();
+        public List<int> OwnedBlockCounts = new();
     }
 }

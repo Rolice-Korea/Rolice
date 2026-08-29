@@ -26,6 +26,7 @@ namespace Rolice.Home
         [Header("팬")]
         [SerializeField] private float   keyPanSpeed  = 8f;     // WASD (유닛/초)
         [SerializeField] private float   dragPanSpeed = 0.02f;  // 중간드래그 1px당 (거리 비례)
+        [Tooltip("포커스 기준 상대 범위(절대 좌표 아님).")]
         [SerializeField] private Vector2 panLimitX    = new(-25f, 25f);
         [SerializeField] private Vector2 panLimitZ    = new(-25f, 25f);
 
@@ -40,11 +41,43 @@ namespace Rolice.Home
         private float   targetYaw;
         private Vector3 lastMousePos;
 
+        // 팬 제한의 기준점. 섬이 월드 원점에 없을 수 있으므로(로비 편입) 인스펙터의
+        // panLimit은 절대 좌표가 아니라 이 중심 기준 상대 범위로 해석한다.
+        private Vector3 panCenter;
+
         private void Awake()
         {
             targetFocus    = focusPoint;
             targetDistance = distance;
             targetYaw      = yaw;
+            panCenter      = focusPoint;
+        }
+
+        /// <summary>
+        /// 편집 대상(섬)을 포커스로 지정한다. 모드 컨트롤러가 편집 진입 시 호출.
+        /// </summary>
+        /// <param name="snap">true면 보간 없이 즉시 그 자세로 맞춘다(전환 트윈 도착점과 이음새 제거).</param>
+        public void SetFocus(Vector3 worldFocus, bool snap = false)
+        {
+            panCenter   = worldFocus;
+            targetFocus = worldFocus;
+
+            if (!snap) return;
+
+            focusPoint = targetFocus;
+            distance   = targetDistance;
+            yaw        = targetYaw;
+            ApplyTransform();
+        }
+
+        /// <summary>
+        /// 보간을 건너뛴 목표 자세. 모드 전환 트윈의 도착점으로 쓴다
+        /// (여기로 도착시킨 뒤 이 컴포넌트를 켜면 이음새 없이 이어진다).
+        /// </summary>
+        public void GetTargetPose(out Vector3 position, out Quaternion rotation)
+        {
+            rotation = Quaternion.Euler(pitch, targetYaw, 0f);
+            position = targetFocus - rotation * Vector3.forward * targetDistance;
         }
 
         private void Update()
@@ -104,8 +137,8 @@ namespace Rolice.Home
             if (move == Vector3.zero) return;
 
             targetFocus += move;
-            targetFocus.x = Mathf.Clamp(targetFocus.x, panLimitX.x, panLimitX.y);
-            targetFocus.z = Mathf.Clamp(targetFocus.z, panLimitZ.x, panLimitZ.y);
+            targetFocus.x = Mathf.Clamp(targetFocus.x, panCenter.x + panLimitX.x, panCenter.x + panLimitX.y);
+            targetFocus.z = Mathf.Clamp(targetFocus.z, panCenter.z + panLimitZ.x, panCenter.z + panLimitZ.y);
         }
 
         // 카메라 yaw 기준 수평 이동 방향 (right, forward → 월드 벡터)

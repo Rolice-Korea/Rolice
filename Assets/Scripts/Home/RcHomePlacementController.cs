@@ -16,13 +16,21 @@ namespace Rolice.Home
         [SerializeField, Tooltip("비우면 Camera.main")] private Camera targetCamera;
         [SerializeField] private RcHomeBlockCursor cursor;
 
+        [Tooltip("그리드 원점이 되는 섬 루트. 비우면 월드 원점 기준.")]
+        [SerializeField] private Transform islandRoot;
+
         [Header("현재 선택 (추후 인벤토리 UI가 주입)")]
         [SerializeField] private int    currentBlockId;
         [SerializeField] private string currentSkinId;
 
-        private readonly RcHomePlacementTargeter targeter = new();
+        private RcHomePlacementTargeter targeter;
 
         private Camera Cam => targetCamera != null ? targetCamera : Camera.main;
+
+        private void Awake()
+        {
+            targeter = new RcHomePlacementTargeter(islandRoot);
+        }
 
         private void Update()
         {
@@ -42,25 +50,35 @@ namespace Rolice.Home
 
             RcPlacementHit hit = targeter.Resolve(cam.ScreenPointToRay(Input.mousePosition));
 
-            UpdateCursor(hit);
-            HandleInput(hit);
+            // 좌표 유효성(타겟터) + 재고 유효성(인벤토리)을 합쳐야 커서 색이 실제 배치 결과와 일치한다.
+            bool canPlace = hit.CanPlace && HasStock();
+
+            UpdateCursor(hit, canPlace);
+            HandleInput(hit, canPlace);
         }
 
-        private void UpdateCursor(RcPlacementHit hit)
+        /// <summary>인벤토리 미배선(개발용 씬)이면 제약 없음으로 본다 — RcHomeBuildManager와 동일 규약.</summary>
+        private bool HasStock()
+        {
+            var inventory = RcHomeBuildManager.Instance.Inventory;
+            return inventory == null || inventory.CanPlace(currentBlockId);
+        }
+
+        private void UpdateCursor(RcPlacementHit hit, bool canPlace)
         {
             if (cursor == null) return;
 
             if (!hit.HasHit)
                 cursor.Hide();
             else
-                cursor.Show(hit.PlaceCell, hit.CanPlace);
+                cursor.Show(hit.PlaceCell, canPlace);
         }
 
-        private void HandleInput(RcPlacementHit hit)
+        private void HandleInput(RcPlacementHit hit, bool canPlace)
         {
             if (!hit.HasHit) return;
 
-            if (Input.GetMouseButtonDown(0) && hit.CanPlace)
+            if (Input.GetMouseButtonDown(0) && canPlace)
                 RcHomeBuildManager.Instance.TryPlace(hit.PlaceCell, currentBlockId, currentSkinId);
             else if (Input.GetMouseButtonDown(1) && hit.IsBlock)
                 RcHomeBuildManager.Instance.Remove(hit.HitCell);

@@ -14,7 +14,9 @@ namespace Rolice.Home
     public class RcHomeBlockSpawner : MonoBehaviour
     {
         [SerializeField] private GameObject blockPrefab;
-        [SerializeField] private Transform  blocksParent;
+
+        [Tooltip("블록이 담길 부모. 섬 루트 하위여야 섬과 함께 움직인다.")]
+        [SerializeField] private Transform blocksParent;
 
         private readonly Dictionary<Vector3Int, GameObject> views = new();
 
@@ -43,8 +45,11 @@ namespace Rolice.Home
             if (views.ContainsKey(block.Position))
                 return;
 
-            Vector3 worldPos = RcHomeGrid.GridToWorld(block.Position);
-            GameObject view = Instantiate(blockPrefab, worldPos, Quaternion.identity, blocksParent);
+            // 섬 로컬 배치: 섬이 로비에서 떠다니고 회전해도 블록이 함께 따라가야 한다.
+            // (월드 좌표로 Instantiate하면 부모의 이동/회전이 반영되지 않아 어긋난다.)
+            GameObject view = Instantiate(blockPrefab, blocksParent);
+            view.transform.localPosition = RcHomeGrid.GridToWorld(block.Position);
+            view.transform.localRotation = Quaternion.identity;
             view.name = $"Block_{block.Position.x}_{block.Position.y}_{block.Position.z}";
 
             // 배치 타겟터가 면 인접 배치를 계산할 수 있도록 그리드 좌표를 마커에 기록
