@@ -80,7 +80,7 @@ namespace Rolice.UI
                 if (skinData != null)
                 {
                     var colorMat = skinData.GetFaceMaterial(RcColorType.White);
-                    if (colorMat != null) previewColor = colorMat.color;
+                    if (colorMat != null) previewColor = GetPreviewColor(colorMat, previewColor);
                 }
 
                 widget.Setup(index, previewColor, iconSprite, HandleItemSelected);
@@ -115,7 +115,7 @@ namespace Rolice.UI
                 Color previewColor = Color.gray;
                 if (row.EdgeMaterial != null)
                 {
-                    previewColor = row.EdgeMaterial.color;
+                    previewColor = GetPreviewColor(row.EdgeMaterial, previewColor);
                 }
 
                 widget.Setup(index, previewColor, iconSprite, HandleItemSelected);
@@ -123,6 +123,20 @@ namespace Rolice.UI
             });
 
             UpdateSelectedNameDisplay();
+        }
+
+        /// <summary>
+        /// 머티리얼에서 프리뷰 스와치용 대표 색을 안전하게 추출.
+        /// NeonDice 셰이더엔 _Color가 없어 .color(=_Color) 직접 접근은 경고를 띄움.
+        /// 주사위 정체색인 _GlowColor를 우선 사용하고, 없으면 _BaseColor, 그것도 없으면 fallback.
+        /// </summary>
+        private static Color GetPreviewColor(Material mat, Color fallback)
+        {
+            if (mat == null) return fallback;
+            if (mat.HasProperty("_GlowColor")) return mat.GetColor("_GlowColor");
+            if (mat.HasProperty("_BaseColor")) return mat.GetColor("_BaseColor");
+            if (mat.HasProperty("_Color")) return mat.color;
+            return fallback;
         }
 
         private void HandleTabChanged(int index)
