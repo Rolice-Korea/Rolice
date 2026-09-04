@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!1 &819770867480300385
 GameObject:
@@ -378,4 +378,3 @@ MonoBehaviour:
   fadeOutDuration: 0.4
   fadeInDuration: 0.4
   minimumLoadTime: 0.8
-
