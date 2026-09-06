@@ -41,6 +41,9 @@ namespace Rolice.UI
 
             // 초기 뷰 설정
             RefreshView();
+
+            // 로비 주사위 프리뷰 위치로 슬라이드
+            RcLobbyCube.Instance?.SlideToPreview();
         }
 
         protected override void OnDispose()
@@ -49,6 +52,9 @@ namespace Rolice.UI
             Panel.OnApplyClicked -= HandleApply;
             Panel.OnResetClicked -= HandleReset;
             Panel.OnTabChanged -= HandleTabChanged;
+
+            // 로비 주사위 원위치 복귀
+            RcLobbyCube.Instance?.SlideToCenter();
         }
 
         private void RefreshView()

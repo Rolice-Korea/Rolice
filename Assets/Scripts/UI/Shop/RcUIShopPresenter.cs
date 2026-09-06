@@ -41,6 +41,9 @@ namespace Rolice.UI
             Panel.OnBuyClicked   += HandleBuy;
             Panel.OnTabChanged   += HandleTabChanged;
             RefreshView();
+
+            // 로비 주사위 프리뷰 위치로 슬라이드
+            RcLobbyCube.Instance?.SlideToPreview();
         }
 
         protected override void OnDispose()
@@ -48,6 +51,9 @@ namespace Rolice.UI
             Panel.OnCloseClicked -= HandleClose;
             Panel.OnBuyClicked   -= HandleBuy;
             Panel.OnTabChanged   -= HandleTabChanged;
+
+            // 로비 주사위 원위치 복귀
+            RcLobbyCube.Instance?.SlideToCenter();
         }
 
         // ─── Refresh ────────────────────────────────────────────────────────
