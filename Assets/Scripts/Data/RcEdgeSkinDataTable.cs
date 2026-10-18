@@ -39,6 +39,13 @@ public class RcEdgeSkinDataTable : RcDataTableSO<RcEdgeSkinRow>
         return new RcEdgeSkinRow();
     }
 
+    /// <summary>경고 없이 스킨 타입으로 조회. 폴백을 직접 처리할 호출부용.</summary>
+    public bool TryGetEdgeData(RcEdgeSkinType skinType, out RcEdgeSkinRow edgeData)
+    {
+        if (edgeDatas == null) OnTableChanged();
+        return edgeDatas.TryGetValue(skinType, out edgeData);
+    }
+
     /// <summary>ItemId(uint)로 조회.</summary>
     public RcEdgeSkinRow? GetByItemId(uint itemId)
     {

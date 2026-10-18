@@ -14,15 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RcFaceSkinDataTable
   rows:
   - ColorType: 1
-    FaceMaterial: {fileID: 2100000, guid: 4dcdd863a801d3d44abe4553b282bbc5, type: 2}
-    TileMaterial: {fileID: 2100000, guid: 39e8550e279185640b098c7090257b44, type: 2}
-    MatchEffect: {fileID: 6946120282878016763, guid: a0c7bd4533a315747b2249443052a876, type: 3}
-  - ColorType: 5
-    FaceMaterial: {fileID: 2100000, guid: ee32cda6f158a7241ada424afcdda4e3, type: 2}
-    TileMaterial: {fileID: 2100000, guid: 6469e6d667efa3f47bab0703f1cc6004, type: 2}
-    MatchEffect: {fileID: 6946120282878016763, guid: 52447422aaa2bdc4680f62534e5d8deb, type: 3}
+    FaceMaterial: {fileID: 2100000, guid: 333ed7eda418458e86e1e7e4cb5df4f2, type: 2}
+    TileMaterial: {fileID: 2100000, guid: cb8132b58c81c4e41b0862a2d3db7316, type: 2}
+    MatchEffect: {fileID: 6946120282878016763, guid: eb882837d6b728646989edec6f51f41a, type: 3}
   - ColorType: 2
-    FaceMaterial: {fileID: 2100000, guid: 7bada31283bc1d64383d0fb0b4e42dc5, type: 2}
+    FaceMaterial: {fileID: 2100000, guid: 55749b97755f462380cbbaa98fc5c2b4, type: 2}
     TileMaterial: {fileID: 2100000, guid: e6ab13c4b97d5e94f9f1c0da87223bda, type: 2}
     MatchEffect: {fileID: 6946120282878016763, guid: cef8ec880b064c84ebc50ecafc46e126, type: 3}
-  skinType: 0
+  - ColorType: 3
+    FaceMaterial: {fileID: 2100000, guid: 8e80079387c3496996fff8eff634e47d, type: 2}
+    TileMaterial: {fileID: 2100000, guid: 39e8550e279185640b098c7090257b44, type: 2}
+    MatchEffect: {fileID: 6946120282878016763, guid: a0c7bd4533a315747b2249443052a876, type: 3}
+  - ColorType: 4
+    FaceMaterial: {fileID: 2100000, guid: d220b5cc2c614b7cbf6c809a707ab925, type: 2}
+    TileMaterial: {fileID: 2100000, guid: 9c9cd06bac017584a8de6844d7e2531b, type: 2}
+    MatchEffect: {fileID: 6946120282878016763, guid: 66ecdc9482e68d14393184f04a93bb8d, type: 3}
+  - ColorType: 5
+    FaceMaterial: {fileID: 2100000, guid: 41fb6355834747bda4b6478452fb4646, type: 2}
+    TileMaterial: {fileID: 2100000, guid: 6469e6d667efa3f47bab0703f1cc6004, type: 2}
+    MatchEffect: {fileID: 6946120282878016763, guid: 52447422aaa2bdc4680f62534e5d8deb, type: 3}
+  - ColorType: 6
+    FaceMaterial: {fileID: 2100000, guid: a5a515bacccc4faa8d4a7f8063e7c2a7, type: 2}
+    TileMaterial: {fileID: 2100000, guid: e74dc88759ff0a2498ddf6aeb8a921e7, type: 2}
+    MatchEffect: {fileID: 6946120282878016763, guid: 45bb622c063981a438a8cb8714938e4d, type: 3}
+  skinType: 1

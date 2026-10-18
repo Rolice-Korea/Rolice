@@ -17,3 +17,15 @@ MonoBehaviour:
     SkinType: 0
     EdgeMaterial: {fileID: 2100000, guid: 67ea0963ad8954c4ca823734c4fe00e9, type: 2}
     IconSprite: {fileID: 21300000, guid: 4932a76549db61649baa22ca884a70c9, type: 3}
+  - Id: 30001
+    SkinType: 1
+    EdgeMaterial: {fileID: 2100000, guid: 48cdd1452bd94d0f89d1270179651359, type: 2}
+    IconSprite: {fileID: 0}
+  - Id: 30002
+    SkinType: 2
+    EdgeMaterial: {fileID: 2100000, guid: ae5f4395bf774c54b6fe686a9e7c3b25, type: 2}
+    IconSprite: {fileID: 0}
+  - Id: 30003
+    SkinType: 3
+    EdgeMaterial: {fileID: 2100000, guid: 6edd68cdd7b748779da70293bd45078b, type: 2}
+    IconSprite: {fileID: 0}

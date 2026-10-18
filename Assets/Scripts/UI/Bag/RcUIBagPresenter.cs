@@ -42,7 +42,8 @@ namespace Rolice.UI
             // 초기 뷰 설정
             RefreshView();
 
-            // 로비 주사위 프리뷰 위치로 슬라이드
+            // 로비 주사위를 장착 스킨으로 맞춘 뒤 프리뷰 위치로 슬라이드
+            RcLobbyCube.Instance?.RestoreActiveSkin();
             RcLobbyCube.Instance?.SlideToPreview();
         }
 
@@ -53,7 +54,8 @@ namespace Rolice.UI
             Panel.OnResetClicked -= HandleReset;
             Panel.OnTabChanged -= HandleTabChanged;
 
-            // 로비 주사위 원위치 복귀
+            // 미적용 프리뷰 원복 후 로비 주사위 원위치 복귀
+            RcLobbyCube.Instance?.RestoreActiveSkin();
             RcLobbyCube.Instance?.SlideToCenter();
         }
 
@@ -80,14 +82,7 @@ namespace Rolice.UI
                 var type = (RcFaceSkinType)index;
                 var skinData = table.GetFaceData(type);
                 Sprite iconSprite = skinData != null ? skinData.IconSprite : null;
-                
-                // 프리뷰 색상 (필요 시 데이터에서 추출)
-                Color previewColor = Color.white;
-                if (skinData != null)
-                {
-                    var colorMat = skinData.GetFaceMaterial(RcColorType.White);
-                    if (colorMat != null) previewColor = colorMat.color;
-                }
+                Color previewColor = RcSkinPreviewColor.FromFaceSkin(skinData, Color.white);
 
                 widget.Setup(index, previewColor, iconSprite, HandleItemSelected);
                 widget.SetState(selectedFaceSkin == type, false);
@@ -117,12 +112,7 @@ namespace Rolice.UI
             {
                 var row = table.Rows[index];
                 Sprite iconSprite = row.IconSprite;
-                
-                Color previewColor = Color.gray;
-                if (row.EdgeMaterial != null)
-                {
-                    previewColor = row.EdgeMaterial.color;
-                }
+                Color previewColor = RcSkinPreviewColor.FromEdgeMaterial(row.EdgeMaterial, Color.gray);
 
                 widget.Setup(index, previewColor, iconSprite, HandleItemSelected);
                 widget.SetState(selectedEdgeSkin == row.SkinType, false);
@@ -143,9 +133,19 @@ namespace Rolice.UI
         private void HandleItemSelected(int index)
         {
             if (currentTab == RcBagTabType.Face)
+            {
                 selectedFaceSkin = (RcFaceSkinType)index;
+                RcLobbyCube.Instance?.PreviewFaceSkin(selectedFaceSkin);
+            }
             else
-                selectedEdgeSkin = (RcEdgeSkinType)index;
+            {
+                // Edge 리스트는 table.Rows 순서로 그려지므로 index ≠ enum 값일 수 있음
+                var rows = RcDataTableManager.EdgeSkinDataTable?.Rows;
+                if (rows == null || index < 0 || index >= rows.Length) return;
+
+                selectedEdgeSkin = rows[index].SkinType;
+                RcLobbyCube.Instance?.PreviewEdgeSkin(selectedEdgeSkin);
+            }
 
             UpdateSelectedNameDisplay();
             RefreshView();
@@ -162,6 +162,9 @@ namespace Rolice.UI
             activeFaceSkin = selectedFaceSkin;
             activeEdgeSkin = selectedEdgeSkin;
 
+            // 저장된 값 기준으로 프리뷰 확정 (선택값과 동일하지만 단일 진실 원천을 따름)
+            RcLobbyCube.Instance?.RestoreActiveSkin();
+
             Debug.Log($"[RcUIBag] Skins Applied: Face={activeFaceSkin}, Edge={activeEdgeSkin}");
             
             // 전역 스킨 갱신 (이미 게임 중에 오픈되었을 경우 현재 객체들에 반영을 위해 주사위 비주얼 갱신 등을 호출할 수 있음)
@@ -173,6 +176,7 @@ namespace Rolice.UI
             // 현재 저장된 상태로 되돌림
             selectedFaceSkin = activeFaceSkin;
             selectedEdgeSkin = activeEdgeSkin;
+            RcLobbyCube.Instance?.RestoreActiveSkin();
             RefreshView();
         }
 

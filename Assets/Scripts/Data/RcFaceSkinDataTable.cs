@@ -38,6 +38,22 @@ public class RcFaceSkinDataTable : RcDataTableSO<RcFaceSkinRow>
         return null;
     }
 
+    /// <summary>
+    /// 경고 없이 FaceMaterial 조회. 누락을 정상 케이스로 보고 폴백할 호출부(로비 프리뷰 등)용.
+    /// </summary>
+    public bool TryGetFaceMaterial(RcColorType colorType, out Material material)
+    {
+        material = null;
+        if (Rows == null) return false;
+        foreach (var row in Rows)
+        {
+            if (row.ColorType != colorType) continue;
+            material = row.FaceMaterial;
+            return material != null;
+        }
+        return false;
+    }
+
     public Material GetTileMaterial(RcColorType colorType)
     {
         if (Rows == null) return null;

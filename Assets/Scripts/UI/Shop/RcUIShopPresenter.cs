@@ -42,7 +42,8 @@ namespace Rolice.UI
             Panel.OnTabChanged   += HandleTabChanged;
             RefreshView();
 
-            // 로비 주사위 프리뷰 위치로 슬라이드
+            // 로비 주사위를 장착 스킨으로 맞춘 뒤 프리뷰 위치로 슬라이드
+            RcLobbyCube.Instance?.RestoreActiveSkin();
             RcLobbyCube.Instance?.SlideToPreview();
         }
 
@@ -52,7 +53,8 @@ namespace Rolice.UI
             Panel.OnBuyClicked   -= HandleBuy;
             Panel.OnTabChanged   -= HandleTabChanged;
 
-            // 로비 주사위 원위치 복귀
+            // 입어보기 원복 후 로비 주사위 원위치 복귀 (장착은 가방에서만)
+            RcLobbyCube.Instance?.RestoreActiveSkin();
             RcLobbyCube.Instance?.SlideToCenter();
         }
 
@@ -119,10 +121,7 @@ namespace Rolice.UI
                 {
                     var table = RcDataTableManager.FaceSkinRegistry?.GetByItemId(row.ItemId);
                     var icon  = table != null ? table.IconSprite : null;
-                    var mat   = table?.GetFaceMaterial(RcColorType.White);
-                    var color = mat != null && mat.HasColor("_BaseColor")
-                        ? mat.GetColor("_BaseColor")
-                        : Color.white;
+                    var color = RcSkinPreviewColor.FromFaceSkin(table, Color.white);
                     var name  = table != null ? table.SkinType.ToString() : row.ItemId.ToString();
                     return new ItemVisual { Color = color, Icon = icon, Name = name };
                 }
@@ -131,9 +130,7 @@ namespace Rolice.UI
                     var rowData = RcDataTableManager.EdgeSkinDataTable?.GetByItemId(row.ItemId);
                     var icon    = rowData.HasValue ? rowData.Value.IconSprite : null;
                     var edgeMat = rowData.HasValue ? rowData.Value.EdgeMaterial : null;
-                    var color   = edgeMat != null && edgeMat.HasColor("_BaseColor")
-                        ? edgeMat.GetColor("_BaseColor")
-                        : Color.gray;
+                    var color   = RcSkinPreviewColor.FromEdgeMaterial(edgeMat, Color.gray);
                     var name    = rowData.HasValue ? rowData.Value.SkinType.ToString() : row.ItemId.ToString();
                     return new ItemVisual { Color = color, Icon = icon, Name = name };
                 }
@@ -186,6 +183,9 @@ namespace Rolice.UI
             currentTab    = next;
             selectedIndex = -1;
             selectedRow   = null;
+
+            // 선택이 해제되므로 입어보기도 원복
+            RcLobbyCube.Instance?.RestoreActiveSkin();
             RefreshView();
         }
 
@@ -195,7 +195,34 @@ namespace Rolice.UI
             selectedRow   = (index >= 0 && index < currentRows.Count)
                 ? currentRows[index]
                 : (RcShopRow?)null;
+
+            if (selectedRow.HasValue)
+                PreviewItem(selectedRow.Value);
+
             RefreshSelectionStates();
+        }
+
+        /// <summary>미보유/잠금 여부와 무관하게 입어보기 프리뷰.</summary>
+        private static void PreviewItem(RcShopRow row)
+        {
+            var cube = RcLobbyCube.Instance;
+            if (cube == null) return;
+
+            switch (row.ItemType)
+            {
+                case RcItemType.FaceSkin:
+                {
+                    var table = RcDataTableManager.FaceSkinRegistry?.GetByItemId(row.ItemId);
+                    if (table != null) cube.PreviewFaceSkin(table);
+                    break;
+                }
+                case RcItemType.EdgeSkin:
+                {
+                    var rowData = RcDataTableManager.EdgeSkinDataTable?.GetByItemId(row.ItemId);
+                    if (rowData.HasValue) cube.PreviewEdgeSkin(rowData.Value.SkinType);
+                    break;
+                }
+            }
         }
 
         private void HandleBuy()  => HandleBuyAsync().Forget();
