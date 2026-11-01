@@ -214,7 +214,8 @@ public class RcLevelEditorProxyEditor : Editor
             EditorUtility.SetDirty(proxy.LevelData);
     }
 
-    static readonly string[] FaceNames = { "TOP", "BOTTOM", "FRONT", "BACK", "LEFT", "RIGHT" };
+    // RcDiceDirectionType 순서 (+X, -X, +Y, -Y, +Z, -Z)
+    static readonly string[] FaceNames = { "+X RIGHT", "-X LEFT", "+Y TOP", "-Y BOTTOM", "+Z FRONT", "-Z BACK" };
 
     void DrawDiceSetupSection()
     {
@@ -230,7 +231,7 @@ public class RcLevelEditorProxyEditor : Editor
         for (int i = 0; i < 6; i++)
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(FaceNames[i], GUILayout.Width(58));
+            EditorGUILayout.LabelField(FaceNames[i], GUILayout.Width(74));
 
             GUI.backgroundColor = ld.InitialDiceFaces[i] == RcColorType.None ? Color.yellow : new Color(0.6f, 0.6f, 0.6f);
             if (GUILayout.Button("None", GUILayout.Height(22), GUILayout.Width(46)))

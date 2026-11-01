@@ -71,16 +71,16 @@ namespace Rolice.UI
 
         private void RefreshFaceList()
         {
-            var table = RcDataTableManager.FaceSkinRegistry;
-            if (table == null) return;
+            var registry = RcDataTableManager.FaceSkinRegistry;
+            if (registry == null || registry.Rows == null) return;
 
-            // TODO: 실제 데이터 테이블에서 리스트를 가져오는 기능을 보강해야 할 수도 있음
-            // 현재는 Enum을 기반으로 루프 (데이터 테이블 확장에 따라 변경 가능)
-            int count = (int)RcFaceSkinType.Max;
+            var rows = registry.Rows;
+            int count = rows.Length;
             Panel.RefreshItemList((int)currentTab, count, (index, widget) =>
             {
-                var type = (RcFaceSkinType)index;
-                var skinData = table.GetFaceData(type);
+                var entry = rows[index];
+                var type = entry.SkinType;
+                var skinData = entry.Table;
                 Sprite iconSprite = skinData != null ? skinData.IconSprite : null;
                 Color previewColor = RcSkinPreviewColor.FromFaceSkin(skinData, Color.white);
 
@@ -134,7 +134,10 @@ namespace Rolice.UI
         {
             if (currentTab == RcBagTabType.Face)
             {
-                selectedFaceSkin = (RcFaceSkinType)index;
+                var rows = RcDataTableManager.FaceSkinRegistry?.Rows;
+                if (rows == null || index < 0 || index >= rows.Length) return;
+
+                selectedFaceSkin = rows[index].SkinType;
                 RcLobbyCube.Instance?.PreviewFaceSkin(selectedFaceSkin);
             }
             else
@@ -166,9 +169,6 @@ namespace Rolice.UI
             RcLobbyCube.Instance?.RestoreActiveSkin();
 
             Debug.Log($"[RcUIBag] Skins Applied: Face={activeFaceSkin}, Edge={activeEdgeSkin}");
-            
-            // 전역 스킨 갱신 (이미 게임 중에 오픈되었을 경우 현재 객체들에 반영을 위해 주사위 비주얼 갱신 등을 호출할 수 있음)
-            // 여기서는 단순히 패널 닫기 처리를 할 수도 있고, 메시지를 띄울 수도 있음
         }
 
         private void HandleReset()

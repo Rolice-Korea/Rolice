@@ -38,12 +38,15 @@ public class RcLobbyCube : MonoBehaviour
     [SerializeField] private MeshRenderer faceRenderer;
     [Tooltip("테두리 렌더러(1슬롯). 비어 있으면 자식에서 자동 탐색")]
     [SerializeField] private MeshRenderer edgeRenderer;
-    [Tooltip("면 렌더러의 머티리얼 슬롯 인덱스별 색상. 로비 큐브는 구르지 않으므로 슬롯-색 고정 매핑으로 충분")]
-    [SerializeField] private RcColorType[] slotColors =
+    [Tooltip("방향별 면 색상. RcDiceDirectionType 순서(+X, -X, +Y, -Y, +Z, -Z). 마주보는 면끼리 같은 색")]
+    [SerializeField] private RcColorType[] faceColors =
     {
-        RcColorType.Cyan, RcColorType.Green, RcColorType.Grey,
-        RcColorType.Magenta, RcColorType.Yellow, RcColorType.White
+        RcColorType.Magenta, RcColorType.Magenta, // X : 좌우
+        RcColorType.Yellow,  RcColorType.Yellow,  // Y : 위아래
+        RcColorType.Cyan,    RcColorType.Cyan,    // Z : 앞뒤
     };
+    [Tooltip("방향(RcDiceDirectionType 순서)별 면 렌더러 머티리얼 슬롯 인덱스. 컨텍스트 메뉴 Bake로 갱신")]
+    [SerializeField] private int[] faceToSlot = { 0, 2, 1, 3, 5, 4 };
 
     private Camera mainCamera;
     private Vector2 lastPointerPos;
@@ -83,17 +86,17 @@ public class RcLobbyCube : MonoBehaviour
     }
 
     /// <summary>
-    /// 인스펙터 미할당 대비 폴백. 슬롯 수로 구분한다(면 = slotColors 이상, 테두리 = 1).
+    /// 인스펙터 미할당 대비 폴백. 슬롯 수로 구분한다(면 = 6 이상, 테두리 = 1).
     /// </summary>
     private void ResolveRenderers()
     {
         if (faceRenderer != null && edgeRenderer != null) return;
 
-        int faceSlotCount = slotColors != null ? slotColors.Length : 0;
+        const int faceSlotCount = RcDiceDirectionTypeExt.Count;
         foreach (var r in GetComponentsInChildren<MeshRenderer>(true))
         {
             int count = r.sharedMaterials.Length;
-            if (faceRenderer == null && faceSlotCount > 0 && count >= faceSlotCount) faceRenderer = r;
+            if (faceRenderer == null && count >= faceSlotCount) faceRenderer = r;
             else if (edgeRenderer == null && count == 1) edgeRenderer = r;
         }
 
@@ -243,24 +246,11 @@ public class RcLobbyCube : MonoBehaviour
     /// </summary>
     public void PreviewFaceSkin(RcFaceSkinDataTable skin)
     {
-        if (faceRenderer == null || slotColors == null) return;
-
-        var registry = RcDataTableManager.FaceSkinRegistry;
-        if (registry == null) return;
-
-        var fallback = registry.GetFaceData(RcFaceSkinType.Default);
+        if (faceRenderer == null) return;
 
         // sharedMaterials: 에셋 머티리얼을 교체만 하므로 인스턴스 생성(materials) 불필요
         var mats = faceRenderer.sharedMaterials;
-        int count = Mathf.Min(mats.Length, slotColors.Length);
-        for (int slot = 0; slot < count; slot++)
-        {
-            var color = slotColors[slot];
-            if (color == RcColorType.None) continue;
-
-            if (TryGetFaceMaterial(skin, color, out var mat) || TryGetFaceMaterial(fallback, color, out mat))
-                mats[slot] = mat;
-        }
+        RcDiceSkinApplier.Apply(mats, faceToSlot, faceColors, skin);
         faceRenderer.sharedMaterials = mats;
     }
 
@@ -283,12 +273,6 @@ public class RcLobbyCube : MonoBehaviour
             edgeRenderer.sharedMaterial = mat;
     }
 
-    private static bool TryGetFaceMaterial(RcFaceSkinDataTable skin, RcColorType color, out Material mat)
-    {
-        mat = null;
-        return skin != null && skin.TryGetFaceMaterial(color, out mat);
-    }
-
     private static Material GetEdgeMaterial(RcEdgeSkinDataTable table, RcEdgeSkinType skinType)
         => table.TryGetEdgeData(skinType, out var row) ? row.EdgeMaterial : null;
 
@@ -296,5 +280,30 @@ public class RcLobbyCube : MonoBehaviour
     {
         slideTween?.Kill();
     }
-}
 
+    private void OnValidate()
+    {
+        const int count = RcDiceDirectionTypeExt.Count;
+        if (faceColors == null || faceColors.Length != count) System.Array.Resize(ref faceColors, count);
+        if (faceToSlot == null || faceToSlot.Length != count) faceToSlot = new[] { 0, 2, 1, 3, 5, 4 };
+    }
+
+#if UNITY_EDITOR
+    [ContextMenu("Bake FaceToSlot From Mesh")]
+    private void BakeFaceToSlot()
+    {
+        var mf = faceRenderer != null
+            ? faceRenderer.GetComponent<MeshFilter>()
+            : RcDiceSkinApplier.FindFaceMeshFilter(transform, RcDiceDirectionTypeExt.Count);
+        if (mf == null || mf.sharedMesh == null)
+        {
+            Debug.LogError("[RcLobbyCube] 면 MeshFilter 없음");
+            return;
+        }
+
+        UnityEditor.Undo.RecordObject(this, "Bake FaceToSlot");
+        faceToSlot = RcDiceSkinApplier.BakeFaceToSlot(transform, mf);
+        UnityEditor.EditorUtility.SetDirty(this);
+    }
+#endif
+}

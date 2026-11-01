@@ -13,6 +13,11 @@ Shader "Rolice/NeonDice"
         _GlowSoftness ("Glow Softness", Range(0.01, 0.5)) = 0.2
         _FaceHalfSize ("Face Half Size", Range(0.01, 2)) = 0.5
 
+        [Header(Face Pattern)]
+        _FillPattern ("Fill Pattern (0:Edge, 1:Solid, 2:Circle, 3:Square)", Float) = 0
+        _HoleSize ("Hole Size", Range(0.05, 0.48)) = 0.25
+        _HoleSoftness ("Hole Softness", Range(0.005, 0.2)) = 0.02
+
         [Header(Light Bleed)]
         _LightBleedStrength ("Light Bleed Strength", Range(0, 3)) = 1.5
 
@@ -79,6 +84,9 @@ Shader "Rolice/NeonDice"
                 half _GlowWidth;
                 half _GlowSoftness;
                 half _FaceHalfSize;
+                half _FillPattern;
+                half _HoleSize;
+                half _HoleSoftness;
                 half _LightBleedStrength;
                 float _ReflectionFadeFloorY;
                 float _ReflectionFadeDist;
@@ -142,7 +150,7 @@ Shader "Rolice/NeonDice"
                     additionalSpecular += light.color * pow(NdotH_add, specPower * 0.5) * _Smoothness * atten;
                 LIGHT_LOOP_END
 
-                // === 면 글로우 ===
+                // === 면 글로우 / 패턴 ===
                 // 오브젝트 스페이스 좌표 + 노멀 방향으로 면 UV 결정
                 // 큐브: -0.5~0.5 범위, 노멀 방향에 수직인 두 축을 사용
                 float3 absNorm = abs(input.normalOS);
@@ -155,9 +163,34 @@ Shader "Rolice/NeonDice"
                     rawCoords = input.positionOS.xy;
 
                 float2 faceUV = saturate(rawCoords / (_FaceHalfSize * 2.0) + 0.5);
-                float2 edgeDist = min(faceUV, 1.0 - faceUV);
-                float minEdgeDist = min(edgeDist.x, edgeDist.y);
-                half glowMask = 1.0 - smoothstep(_GlowWidth, _GlowWidth + _GlowSoftness, minEdgeDist);
+                float2 centeredUV = faceUV - 0.5;
+
+                half glowMask = 0.0;
+                if (_FillPattern < 0.5)
+                {
+                    // 0: 기존 테두리 글로우
+                    float2 edgeDist = min(faceUV, 1.0 - faceUV);
+                    float minEdgeDist = min(edgeDist.x, edgeDist.y);
+                    glowMask = 1.0 - smoothstep(_GlowWidth, _GlowWidth + _GlowSoftness, minEdgeDist);
+                }
+                else if (_FillPattern < 1.5)
+                {
+                    // 1: Skin_1 (모든 면 전체 색상 채움)
+                    glowMask = 1.0;
+                }
+                else if (_FillPattern < 2.5)
+                {
+                    // 2: Skin_2 (가운데 원형으로 비움 -> 어두운 바탕색 노출)
+                    float dist = length(centeredUV);
+                    glowMask = smoothstep(_HoleSize, _HoleSize + _HoleSoftness, dist);
+                }
+                else
+                {
+                    // 3: Skin_3 (가운데 사각형으로 비움 -> 어두운 바탕색 노출)
+                    float dist = max(abs(centeredUV.x), abs(centeredUV.y));
+                    glowMask = smoothstep(_HoleSize, _HoleSize + _HoleSoftness, dist);
+                }
+
                 half3 faceGlow = _GlowColor.rgb * glowMask * _GlowIntensity;
 
                 // === 앰비언트 ===

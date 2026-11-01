@@ -57,7 +57,7 @@ MonoBehaviour:
     StoneMaxHits: 1
     TeleportTargetGrid: {x: 0, y: 0}
   SpawnGridPosition: {x: 1, y: 2}
-  InitialDiceFaces: 020000000500000002000000050000000200000005000000
+  InitialDiceFaces: 050000000200000002000000050000000200000005000000
   Rules:
     HasTurnLimit: 1
     MaxTurns: 18

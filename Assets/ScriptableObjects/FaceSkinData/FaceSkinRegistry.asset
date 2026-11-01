@@ -16,15 +16,12 @@ MonoBehaviour:
   - Id: 20000
     SkinType: 0
     Table: {fileID: 11400000, guid: 27c9bab86e3675f49a9c509be78e9d30, type: 2}
-  - Id: 20001
-    SkinType: 1
-    Table: {fileID: 11400000, guid: 922e398f8994bf64dbf4efd1f5d6b3fb, type: 2}
-  - Id: 20002
-    SkinType: 2
-    Table: {fileID: 11400000, guid: 0a42f66d9b2544f4fa1d4dfe90be8f42, type: 2}
-  - Id: 20003
-    SkinType: 3
-    Table: {fileID: 11400000, guid: 3b3279f4c6f44f449aca68adf21caa92, type: 2}
-  - Id: 20004
-    SkinType: 4
-    Table: {fileID: 11400000, guid: c535c858bcfdd8e4eafb5b057945957e, type: 2}
+  - Id: 20005
+    SkinType: 5
+    Table: {fileID: 11400000, guid: a1b2c3d4e5f647189201a1b2c3d4e501, type: 2}
+  - Id: 20006
+    SkinType: 6
+    Table: {fileID: 11400000, guid: a1b2c3d4e5f647189201a1b2c3d4e502, type: 2}
+  - Id: 20007
+    SkinType: 7
+    Table: {fileID: 11400000, guid: a1b2c3d4e5f647189201a1b2c3d4e503, type: 2}

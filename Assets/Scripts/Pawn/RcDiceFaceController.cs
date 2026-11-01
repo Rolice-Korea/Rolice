@@ -9,11 +9,12 @@ public class RcDiceFaceController : MonoBehaviour
     [SerializeField] private MeshRenderer diceRenderer;
 
     [Header("Material Slot Mapping")]
-    [Tooltip("각 면(TOP, BOTTOM, FRONT, BACK, LEFT, RIGHT)에 대응하는 Material 슬롯 인덱스")]
+    [Tooltip("각 면(RcDiceDirectionType: +X, -X, +Y, -Y, +Z, -Z)에 대응하는 Material 슬롯 인덱스")]
     [SerializeField] private int[] faceToSlot = { 0, 1, 2, 3, 4, 5 };
 
     [Header("Initial Face Colors")]
-    [SerializeField] private RcColorType[] initialFaces = new RcColorType[6];
+    [Tooltip("RcDiceDirectionType 순서(+X, -X, +Y, -Y, +Z, -Z)")]
+    [SerializeField] private RcColorType[] initialFaces = new RcColorType[RcDiceDirectionTypeExt.Count];
 
     [Header("Defeat Effect")]
     [SerializeField] private float grayFadeDuration = 0.6f;
@@ -60,32 +61,23 @@ public class RcDiceFaceController : MonoBehaviour
         return faceData.GetFaceColor(faceIndex);
     }
 
+    public RcColorType GetFaceColor(RcDiceDirectionType direction)
+    {
+        return faceData.GetFaceColor(direction);
+    }
+
     public void UpdateVisuals()
     {
-        if (diceRenderer == null) return;
+        if (diceRenderer == null || faceData.faces == null) return;
 
-        var mats = diceRenderer.materials;
         var registry = RcDataTableManager.FaceSkinRegistry;
         if (registry == null) return;
 
         var skinData = registry.GetFaceData(RcSkinSystem.ActiveFaceSkinType);
 
-        for (int i = 0; i < 6; i++)
-        {
-            int slot = faceToSlot[i];
-            if (slot < 0 || slot >= mats.Length) continue;
-
-            // 현재 주사위 면의 색상 정보를 가져옴 (this.faceData 사용)
-            RcColorType faceColor = faceData.GetFaceColor(i);
-            if (faceColor == RcColorType.None) continue;
-
-            Material skinMat = skinData?.GetFaceMaterial(faceColor);
-            if (skinMat != null)
-            {
-                mats[slot] = skinMat;
-            }
-        }
-
+        // materials: FadeToGray / FlashEmission 이 색을 조작하므로 인스턴스 머티리얼 사용
+        var mats = diceRenderer.materials;
+        RcDiceSkinApplier.Apply(mats, faceToSlot, faceData.faces, skinData);
         diceRenderer.materials = mats;
     }
 
@@ -159,70 +151,34 @@ public class RcDiceFaceController : MonoBehaviour
 
     private void OnValidate()
     {
-        if (initialFaces == null || initialFaces.Length != 6)
+        const int count = RcDiceDirectionTypeExt.Count;
+
+        if (initialFaces == null || initialFaces.Length != count)
         {
-            initialFaces = new RcColorType[6];
+            initialFaces = new RcColorType[count];
         }
 
-        if (faceToSlot == null || faceToSlot.Length != 6)
+        if (faceToSlot == null || faceToSlot.Length != count)
         {
             faceToSlot = new int[] { 0, 1, 2, 3, 4, 5 };
         }
     }
-    
-#if UNITY_EDITOR
-    private int[] BuildFaceToSlotByNormal(MeshFilter mf)
-    {
-        Mesh mesh = mf.sharedMesh;
-        Vector3[] normals = mesh.normals;
 
-        int[] result = new int[6];
-
-        for (int sub = 0; sub < mesh.subMeshCount; sub++)
-        {
-            int[] tris = mesh.GetTriangles(sub);
-            Vector3 avg = Vector3.zero;
-
-            foreach (int t in tris)
-                avg += normals[t];
-
-            avg.Normalize();
-            Vector3 world = mf.transform.TransformDirection(avg);
-
-            int face = GetFaceIndex(world);
-            result[face] = sub;
-        }
-
-        return result;
-    }
-
-    private int GetFaceIndex(Vector3 n)
-    {
-        n.Normalize();
-
-        if (Vector3.Dot(n, Vector3.up) > 0.9f) return RcDiceFaceData.TOP;
-        if (Vector3.Dot(n, Vector3.down) > 0.9f) return RcDiceFaceData.BOTTOM;
-        if (Vector3.Dot(n, Vector3.forward) > 0.9f) return RcDiceFaceData.FRONT;
-        if (Vector3.Dot(n, Vector3.back) > 0.9f) return RcDiceFaceData.BACK;
-        if (Vector3.Dot(n, Vector3.left) > 0.9f) return RcDiceFaceData.LEFT;
-        if (Vector3.Dot(n, Vector3.right) > 0.9f) return RcDiceFaceData.RIGHT;
-        
-        return RcDiceFaceData.TOP;
-    }
-#endif
-    
 #if UNITY_EDITOR
     [ContextMenu("Bake FaceToSlot From Mesh")]
     private void BakeFaceToSlot()
     {
-        var mf = GetComponentInChildren<MeshFilter>();
+        var mf = diceRenderer != null
+            ? diceRenderer.GetComponent<MeshFilter>()
+            : RcDiceSkinApplier.FindFaceMeshFilter(transform, RcDiceDirectionTypeExt.Count);
         if (mf == null || mf.sharedMesh == null)
         {
             Debug.LogError("MeshFilter 없음");
             return;
         }
 
-        faceToSlot = BuildFaceToSlotByNormal(mf);
+        UnityEditor.Undo.RecordObject(this, "Bake FaceToSlot");
+        faceToSlot = RcDiceSkinApplier.BakeFaceToSlot(transform, mf);
         UnityEditor.EditorUtility.SetDirty(this);
     }
 #endif

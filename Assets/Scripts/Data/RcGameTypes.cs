@@ -14,6 +14,22 @@ namespace Rolice
         Max
     }
 
+    /// <summary>
+    /// 주사위 면 방향. X → Y → Z 축 순서, 각 축은 + → - 순서.
+    /// 값이 InitialDiceFaces / faceToSlot 등 6칸 배열의 인덱스로 직렬화되므로 순서 변경 금지.
+    /// 반대면 = (int)dir ^ 1, 축 = (int)dir >> 1 (0=X, 1=Y, 2=Z).
+    /// </summary>
+    public enum RcDiceDirectionType
+    {
+        PlusX  = 0, // Right  (Vector3.right)
+        MinusX = 1, // Left   (Vector3.left)
+        PlusY  = 2, // Top    (Vector3.up)
+        MinusY = 3, // Bottom (Vector3.down)
+        PlusZ  = 4, // Front  (Vector3.forward)
+        MinusZ = 5, // Back   (Vector3.back)
+        Max
+    }
+
     public enum RcFaceSkinType
     {
         Default,
@@ -21,6 +37,9 @@ namespace Rolice
         Stone,
         Metal,
         Water,
+        Skin_1, // 면 전체 색상
+        Skin_2, // 가운데 원형 비움
+        Skin_3, // 가운데 사각 비움
         Max
     }
 

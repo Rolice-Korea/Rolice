@@ -389,8 +389,7 @@ public static class RcLevelAutoGenerator
 
     private static readonly RcColorType[] AllColors =
     {
-        RcColorType.White, RcColorType.Magenta, RcColorType.Yellow,
-        RcColorType.Green, RcColorType.Cyan,    RcColorType.Grey
+        RcColorType.Yellow, RcColorType.Cyan, RcColorType.Magenta
     };
 
     private static void AssignColors(

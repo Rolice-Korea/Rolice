@@ -50,17 +50,13 @@ namespace Rolice.UI
             if (_isSyncing) return;
             _isSyncing = true;
 
-            // 클라우드 동기화 실패 시 재시도 UI 표시 (차단)
-            await RcSystemDialogManager.Instance.ShowUntilSuccessAsync(
-                () => RcPlayerState.Instance.SyncFromCloudAsync(),
-                "Connection failed.\nPlease retry."
-            );
-
+            // 최초 접속 이후에는 RcPlayerState가 기준 데이터.
+            // 여기서 클라우드를 다시 받으면 로컬 변경(가방 스킨 등)이 서버 값으로 덮어써지므로 재동기화하지 않는다.
             int stageNumber = Panel.Data.StageNumber;
 
             if (!RcProgressManager.Instance.IsStageUnlocked(stageNumber))
             {
-                Debug.LogWarning($"[StageStartDialog] 스테이지 {stageNumber} 잠금 상태 (클라우드 재검증)");
+                Debug.LogWarning($"[StageStartDialog] 스테이지 {stageNumber} 잠금 상태");
                 Panel.Close();
                 _isSyncing = false;
                 return;
