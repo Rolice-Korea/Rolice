@@ -14,7 +14,12 @@ public class RcDiceFaceController : MonoBehaviour
 
     [Header("Initial Face Colors")]
     [Tooltip("RcDiceDirectionType 순서(+X, -X, +Y, -Y, +Z, -Z)")]
-    [SerializeField] private RcColorType[] initialFaces = new RcColorType[RcDiceDirectionTypeExt.Count];
+    [SerializeField] private RcColorType[] initialFaces =
+    {
+        RcColorType.Magenta, RcColorType.Magenta, // X : 좌우
+        RcColorType.Yellow,  RcColorType.Yellow,  // Y : 위아래
+        RcColorType.Cyan,    RcColorType.Cyan,    // Z : 앞뒤
+    };
 
     [Header("Defeat Effect")]
     [SerializeField] private float grayFadeDuration = 0.6f;

@@ -69,16 +69,8 @@ public static class RcLevelAutoGenerator
             levelData.SpawnGridPosition = new Vector2Int(spawnIdx % levelData.Width, spawnIdx / levelData.Width);
         }
 
-        // ② Hybrid 역산 전에 다이스 초기 면을 먼저 임시 설정 (랜덤 색풀 기반)
-        if (levelData.InitialDiceFaces == null || levelData.InitialDiceFaces.Length != 6)
-            levelData.InitialDiceFaces = new RcColorType[6];
-        {
-            int clampedColorCount = Mathf.Clamp(p.ColorCount, 1, AllColors.Length);
-            var tempPool = AllColors.ToList();
-            Shuffle(tempPool, rng);
-            for (int i = 0; i < 6; i++)
-                levelData.InitialDiceFaces[i] = tempPool[i % clampedColorCount];
-        }
+        // 다이스 초기 면: 마주보는 면끼리 같은 색 (좌우=Magenta, 위아래=Yellow, 앞뒤=Cyan)
+        levelData.InitialDiceFaces = (RcColorType[])RcLevelDataSO.DefaultDiceFaces.Clone();
 
         // Hybrid: 핵심 구간 먼저 역방향 설계
         var criticalSet = new HashSet<int>();
@@ -97,21 +89,6 @@ public static class RcLevelAutoGenerator
         levelData.StageInfo ??= new Rolice.Data.RcStageInfo();
         levelData.StageInfo.MoveCountThreshold = tileCount * 4;          // ★2: 타일수 × 4회 이하
         levelData.StageInfo.TimeThreshold      = tileCount * 6f;         // ★3: 타일수 × 6초 이하
-
-        // ① 실제 타일에 사용된 색 기반으로 다이스 면 최종 확정
-        var tileColors = levelData.Tiles
-            .Where(t => t != null && t.colorType != RcColorType.None)
-            .Select(t => t.colorType)
-            .Distinct()
-            .ToList();
-
-        if (tileColors.Count > 0)
-        {
-            // 6면에 tileColors를 순환 배치 — 모든 타일 색이 최소 1면에 존재
-            for (int i = 0; i < 6; i++)
-                levelData.InitialDiceFaces[i] = tileColors[i % tileColors.Count];
-        }
-        // tileColors가 비어있으면 임시 설정값 유지
 
         return seed;
     }

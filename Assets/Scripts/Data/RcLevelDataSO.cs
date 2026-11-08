@@ -5,6 +5,13 @@ using Rolice;
 [CreateAssetMenu(fileName = "NewLevel", menuName = "Rolice/Level")]
 public class RcLevelDataSO : ScriptableObject
 {
+    public static readonly RcColorType[] DefaultDiceFaces =
+    {
+        RcColorType.Magenta, RcColorType.Magenta, // X : 좌우
+        RcColorType.Yellow,  RcColorType.Yellow,  // Y : 위아래
+        RcColorType.Cyan,    RcColorType.Cyan,    // Z : 앞뒤
+    };
+
     [Header("Stage Info")]
     public RcStageInfo StageInfo = new();
 
@@ -19,7 +26,7 @@ public class RcLevelDataSO : ScriptableObject
 
     [Header("Dice Setup")]
     [Tooltip("RcDiceDirectionType 순서 (+X, -X, +Y, -Y, +Z, -Z)")]
-    public RcColorType[] InitialDiceFaces = new RcColorType[6];
+    public RcColorType[] InitialDiceFaces = (RcColorType[])DefaultDiceFaces.Clone();
 
     [Header("Game Rules")]
     public RcLevelRules Rules = new RcLevelRules();
@@ -43,7 +50,7 @@ public class RcLevelDataSO : ScriptableObject
         if (InitialDiceFaces == null || InitialDiceFaces.Length != 6)
         {
             var prev = InitialDiceFaces;
-            InitialDiceFaces = new RcColorType[6];
+            InitialDiceFaces = (RcColorType[])DefaultDiceFaces.Clone();
             if (prev != null)
                 for (int i = 0; i < Mathf.Min(prev.Length, 6); i++)
                     InitialDiceFaces[i] = prev[i];
