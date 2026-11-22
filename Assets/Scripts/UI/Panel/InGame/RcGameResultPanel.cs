@@ -1,7 +1,6 @@
 using Engine.UI;
 using TMPro;
 using UnityEngine;
-using Cysharp.Threading.Tasks;
 using Rolice.Particle;
 
 namespace Rolice.UI
@@ -52,34 +51,17 @@ namespace Rolice.UI
             moveText.text = $"Move : {turnUsed}";
         }
 
-        public async void SetStars(int count)
+        public void HideStars()
         {
+            if (starGlows == null) return;
+
             for (int i = 0; i < starGlows.Length; i++)
             {
-                starGlows[i].SetActive(i < count);
+                if (starGlows[i] == null) continue;
+                starGlows[i].SetActive(false);
+                if (starGlows[i].transform.parent != null)
+                    starGlows[i].transform.parent.gameObject.SetActive(false);
             }
-
-            if (starGlowParticlePrefab != null && particleFactory != null)
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    await UniTask.Delay((int)(starPopDelay * 1000f));
-                    PlayStarParticle(i);
-                }
-            }
-        }
-
-        private void PlayStarParticle(int starIndex)
-        {
-            if (starIndex >= starGlows.Length) return;
-
-            var starTransform = starGlows[starIndex].transform;
-            var effect = particleFactory.Get($"star_{starIndex}", starGlowParticlePrefab);
-
-            effect.transform.SetParent(starTransform);
-            effect.transform.localPosition = Vector3.zero;
-
-            effect.PlayAsync().Forget();
         }
 
         public void SetRetryButtonVisible(bool visible)

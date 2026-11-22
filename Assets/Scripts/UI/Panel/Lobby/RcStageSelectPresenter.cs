@@ -1,101 +1,86 @@
+using Cysharp.Threading.Tasks;
 using Engine.UI;
 using Rolice.System;
-using UnityEngine;
 
 namespace Rolice.UI
 {
     public class RcStageSelectPresenter : RcUIPresenter<RcStageSelectPanel>
     {
+        private static readonly int[] GridSizes = { 4, 5, 6 };
+
+        private bool isStarting;
+
         protected override void OnInitialize()
         {
-            Panel.OnStageSelected += HandleStageSelected;
-            RcPlayerState.Instance.OnProgressChanged += RefreshStageList;
-            RefreshStageList();
+            Panel.OnGridSizeSelected += HandleGridSizeSelected;
+            RefreshGridSizeList();
         }
 
         protected override void OnDispose()
         {
-            Panel.OnStageSelected -= HandleStageSelected;
-            RcPlayerState.Instance.OnProgressChanged -= RefreshStageList;
+            Panel.OnGridSizeSelected -= HandleGridSizeSelected;
         }
 
-        public void RefreshStageList()
+        public void RefreshGridSizeList()
         {
-            if (!RcPlayerState.Instance.IsSynced) return;
-
-            if (!RcProgressManager.Instance.IsInitialized)
-            {
-                Debug.LogWarning("[StageSelectPresenter] ProgressManager 미초기화");
-                return;
-            }
-
-            int totalStages = RcProgressManager.Instance.TotalStageCount;
-
-            // 스테이지 수가 같으면 pool 재생성 없이 visible 위젯 데이터만 갱신
-            if (totalStages == Panel.ItemCount)
+            if (GridSizes.Length == Panel.ItemCount)
             {
                 Panel.RefreshVisibleData();
                 return;
             }
 
-            Panel.SetupVirtualCarousel(totalStages, GetStageItemData);
+            Panel.SetupVirtualCarousel(GridSizes.Length, GetGridSizeItemData);
             Panel.FocusIndex(GetInitialFocusIndex());
             Panel.PlayEntryAnimation();
         }
 
-        private RcStageSelectPanel.StageItemData GetStageItemData(int index)
+        private RcStageSelectPanel.StageItemData GetGridSizeItemData(int index)
         {
-            int stageNumber = index + 1;
+            int size = GridSizes[index];
             return new RcStageSelectPanel.StageItemData
             {
-                StageNumber = stageNumber,
-                State       = GetStageState(stageNumber),
-                Stars       = RcProgressManager.Instance.GetStageStars(stageNumber),
+                GridSize = size,
+                Label    = $"{size}x{size}",
+                State    = RcStageState.Unlocked,
             };
         }
 
         private int GetInitialFocusIndex()
         {
-            int total = RcProgressManager.Instance.TotalStageCount;
-            for (int i = 0; i < total; i++)
+            int currentSize = RcGameContext.SelectedGridSize;
+            for (int i = 0; i < GridSizes.Length; i++)
             {
-                if (GetStageState(i + 1) != RcStageState.Cleared)
+                if (GridSizes[i] == currentSize)
                     return i;
             }
-            return total - 1;
+            return 0;
         }
 
-        private RcStageState GetStageState(int stageNumber)
+        private void HandleGridSizeSelected(int gridSize)
         {
-            if (!RcProgressManager.Instance.IsStageUnlocked(stageNumber))
-                return RcStageState.Locked;
-
-            if (RcProgressManager.Instance.IsStageCleared(stageNumber))
-                return RcStageState.Cleared;
-
-            return RcStageState.Unlocked;
+            StartGameAsync(gridSize).Forget();
         }
 
-        private void HandleStageSelected(int stageNumber)
+        private async UniTaskVoid StartGameAsync(int gridSize)
         {
-            var levelData = RcProgressManager.Instance.StageDatabase.GetStage(stageNumber);
-            if (levelData == null)
+            if (isStarting) return;
+            isStarting = true;
+
+            bool heartSpent = false;
+            await RcSystemDialogManager.Instance.ShowUntilSuccessAsync(async () =>
             {
-                Debug.LogError($"[StageSelectPresenter] 스테이지 {stageNumber} 데이터 없음");
+                heartSpent = await RcHeartManager.Instance.TrySpendAsync();
+            }, "Connection failed.\nPlease retry.");
+
+            if (!heartSpent)
+            {
+                RcUIManager.Instance.Open<RcHeartShopPanel>();
+                isStarting = false;
                 return;
             }
 
-            var stageInfo    = levelData.StageInfo;
-            int currentStars = RcProgressManager.Instance.GetStageStars(stageNumber);
-
-            RcUIManager.Instance.Open<RcStageStartDialog, RcStageStartDialogData>(new RcStageStartDialogData
-            {
-                StageNumber        = stageNumber,
-                StageName          = stageInfo.GetDisplayName(),
-                MoveCountThreshold = stageInfo.MoveCountThreshold,
-                TimeThreshold      = stageInfo.TimeThreshold,
-                CurrentStars       = currentStars,
-            });
+            isStarting = false;
+            RcGameFlowManager.Instance.StartRandomGame(gridSize);
         }
     }
 }

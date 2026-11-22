@@ -11,12 +11,12 @@ public class RcGameFlowManager : RcSingletonMono<RcGameFlowManager>
         InitializeSingleton();
     }
 
-    public void GoToStage(int stageNumber)
+    public void StartRandomGame(int gridSize)
     {
         if (RcSceneLoader.Instance.IsLoading) return;
 
         RcUIManager.Instance.CloseAll();
-        RcGameContext.SetStage(stageNumber);
+        RcGameContext.SetGridSize(gridSize);
         RcSceneLoader.Instance.LoadScene(MainSceneName, OnBeforeSceneActivate);
     }
 
@@ -25,17 +25,6 @@ public class RcGameFlowManager : RcSingletonMono<RcGameFlowManager>
         if (RcSceneLoader.Instance.IsLoading) return;
 
         RcUIManager.Instance.CloseAll();
-        RcSceneLoader.Instance.LoadScene(MainSceneName, OnBeforeSceneActivate);
-    }
-
-    public void GoToNextStage()
-    {
-        if (RcSceneLoader.Instance.IsLoading) return;
-
-        int next = RcGameContext.SelectedStageNumber + 1;
-
-        RcUIManager.Instance.CloseAll();
-        RcGameContext.SetStage(next);
         RcSceneLoader.Instance.LoadScene(MainSceneName, OnBeforeSceneActivate);
     }
 

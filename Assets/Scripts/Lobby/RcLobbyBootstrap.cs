@@ -1,13 +1,10 @@
-using Engine.UI;
-using Rolice.UI;
 using UnityEngine;
 
 public class RcLobbyBootstrap : MonoBehaviour
 {
     private void Start()
     {
-        RcGameContext.Clear();
-        RcUIManager.Instance.Open<RcCurrencyHudPanel>();
-        RcUIManager.Instance.Open<RcStageSelectPanel>();
+        Engine.UI.RcUIManager.Instance.Open<Rolice.UI.RcCurrencyHudPanel>();
+        Engine.UI.RcUIManager.Instance.Open<Rolice.UI.RcStageSelectPanel>();
     }
 }

@@ -9,14 +9,12 @@ namespace Rolice.UI
             InitializeDisplay(Panel.Data);
 
             Panel.RetryButton.OnClick += OnRetryClicked;
-            Panel.NextLevelButton.OnClick += OnNextLevelClicked;
             Panel.LobbyButton.OnClick += OnLobbyClicked;
         }
 
         protected override void OnDispose()
         {
             Panel.RetryButton.OnClick -= OnRetryClicked;
-            Panel.NextLevelButton.OnClick -= OnNextLevelClicked;
             Panel.LobbyButton.OnClick -= OnLobbyClicked;
         }
 
@@ -24,19 +22,14 @@ namespace Rolice.UI
         {
             Panel.SetResultTitle(data.IsVictory);
             Panel.SetMoveCount(data.MoveCount);
-            Panel.SetStars(data.StarCount);
-            Panel.SetRetryButtonVisible(false);
-            Panel.SetNextButtonVisible(data.HasNextStage);
+            Panel.HideStars();
+            Panel.SetRetryButtonVisible(true);
+            Panel.SetNextButtonVisible(false);
         }
 
         private void OnRetryClicked()
         {
             RcGameFlowManager.Instance.RetryStage();
-        }
-
-        private void OnNextLevelClicked()
-        {
-            RcGameFlowManager.Instance.GoToNextStage();
         }
 
         private void OnLobbyClicked()

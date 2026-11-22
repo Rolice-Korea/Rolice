@@ -36,19 +36,19 @@ namespace Rolice.UI
         private static readonly Color GlowColorSelected = new Color(0.1f, 0.9f, 1f, 1f);
         private static readonly Color GlowColorIdle = Color.white;
 
-        private int stageNumber;
+        private int itemIndex;
+        private string displayLabel;
         private RcStageState state;
-        private int stars;
         private bool isSelected;
         private CanvasGroup canvasGroup;
         private RcUIHDRImage glowHDRImage;
         private Tweener pulseTween;
         private RcTweenAnimator tweenAnimator;
 
-        public int StageNumber => stageNumber;
+        public int ItemIndex => itemIndex;
         public RcStageState State => state;
         public float CarouselAlpha => canvasGroup != null ? canvasGroup.alpha : 1f;
-        public event Action<int> OnStageSelected;
+        public event Action<int> OnItemSelected;
 
         public override void Initialize()
         {
@@ -58,7 +58,13 @@ namespace Rolice.UI
                 glowFrame.raycastTarget = false;
                 glowHDRImage = glowFrame.GetComponent<RcUIHDRImage>();
             }
-            if (stageNumberText != null) stageNumberText.raycastTarget = false;
+            if (stageNumberText != null)
+            {
+                stageNumberText.raycastTarget = false;
+                stageNumberText.rectTransform.anchoredPosition = Vector2.zero;
+            }
+
+            HideStarIcons();
 
             canvasGroup = GetComponent<CanvasGroup>();
             if (canvasGroup == null)
@@ -81,14 +87,14 @@ namespace Rolice.UI
         {
             pulseTween?.Kill();
             button.OnClick -= HandleClick;
-            OnStageSelected = null;
+            OnItemSelected = null;
         }
 
-        public void SetData(int stageNumber, RcStageState state, int stars = 0)
+        public void SetData(int index, string label, RcStageState state = RcStageState.Unlocked)
         {
-            this.stageNumber = stageNumber;
+            this.itemIndex = index;
+            this.displayLabel = label;
             this.state = state;
-            this.stars = Mathf.Clamp(stars, 0, 3);
             stateMachine?.SetState(state.ToString());
             UpdateVisual();
         }
@@ -114,30 +120,30 @@ namespace Rolice.UI
 
         private void UpdateVisual()
         {
-            UpdateStageNumber();
-            UpdateStars();
+            UpdateLabel();
+            HideStarIcons();
             UpdateGlow();
             button.Interactable = state != RcStageState.Locked;
         }
 
-        private void UpdateStageNumber()
+        private void UpdateLabel()
         {
             if (stageNumberText == null) return;
 
-            stageNumberText.text = stageNumber.ToString();
+            stageNumberText.text = displayLabel;
             SetAlpha(stageNumberText, GetTextAlpha());
         }
 
-        private void UpdateStars()
+        private void HideStarIcons()
         {
             if (starImages == null) return;
 
             for (int i = 0; i < starImages.Length; i++)
             {
                 if (starImages[i] == null) continue;
-
-                bool isEarned = state == RcStageState.Cleared && i < stars;
-                SetAlpha(starImages[i], isEarned ? 1f : starDimmedAlpha);
+                starImages[i].gameObject.SetActive(false);
+                if (starImages[i].transform.parent != null)
+                    starImages[i].transform.parent.gameObject.SetActive(false);
             }
         }
 
@@ -185,7 +191,7 @@ namespace Rolice.UI
         private void HandleClick()
         {
             if (state == RcStageState.Locked) return;
-            OnStageSelected?.Invoke(stageNumber);
+            OnItemSelected?.Invoke(itemIndex);
         }
 
         private static void SetAlpha(Image image, float alpha)

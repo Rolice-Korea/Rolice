@@ -9,15 +9,13 @@ using UnityEngine;
 /// </summary>
 public static class RcAppBootstrap
 {
-    private const string CorePrefabPath    = "Core";
-    private const string StageDatabasePath = "StageDatabase";
+    private const string CorePrefabPath = "Core";
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Initialize()
     {
         LoadCorePrefab();
         RegisterBackend();
-        InitializeProgressManager();
         RcScreenOrientationApplier.Apply(RcGameSettingsData.Current.GetScreenMode());
     }
 
@@ -46,17 +44,5 @@ public static class RcAppBootstrap
         var instance = Object.Instantiate(prefab);
         instance.name = "Core";
         Object.DontDestroyOnLoad(instance);
-    }
-
-    private static void InitializeProgressManager()
-    {
-        var stageDatabase = Resources.Load<RcStageDatabaseSO>(StageDatabasePath);
-        if (stageDatabase == null)
-        {
-            Debug.LogWarning($"[AppBootstrap] StageDatabase를 찾을 수 없습니다: Resources/{StageDatabasePath}");
-            return;
-        }
-
-        RcProgressManager.Instance.Initialize(stageDatabase);
     }
 }

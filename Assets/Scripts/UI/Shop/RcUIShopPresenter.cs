@@ -12,20 +12,14 @@ namespace Rolice.UI
 {
     /// <summary>
     /// 메인 상점 UI 프레젠터 (Face/Edge 코스메틱 전용).
-    ///
-    /// 구매 판정은 두 축으로 분리된다:
-    ///   - 해금 게이트  : 누적 별 합(RcProgressManager.GetTotalStars) ≥ row.RequiredStars. 별은 소모되지 않음.
-    ///   - 결제 비용    : 해금된 뒤 Free(무상) 또는 Gem 소모.
-    ///
-    /// 잼 획득(광고/IAP)과 하트 충전은 별도 팝업(RcGemShopPanel / RcHeartShopPanel)이 담당한다.
+    /// 별(Star) 시스템 제거에 따라 모든 아이템은 해금 게이트 없이 결제 비용(Free 또는 Gem)만으로 구매한다.
     /// </summary>
     public class RcUIShopPresenter : RcUIPresenter<RcUIShopPanel>
     {
-        private RcShopTabType    currentTab    = RcShopTabType.Face;
-        private int              selectedIndex = -1;
-        private RcShopRow?       selectedRow;
+        private RcShopTabType currentTab    = RcShopTabType.Face;
+        private int           selectedIndex = -1;
+        private RcShopRow?    selectedRow;
 
-        // 현재 탭 index → ShopRow 매핑 (Refresh 시 재구성)
         private readonly List<RcShopRow> currentRows = new();
 
         private struct ItemVisual
@@ -42,7 +36,6 @@ namespace Rolice.UI
             Panel.OnTabChanged   += HandleTabChanged;
             RefreshView();
 
-            // 로비 주사위를 장착 스킨으로 맞춘 뒤 프리뷰 위치로 슬라이드
             RcLobbyCube.Instance?.RestoreActiveSkin();
             RcLobbyCube.Instance?.SlideToPreview();
         }
@@ -53,7 +46,6 @@ namespace Rolice.UI
             Panel.OnBuyClicked   -= HandleBuy;
             Panel.OnTabChanged   -= HandleTabChanged;
 
-            // 입어보기 원복 후 로비 주사위 원위치 복귀 (장착은 가방에서만)
             RcLobbyCube.Instance?.RestoreActiveSkin();
             RcLobbyCube.Instance?.SlideToCenter();
         }
@@ -77,15 +69,13 @@ namespace Rolice.UI
 
             foreach (var r in rows) currentRows.Add(r);
 
-            int totalStars = TotalStars;
-
             Panel.RefreshItemList((int)currentTab, currentRows.Count, (index, widget) =>
             {
                 var row    = currentRows[index];
                 var visual = GetVisual(row);
 
-                widget.Setup(index, visual.Color, visual.Icon, FormatSlotLabel(row, totalStars), HandleItemSelected);
-                widget.SetState(ResolveState(row, index, totalStars));
+                widget.Setup(index, visual.Color, visual.Icon, FormatCost(row), HandleItemSelected);
+                widget.SetState(ResolveState(row, index));
             });
 
             UpdateSelectedDisplay();
@@ -94,22 +84,20 @@ namespace Rolice.UI
         /// <summary>선택만 바뀐 경우 — Setup 재호출 없이 슬롯 상태만 경량 갱신.</summary>
         private void RefreshSelectionStates()
         {
-            int totalStars = TotalStars;
             Panel.RefreshItemStates((int)currentTab, (index, widget) =>
             {
                 if (index < 0 || index >= currentRows.Count) return;
-                widget.SetState(ResolveState(currentRows[index], index, totalStars));
+                widget.SetState(ResolveState(currentRows[index], index));
             });
             UpdateSelectedDisplay();
         }
 
         // ─── State / Visual ─────────────────────────────────────────────────
 
-        private RcShopItemState ResolveState(RcShopRow row, int index, int totalStars)
+        private RcShopItemState ResolveState(RcShopRow row, int index)
         {
-            if (index == selectedIndex)        return RcShopItemState.Selected;
-            if (IsOwned(row))                  return RcShopItemState.Owned;
-            if (totalStars < row.RequiredStars) return RcShopItemState.Locked;
+            if (index == selectedIndex) return RcShopItemState.Selected;
+            if (IsOwned(row))           return RcShopItemState.Owned;
             return RcShopItemState.Normal;
         }
 
@@ -163,13 +151,6 @@ namespace Rolice.UI
                 return;
             }
 
-            if (TotalStars < row.RequiredStars)
-            {
-                Panel.SetSelectedItemPrice($"★{row.RequiredStars} 필요");
-                Panel.SetBuyButtonInteractable(false);
-                return;
-            }
-
             Panel.SetSelectedItemPrice(FormatCost(row));
             Panel.SetBuyButtonInteractable(row.Effect != null);
         }
@@ -184,7 +165,6 @@ namespace Rolice.UI
             selectedIndex = -1;
             selectedRow   = null;
 
-            // 선택이 해제되므로 입어보기도 원복
             RcLobbyCube.Instance?.RestoreActiveSkin();
             RefreshView();
         }
@@ -202,7 +182,6 @@ namespace Rolice.UI
             RefreshSelectionStates();
         }
 
-        /// <summary>미보유/잠금 여부와 무관하게 입어보기 프리뷰.</summary>
         private static void PreviewItem(RcShopRow row)
         {
             var cube = RcLobbyCube.Instance;
@@ -225,7 +204,7 @@ namespace Rolice.UI
             }
         }
 
-        private void HandleBuy()  => HandleBuyAsync().Forget();
+        private void HandleBuy() => HandleBuyAsync().Forget();
 
         private async UniTaskVoid HandleBuyAsync()
         {
@@ -237,8 +216,7 @@ namespace Rolice.UI
 
             var row = selectedRow.Value;
 
-            if (IsOwned(row))                  return;
-            if (TotalStars < row.RequiredStars) return;
+            if (IsOwned(row)) return;
 
             Panel.SetBuyButtonInteractable(false);
             try
@@ -272,8 +250,6 @@ namespace Rolice.UI
 
         // ─── Helpers ────────────────────────────────────────────────────────
 
-        private static int TotalStars => RcProgressManager.Instance.GetTotalStars();
-
         private static RcItemType TabToItemType(RcShopTabType tab) => tab switch
         {
             RcShopTabType.Face => RcItemType.FaceSkin,
@@ -285,12 +261,6 @@ namespace Rolice.UI
             => row.Effect != null
             && !row.Effect.IsRepurchasable
             && RcBackendServices.Economy.HasItem(row.ItemId.ToString());
-
-        /// <summary>슬롯 라벨: 잠금이면 해금 조건, 아니면 결제 비용.</summary>
-        private static string FormatSlotLabel(RcShopRow row, int totalStars)
-            => totalStars < row.RequiredStars
-                ? $"★{row.RequiredStars}"
-                : FormatCost(row);
 
         private static string FormatCost(RcShopRow row)
             => row.CostType == RcShopCostType.Free

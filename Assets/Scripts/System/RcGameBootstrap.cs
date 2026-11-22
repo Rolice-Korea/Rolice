@@ -1,51 +1,119 @@
 using Engine.UI;
+using Rolice;
 using Rolice.UI;
 using UnityEngine;
 
 public class RcGameBootstrap : MonoBehaviour
 {
+    private const string NormalTilePrefabResourcePath = "Tiles/color";
+
+    private static readonly RcColorType[] RandomPoolColors =
+    {
+        RcColorType.Magenta,
+        RcColorType.Yellow,
+        RcColorType.Cyan,
+    };
+
     [Header("Level Settings")]
     [SerializeField] private Transform tilesParent;
     [SerializeField] private RcDicePawn dicePawn;
+    [SerializeField] private RcTileTypeSO normalTileType;
 
     [Header("Fallback (에디터 직접 실행용)")]
     [SerializeField] private RcLevelDataSO fallbackLevel;
 
-    private int currentStageNumber;
+    private RcLevelDataSO runtimeLevelData;
+    private RcTileTypeSO runtimeTileType;
 
     private void Awake()
     {
-        RcLevelDataSO levelData = ResolveLevel();
+        RcLevelDataSO levelData = GenerateRandomLevel();
         if (levelData != null)
         {
             GameLoad(levelData);
         }
         else
         {
-            Debug.LogError("[Bootstrap] 로드할 레벨을 찾을 수 없습니다!");
+            Debug.LogError("[Bootstrap] 랜덤 레벨 생성에 실패했습니다!");
         }
     }
 
-    private RcLevelDataSO ResolveLevel()
+    private void OnDestroy()
     {
-        int stageNumber = RcGameContext.SelectedStageNumber;
+        if (runtimeLevelData != null)
+            Destroy(runtimeLevelData);
 
-        if (stageNumber > 0)
+        if (runtimeTileType != null)
+            Destroy(runtimeTileType);
+    }
+
+    private RcLevelDataSO GenerateRandomLevel()
+    {
+        int gridSize = RcGameContext.SelectedGridSize > 0
+            ? RcGameContext.SelectedGridSize
+            : RcGameContext.DefaultGridSize;
+
+        RcTileTypeSO tileType = ResolveNormalTileType();
+        if (tileType == null)
         {
-            var levelData = RcProgressManager.Instance.StageDatabase.GetStage(stageNumber);
-            if (levelData != null)
-            {
-                currentStageNumber = stageNumber;
-                return levelData;
-            }
-
-            Debug.LogWarning($"[Bootstrap] 스테이지 {stageNumber} 데이터를 찾을 수 없습니다. fallback 사용");
+            Debug.LogError("[Bootstrap] 기본 타일(NormalTileType)을 찾을 수 없습니다!");
+            return null;
         }
 
-        if (fallbackLevel == null) return null;
+        runtimeLevelData = ScriptableObject.CreateInstance<RcLevelDataSO>();
+        runtimeLevelData.Width = gridSize;
+        runtimeLevelData.Height = gridSize;
 
-        currentStageNumber = fallbackLevel.StageInfo.StageNumber;
-        return fallbackLevel;
+        int totalTiles = gridSize * gridSize;
+        runtimeLevelData.Tiles = new RcTileData[totalTiles];
+
+        for (int i = 0; i < totalTiles; i++)
+        {
+            RcColorType randomColor = RandomPoolColors[Random.Range(0, RandomPoolColors.Length)];
+            runtimeLevelData.Tiles[i] = new RcTileData
+            {
+                TileType = tileType,
+                colorType = randomColor
+            };
+        }
+
+        runtimeLevelData.SpawnGridPosition = new Vector2Int(
+            Random.Range(0, gridSize),
+            Random.Range(0, gridSize)
+        );
+
+        runtimeLevelData.InitialDiceFaces = (RcColorType[])RcLevelDataSO.DefaultDiceFaces.Clone();
+        runtimeLevelData.Rules = new RcLevelRules
+        {
+            HasTurnLimit = false
+        };
+
+        return runtimeLevelData;
+    }
+
+    private RcTileTypeSO ResolveNormalTileType()
+    {
+        if (normalTileType != null && normalTileType.Prefab != null)
+            return normalTileType;
+
+        if (fallbackLevel != null && fallbackLevel.Tiles != null)
+        {
+            foreach (var tile in fallbackLevel.Tiles)
+            {
+                if (tile != null && tile.TileType != null && tile.TileType.Prefab != null)
+                    return tile.TileType;
+            }
+        }
+
+        GameObject prefab = Resources.Load<GameObject>(NormalTilePrefabResourcePath);
+        if (prefab == null)
+            return null;
+
+        runtimeTileType = ScriptableObject.CreateInstance<RcTileTypeSO>();
+        runtimeTileType.name = "RuntimeNormalTileType";
+        runtimeTileType.Prefab = prefab;
+        runtimeTileType.bHasColor = true;
+        return runtimeTileType;
     }
 
     private void GameLoad(RcLevelDataSO levelData)
@@ -68,7 +136,7 @@ public class RcGameBootstrap : MonoBehaviour
     private void Start()
     {
         RcUIManager.Instance.Open<RcGameHudPanel>();
-        RcGameResultManager.Instance.Initialize(currentStageNumber);
+        RcGameResultManager.Instance.Initialize();
     }
 
     private void LoadLevel(RcLevelDataSO levelData)
@@ -91,17 +159,15 @@ public class RcGameBootstrap : MonoBehaviour
         var faces = levelData.InitialDiceFaces;
         if (faces == null || faces.Length != 6) return;
 
-        // 전부 None이면 레벨에서 다이스 면을 지정하지 않은 것 → 프리팹 기본값 유지
         foreach (var face in faces)
         {
-            if (face != Rolice.RcColorType.None)
+            if (face != RcColorType.None)
             {
                 dicePawn.InitializeFaces(faces);
                 return;
             }
         }
 
-        // 프리팹 기본값 사용 시에도 비주얼은 갱신
         dicePawn.RefreshVisuals();
     }
 

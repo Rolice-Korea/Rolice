@@ -1,6 +1,5 @@
 using System.Collections;
 using Cysharp.Threading.Tasks;
-using Rolice.System;
 using DG.Tweening;
 using Engine;
 using Engine.UI;
@@ -18,7 +17,6 @@ public class RcGameResultManager : RcSingletonMono<RcGameResultManager>
     [SerializeField] private float zoomOutAmount = 0.5f;
     [SerializeField] private float zoomDuration  = 0.8f;
 
-    private int   currentStageNumber;
     private float originalCameraSize;
     private Tween cameraZoomTween;
 
@@ -27,10 +25,8 @@ public class RcGameResultManager : RcSingletonMono<RcGameResultManager>
         InitializeSingleton();
     }
 
-    public void Initialize(int stageNumber)
+    public void Initialize()
     {
-        currentStageNumber = stageNumber;
-
         var cam = Camera.main;
         if (cam != null)
             originalCameraSize = cam.orthographicSize;
@@ -88,34 +84,15 @@ public class RcGameResultManager : RcSingletonMono<RcGameResultManager>
 
         yield return new WaitUntil(() => flashDone && effectDone);
 
-        ShowVictoryResultAsync().Forget();
+        ShowVictoryResult();
     }
 
-    private async UniTaskVoid ShowVictoryResultAsync()
+    private void ShowVictoryResult()
     {
         int   moveCount   = RcGameRuleManager.Instance.CurrentTurn;
         float elapsedTime = RcGameRuleManager.Instance.ElapsedTime;
 
-        if (currentStageNumber > 0)
-            RcProgressManager.Instance.RecordStageClear(currentStageNumber, moveCount, elapsedTime);
-
-        // 클라우드 저장 완료 후 결과 화면 표시 (실패 시 재시도 UI)
-        await RcSystemDialogManager.Instance.ShowUntilSuccessAsync(
-            () => RcPlayerState.Instance.SaveToCloudAsync(),
-            "Failed to save.\nPlease retry."
-        );
-
-        int stars = 0;
-        if (currentStageNumber > 0)
-        {
-            var levelData = RcProgressManager.Instance.StageDatabase.GetStage(currentStageNumber);
-            stars = levelData.StageInfo.CalculateStars(moveCount, elapsedTime);
-        }
-
-        bool hasNext = currentStageNumber > 0
-            && currentStageNumber < RcProgressManager.Instance.TotalStageCount;
-
-        ShowResultPanel(moveCount, elapsedTime, stars, hasNext);
+        ShowResultPanel(moveCount, elapsedTime);
     }
 
     private void PlayCameraZoomOut(System.Action onComplete = null)
@@ -145,15 +122,15 @@ public class RcGameResultManager : RcSingletonMono<RcGameResultManager>
             cam.orthographicSize = originalCameraSize;
     }
 
-    private void ShowResultPanel(int moveCount, float elapsedTime, int starCount, bool hasNextStage)
+    private void ShowResultPanel(int moveCount, float elapsedTime)
     {
         var data = new RcGameResultData
         {
             IsVictory    = true,
             MoveCount    = moveCount,
             ElapsedTime  = elapsedTime,
-            StarCount    = starCount,
-            HasNextStage = hasNextStage
+            StarCount    = 0,
+            HasNextStage = false
         };
 
         RcUIManager.Instance.Open<RcGameResultPanel, RcGameResultData>(data);

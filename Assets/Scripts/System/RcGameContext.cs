@@ -1,15 +1,16 @@
-
 public static class RcGameContext
 {
-    public static int SelectedStageNumber { get; private set; }
+    public const int DefaultGridSize = 4;
 
-    public static void SetStage(int stageNumber)
+    public static int SelectedGridSize { get; private set; } = DefaultGridSize;
+
+    public static void SetGridSize(int gridSize)
     {
-        SelectedStageNumber = stageNumber;
+        SelectedGridSize = gridSize;
     }
 
     public static void Clear()
     {
-        SelectedStageNumber = 0;
+        SelectedGridSize = DefaultGridSize;
     }
 }
